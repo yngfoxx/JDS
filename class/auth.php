@@ -61,7 +61,7 @@ class auth extends stdlib
     # Add new device key for automatic login
     $sql = "INSERT INTO authLogin(user_id, deviceKey) VALUES('".$arr['uid']."', '".$arr['dk']."')";
     $qry = mysqli_query($this->db, $sql);
-    
+
     return $qry;
   }
   // -------------------------------------------------------------------------->
@@ -77,5 +77,20 @@ class auth extends stdlib
     return false;
   }
   // -------------------------------------------------------------------------->
+
+
+  function verfUser($devID)
+  {
+    $dID = base64_decode($this->db->escape_string($devID));
+    $sql = "
+      SELECT user.user_id AS 'id', authLogin.deviceKey AS 'key' FROM authlogin
+	     INNER JOIN user ON user.user_id = authlogin.user_id
+      WHERE authLogin.deviceKey = '$devID';
+    ";
+    $qry = (mysqli_query($this->db, $sql)) ? mysqli_query($this->db, $sql) : false;
+    if (!$qry) return false;
+    if (mysqli_num_rows($qry) == 1) return true;
+    return false;
+  }
 }
  ?>

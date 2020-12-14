@@ -28,7 +28,6 @@ $DOMAIN = "http://localhost/JDS/";
 
 <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 <link rel="stylesheet" href="//unpkg.com/swiper/swiper-bundle.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.2.0/dist/sweetalert2.min.css">
 <link rel="stylesheet/less" type="text/css" href="<?php echo "$DOMAIN"; ?>/lib/less/style.less" />
 <link rel="stylesheet" href="<?php echo "$DOMAIN"; ?>/lib/css/fontello/animation.css">
 <link rel="stylesheet" href="<?php echo "$DOMAIN"; ?>/lib/css/fontello/fontello.css">
@@ -37,7 +36,7 @@ $DOMAIN = "http://localhost/JDS/";
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
 <script type="text/javascript" src="https://unpkg.com/vue-router"></script>
 <script src="//unpkg.com/swiper/swiper-bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.2.0/dist/sweetalert2.all.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="//js.pusher.com/5.1/pusher.min.js"></script>
 <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/script.js"></script>
 <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/ajx.js"></script>

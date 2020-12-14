@@ -13,20 +13,43 @@
         if (isJson(res)) {
           let jRes = JSON.parse(res);
           if (jRes.hasOwnProperty('server_error')) {
-            Swal.fire({icon: "error", title: "Oh no!", text: jRes.server_error});
+            swal({icon: "error", title: "Oh no!", text: jRes.server_error});
             return;
           } else {
             // SUCCESS
             console.log(jRes);
             if (jRes.hasOwnProperty('type')) {
               if (jRes.type == 'URL') {
-                Swal.fire({icon: "success", title: "File found!", text: jRes.filename+"."+jRes.extension+" is a downloadable file."});
+                swal({
+                  icon: "success",
+                  text: jRes.filename+"."+jRes.extension+" is a downloadable file, do you wish to create a new J0INT group?",
+                  buttons: ["No", "Yes"],
+                })
+                .then((willCreate) => {
+                  ajx({
+                    type: "POST",
+                    url: 'http://localhost/JDS/req/req_handler.php',
+                    data: {request: willCreate, jdID: jRes.jdsID},
+                    success: (response) => {
+                      if (response) {
+                        $('._bibf_div_c_cont').fadeIn();
+                        let downConfig = document.querySelector('._bibf_dc_div');
+                        downConfig.setAttribute("data-jds-id", jRes.jdsID);
+                      }
+                    }
+                  });
+                });
+                // swal({icon: "success", title: "File found!", text: jRes.filename+"."+jRes.extension+" is a downloadable file."});
                 $("div[data-jds-body]").hide();
+                // REQUEST TYPE IS A URL
               }
             }
             document.querySelector('._bdysec1').classList.add('_pcntd');
           }
         }
+      },
+      complete: () => {
+        console.log("Done!");
       },
       load: 'up'
     });
@@ -116,10 +139,10 @@
             if (isJson(res)) {
               let jRes = JSON.parse(res);
               if (jRes.hasOwnProperty('server_error')) {
-                Swal.fire({icon: "warning", title: "Oh no!", text: jRes.server_error});
+                swal({icon: "warning", title: "Oh no!", text: jRes.server_error});
               }
             } else {
-              Swal.fire({icon: "error", title: "Encountered an error", text: res});
+              swal({icon: "error", title: "Encountered an error", text: res});
             }
           }
         },
@@ -162,16 +185,16 @@
           if (isJson(x)) {
             let arr = JSON.parse(x);
             if (arr.hasOwnProperty("server_error")) {
-              Swal.fire({icon: "error", title: "Uh Oh!", text: arr.server_error});
+              swal({icon: "error", title: "Uh Oh!", text: arr.server_error});
             } else {
-              Swal.fire({icon: "success", title: "Awesome", text: arr.msg}).then((result) => {
+              swal({icon: "success", title: "Awesome", text: arr.msg}).then((result) => {
                 if (result.isConfirmed) {
                   document.location.href = "./?login";
                 }
               });
             }
           } else {
-            Swal.fire({icon: "warning", title: "warning", text: x});
+            swal({icon: "warning", title: "warning", text: x});
           }
         },
         load: 'up'

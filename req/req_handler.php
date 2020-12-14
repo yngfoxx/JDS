@@ -130,6 +130,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           - Grant view access to file chunks
     *
     */
+
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Invalid URL", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+
+    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
     $data = urldecode($std->db->escape_string($_POST['path_code']));
     # check if path_code is a URL or code
     if (filter_var($data, FILTER_VALIDATE_URL)) {
@@ -183,8 +198,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       // ---------------------------------------------------------------------<
 
 
+      // Source Meta data -----------------------------------------------------<
+      // $html = $std->file_get_contents_curl($result['origin']);
+      // $result['html'] = $html;
+      // ----------------------------------------------------------------------<
+
+
       # At this point we know that there is a downloadable file from the URL
       # next thing to do is to create the Joint Group
+      $result['jdsID'] = 1; // temporary ID to represent the JOINT group
+
       echo json_encode($result);
       # parse data to python and MySQL
 
