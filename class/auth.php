@@ -68,13 +68,16 @@ class auth extends stdlib
 
 
   // GET USER BY DEVICE ID ---------------------------------------------------->
-  public function getUserIdByDeviceID($dID)
+  public function getUserIdByDeviceID($devID)
   {
-    $dID = base64_decode($dID);
-    $sql = "SELECT user_id FROM authLogin WHERE deviceKey = '$dID'";
+    $dID = base64_decode($this->db->escape_string($devID));
+    $sql = "
+      SELECT user.user_id AS 'id' FROM authlogin
+	     INNER JOIN user ON user.user_id = authlogin.user_id
+      WHERE authLogin.deviceKey = '$dID';
+    ";
     $qry = mysqli_query($this->db, $sql);
-    if (mysqli_num_rows($qry) == 1) return mysqli_fetch_assoc($qry);
-    return false;
+    return ((mysqli_num_rows($qry) == 1) ? mysqli_fetch_assoc($qry)['id'] : false);
   }
   // -------------------------------------------------------------------------->
 
@@ -87,10 +90,9 @@ class auth extends stdlib
 	     INNER JOIN user ON user.user_id = authlogin.user_id
       WHERE authLogin.deviceKey = '$devID';
     ";
-    $qry = (mysqli_query($this->db, $sql)) ? mysqli_query($this->db, $sql) : false;
+    $qry = mysqli_query($this->db, $sql);
     if (!$qry) return false;
-    if (mysqli_num_rows($qry) == 1) return true;
-    return false;
+    return true;
   }
 }
  ?>

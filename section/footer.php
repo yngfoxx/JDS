@@ -10,6 +10,7 @@
       url: 'http://localhost/JDS/req/req_handler.php',
       data: parm,
       success: (res) => {
+        console.log(res);
         if (isJson(res)) {
           let jRes = JSON.parse(res);
           if (jRes.hasOwnProperty('server_error')) {
@@ -17,7 +18,6 @@
             return;
           } else {
             // SUCCESS
-            console.log(jRes);
             if (jRes.hasOwnProperty('type')) {
               if (jRes.type == 'URL') {
                 swal({
@@ -29,8 +29,9 @@
                   ajx({
                     type: "POST",
                     url: 'http://localhost/JDS/req/req_handler.php',
-                    data: {request: willCreate, jdID: jRes.jdsID},
+                    data: {crt_grp: willCreate, jdID: jRes.jdsID},
                     success: (response) => {
+                      console.log(response);
                       if (response) {
                         $('._bibf_div_c_cont').fadeIn();
                         let downConfig = document.querySelector('._bibf_dc_div');

@@ -4,6 +4,7 @@ session_start();
 // PACKAGES ---------------------------
 include_once $_SERVER['DOCUMENT_ROOT'] . '/JDS/class/standard.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/JDS/class/auth.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/JDS/class/joint.php';
 include $_SERVER['DOCUMENT_ROOT'] . "/JDS/class/class.easyzip.php";
 // ------------------------------------
 
@@ -11,6 +12,7 @@ include $_SERVER['DOCUMENT_ROOT'] . "/JDS/class/class.easyzip.php";
 // OBJECTS [reusable] -----------------
 $std = new stdlib();
 $auth = new auth();
+$jds = new jointlib();
 $result = array();
 // ------------------------------------
 
@@ -144,7 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       exit();
     }
 
-    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
     $data = urldecode($std->db->escape_string($_POST['path_code']));
     # check if path_code is a URL or code
     if (filter_var($data, FILTER_VALIDATE_URL)) {
@@ -206,8 +207,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       # At this point we know that there is a downloadable file from the URL
       # next thing to do is to create the Joint Group
-      $result['jdsID'] = 1; // temporary ID to represent the JOINT group
-
+      // Create Joint Group ---------------------------------------------------<
+      $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+      $crt = $jds->crt_group($userID); // Create joint group ID
+      $result['jdsID'] = ($crt != false) ? $crt : false;
+      // ----------------------------------------------------------------------<
       echo json_encode($result);
       # parse data to python and MySQL
 

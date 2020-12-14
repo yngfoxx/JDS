@@ -13,14 +13,14 @@ $auth = new auth();
 
 // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
 if (isset($_COOKIE['dKEY'])) {
-  if (!$auth->verfUser($_COOKIE['dKEY'])) {
+  if ($auth->verfUser($_COOKIE['dKEY']) == false) {
     $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
-    echo json_encode($result);
-    header("location: ./?login");
+    // echo json_encode($result);
+    header("location: ./?logout");
   }
 } else {
   $_SESSION['error'] = "Unauthorized access";
-  header("location: ./?login");
+  header("location: ./?logout");
 }
 ?>
 
