@@ -308,6 +308,30 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   }
 
 
+  # max chunk modification
+  if (isset($_POST['modChunk'])) {
+    if (!$_POST['modChunk']) exit();
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+    $jointID = $std->db->escape_string($_POST['jdsID']);
+    $size = $std->db->escape_string($_POST['size']);
+    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+    $arr = array('uid' => $userID, 'jid' => $jointID, 'size' => $size);
+    echo $jds->set_max_chunk($arr);
+    exit();
+  }
+
+
   # initialize download request
   if (isset($_POST['joint_init'])) {
     // TODO: Initialize joint download

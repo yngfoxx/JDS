@@ -18,6 +18,7 @@
   --light-green: #4bc64b;
   --dark-gray: #2d2d2d;
   --light-gray: #575757;
+  --light-gray-v2: #bfbfbf;
   --off-white: #e1e1e1;
   --sec-col: #484848;
   --sec-dark-color: #373737;
@@ -324,6 +325,28 @@ select {
     position: relative;
     margin: 7px 0px;
     border-radius: 10px;
+    overflow: auto;
+    ._bs2_div_contr {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      ._bs2dc_pane {
+        margin: 6px;
+        .fill_width();
+        background-color: var(--light-gray-v2);
+        border-radius: 10px;
+        &._pane_l {
+          max-width: 350px;
+        }
+        &._pane_r {
+          color: auto;
+          // background-color: green;
+        }
+      }
+    }
   }
 }
 

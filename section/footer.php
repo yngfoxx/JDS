@@ -30,7 +30,8 @@
                     $('._bibf_div_c_cont').fadeIn();
                     let downConfig = document.querySelector('._bibf_dc_div');
                     downConfig.setAttribute("data-svr-id", jRes.svrID);
-                    // on start click begin download
+                    // show panes
+                    document.querySelector('._bs2_div_contr ').classList.remove('hide');
                   } else {
                     // delete temporary group or add to existing group
                     swal({
@@ -112,6 +113,15 @@
     let jointID = form.getAttribute('data-svr-id');
     let maxChunk = document.querySelector('select[name="max_chunk"]').value;
     // modify chunk size
+    ajx({
+      type: 'POST',
+      url: 'http://localhost/JDS/req/req_handler.php',
+      data: {modChunk: true, jdsID: jointID, size: maxChunk},
+      success: (res) => {
+        if (res) console.log("Max chunk for "+jointID+" has been changed to "+maxChunk+"MB");
+      },
+      load: 'up'
+    });
   });
 
 

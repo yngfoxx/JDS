@@ -73,5 +73,23 @@ class jointlib extends stdlib {
     $qry = mysqli_query($this->db, $sql);
     return (($qry) ? true : false);
   }
+
+  public function set_max_chunk($arr) {
+    $uid = $this->db->escape_string($arr['uid']);
+    $jid = $this->db->escape_string($arr['jid']);
+    $size = $this->db->escape_string($arr['size']);
+    $sql = "
+      UPDATE joint_group SET max_chunk_size = '$size'
+      WHERE joint_group.joint_id IN (
+        SELECT joint_group.joint_id FROM joint_group
+          INNER JOIN joint_group_member, user
+        WHERE joint_group_member.joint_role = 'owner'
+        AND user.user_id = '$uid'
+        AND joint_group.joint_id = '$jid'
+      )
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    return (($qry) ? true : false);
+  }
 }
 ?>

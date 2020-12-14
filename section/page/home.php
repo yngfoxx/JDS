@@ -78,5 +78,9 @@ if (isset($_COOKIE['dKEY'])) {
 
   <div class="_bdysec2">
     <div class="float_center_msg" data-jds-body>Enter a URL or a Group code to begin</div>
+    <div class="_bs2_div_contr hide">
+      <div class="_bs2dc_pane _pane_l"></div>
+      <div class="_bs2dc_pane _pane_r"></div>
+    </div>
   </div>
 </div>
