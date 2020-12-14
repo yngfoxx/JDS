@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // ------------------------------------------------------------------------>
 
     $userData = $auth->getUserByEmail($email);
-    
+
     // PASSWORD CHECK --------------------------------------------------------->
     $pass = $std->db->escape_string($_POST['password']);
     if ($auth->keyCheck($pass, $userData['hash'], $userData['password'])) {
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       // File extension check ------------------------------------------------<
       $result['extension'] = pathinfo($data, PATHINFO_EXTENSION); # source file extension
       if (empty($result['extension'])) {
-        $result = array('server_error' => "Failed to get a downloadable file");
+        $result = array('server_error' => "Invalid URL");
         echo json_encode($result);
         exit();
       }
