@@ -10,6 +10,7 @@
       url: 'http://localhost/JDS/req/req_handler.php',
       data: parm,
       success: (res) => {
+        console.log(res);
         if (isJson(res)) {
           let jRes = JSON.parse(res);
           if (jRes.hasOwnProperty('server_error')) {
@@ -26,27 +27,29 @@
                 })
                 .then((willCreate) => {
                   if (willCreate) {
-                    ajx({
-                      type: "POST",
-                      url: 'http://localhost/JDS/req/req_handler.php',
-                      data: {crt_grp: willCreate, jdID: jRes.jdsID},
-                      success: (response) => {
-                        if (response) { // JOINT group has been created on server
-                          $('._bibf_div_c_cont').fadeIn();
-                          let downConfig = document.querySelector('._bibf_dc_div');
-                          downConfig.setAttribute("data-jds-id", jRes.jdsID);
-                        }
-                      }
-                    });
+                    $('._bibf_div_c_cont').fadeIn();
+                    let downConfig = document.querySelector('._bibf_dc_div');
+                    downConfig.setAttribute("data-svr-id", jRes.svrID);
+                    // on start click begin download
                   } else {
+                    // delete temporary group or add to existing group
                     swal({
                       text: "Add "+jRes.filename+"."+jRes.extension+" to an existing J0INT group?",
                       buttons: ["No", "Yes"],
-                    })
-                    .then((willAdd) => {
+                    }).then((willAdd) => {
                       if (willAdd) {
                         swal("Choose where to add the file.");
                         // TODO: Add file to existing J0INT group
+                      } else {
+                        ajx({
+                          type: 'POST',
+                          url: 'http://localhost/JDS/req/req_handler.php',
+                          data: {delReq: true, jdsID: jRes.jdsID},
+                          success: (res) => {
+                            if (res) console.log("J0INT group deleted successfully!");
+                          },
+                          load: 'up'
+                        });
                       }
                     })
                   }
@@ -105,6 +108,10 @@
   // event listener for config button (close menu)
   $('div[data-button="cls_config"]').on('click', function(e) {
     $('._bibf_div_c_cont').fadeOut();
+    let form = document.querySelector('._bibf_dc_div');
+    let jointID = form.getAttribute('data-svr-id');
+    let maxChunk = document.querySelector('select[name="max_chunk"]').value;
+    // modify chunk size
   });
 
 

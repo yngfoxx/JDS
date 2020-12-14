@@ -25,7 +25,7 @@ if (isset($_COOKIE['dKEY'])) {
 ?>
 
 <div class="_tnvbr">
-  <a class="icon-menu _tb_menu_btn"></a>
+  <a class="icon-wrench-3 _tb_menu_btn"></a>
   <h3 class="_tblgo" title="Joint Download Software">JDS</h3>
   <ul class="_mnuli">
     <li title="Logout">
@@ -50,12 +50,10 @@ if (isset($_COOKIE['dKEY'])) {
         <div class="_bibfdcd_section">
           <div class="_bibfdcds_title">Download configuration</div>
         </div>
-
         <div class="_bibfdcd_section">
           <div class="_bibfdcds_text">Manual configuration</div>
           <label class="switch"><input type="checkbox" name="auto_config"><span class="slider round"></span></label>
         </div>
-
         <div class="_bibfdcd_section">
           <div class="_bibfdcds_text v_row">
             <label>Maximum chunk size</label>
@@ -70,9 +68,8 @@ if (isset($_COOKIE['dKEY'])) {
             <input type="text" style="display: none;" name="chunk_max_size" class="chunkInput" placeholder="Specify chunk size (MB)">
           </div>
         </div>
-
         <div class="_bibfdcd_section">
-          <div class="_bibfdcds_btn" data-button="cls_config">Next</div>
+          <div class="_bibfdcds_btn" data-button="cls_config">Save</div>
         </div>
       </form>
     </div>

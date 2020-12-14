@@ -114,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // --------------------------------------------------------------------------------------------->
 
 
+
   // JOINT DOWNLOAD SYSTEM BRAIN // ------------------------------------------->
   if (isset($_POST['path_code'])) {
     /*
@@ -209,12 +210,39 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       # next thing to do is to create the Joint Group
       // Create Joint Group ---------------------------------------------------<
       $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
-      $crt = $jds->crt_group($userID); // Create joint group ID
-      $result['jdsID'] = ($crt != false) ? $crt : false;
+      $jointID = $jds->crt_group($userID); // Create joint group ID
+
+      $result['jdsID'] = ($jointID != false) ? $jointID : false;
+      if ($result['jdsID'] == false) {
+        $result = array('server_error' => "Unrecoverable error!");
+        echo json_encode($result);
+        exit();
+      }
+
+      // Add user to J0INT group as owner -------------------------------------<
+      $arrGRP = array('jid' => $jointID, 'uid' => $userID, 'role' => 'owner');
+      if ($jds->group_add_member($arrGRP)) {
+        // Add requested file to server download request
+        $arrSVR = array(
+          'jid' => $jointID,
+          'uid' => $userID,
+          'url' => $data,
+          'max_chunk_size' => 5 // put default at first
+        );
+        $crt = $jds->crt_download($arrSVR);
+        if ($crt != false) {
+          $result['svrID'] = $crt;
+          echo json_encode($result); // end of process
+        } else {
+          $result = array('server_error' => "Unrecoverable error v2!");
+          echo json_encode($result);
+        }
+      } else {
+        $result = array('server_error' => "Unrecoverable error v3!");
+        echo json_encode($result);
+      }
       // ----------------------------------------------------------------------<
 
-      // Add requested file to server download request
-      echo json_encode($result);
       # parse data to MySQL and python
 
       // // downloaded file info
@@ -255,6 +283,34 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       // Not an HTTP URL
       echo "checking if code exists";
     }
+  }
+
+  # group delete request
+  if (isset($_POST['delReq'])) {
+    if (!$_POST['delReq']) exit();
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+    $jointID = $std->db->escape_string($_POST['jdsID']);
+    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+    $arr = array('uid' => $userID, 'jid' => $jointID);
+    echo $jds->del_group($arr);
+    exit();
+  }
+
+
+  # initialize download request
+  if (isset($_POST['joint_init'])) {
+    // TODO: Initialize joint download
   }
   // -------------------------------------------------------------------------->
 }
