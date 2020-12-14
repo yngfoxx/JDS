@@ -60,6 +60,18 @@ class jointlib extends stdlib {
   public function del_group($arr) {
     $uid = $this->db->escape_string($arr['uid']);
     $jid = $this->db->escape_string($arr['jid']);
+    $sql = "
+      DELETE FROM joint_group
+      WHERE joint_group.joint_id IN (
+        SELECT joint_group.joint_id FROM joint_group
+          INNER JOIN joint_group_member, user
+        WHERE joint_group_member.joint_role = 'owner'
+        AND user.user_id = '$uid'
+        AND joint_group.joint_id = '$jid'
+      )
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    return (($qry) ? true : false);
   }
 }
 ?>

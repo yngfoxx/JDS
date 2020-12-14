@@ -46,7 +46,7 @@
                           url: 'http://localhost/JDS/req/req_handler.php',
                           data: {delReq: true, jdsID: jRes.jdsID},
                           success: (res) => {
-                            if (res) console.log("J0INT group deleted successfully!");
+                            if (res) console.log("temporary J0INT group deleted!");
                           },
                           load: 'up'
                         });
