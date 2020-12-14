@@ -39,7 +39,7 @@ if (isset($_COOKIE['dKEY'])) {
     <form class="_bibf" method="POST">
       <div class="_bibf_div">
         <input class="_bibftxt" name="path_code" placeholder="Enter URL or JDS code" type="text" required>
-        <button type="submit" class="_bibfbtn icon-download" title="Start JDS"></button>
+        <button type="submit" class="_bibfbtn icon-plus" title="New J0INT"></button>
       </div>
       <div class="floating_info">Don't have JDS extension? download from <a href="#">here</a></div>
     </form>

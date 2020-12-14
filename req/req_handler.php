@@ -212,8 +212,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       $crt = $jds->crt_group($userID); // Create joint group ID
       $result['jdsID'] = ($crt != false) ? $crt : false;
       // ----------------------------------------------------------------------<
+
+      // Add requested file to server download request
       echo json_encode($result);
-      # parse data to python and MySQL
+      # parse data to MySQL and python
 
       // // downloaded file info
       // $arr = $std->downloadFile($data);

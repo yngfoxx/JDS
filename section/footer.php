@@ -10,7 +10,6 @@
       url: 'http://localhost/JDS/req/req_handler.php',
       data: parm,
       success: (res) => {
-        console.log(res);
         if (isJson(res)) {
           let jRes = JSON.parse(res);
           if (jRes.hasOwnProperty('server_error')) {
@@ -22,23 +21,35 @@
               if (jRes.type == 'URL') {
                 swal({
                   icon: "success",
-                  text: jRes.filename+"."+jRes.extension+" is a downloadable file, do you wish to create a new J0INT group?",
+                  text: "\""+jRes.filename+"."+jRes.extension+"\" is a downloadable file, do you wish to create a new J0INT group?",
                   buttons: ["No", "Yes"],
                 })
                 .then((willCreate) => {
-                  ajx({
-                    type: "POST",
-                    url: 'http://localhost/JDS/req/req_handler.php',
-                    data: {crt_grp: willCreate, jdID: jRes.jdsID},
-                    success: (response) => {
-                      console.log(response);
-                      if (response) {
-                        $('._bibf_div_c_cont').fadeIn();
-                        let downConfig = document.querySelector('._bibf_dc_div');
-                        downConfig.setAttribute("data-jds-id", jRes.jdsID);
+                  if (willCreate) {
+                    ajx({
+                      type: "POST",
+                      url: 'http://localhost/JDS/req/req_handler.php',
+                      data: {crt_grp: willCreate, jdID: jRes.jdsID},
+                      success: (response) => {
+                        if (response) { // JOINT group has been created on server
+                          $('._bibf_div_c_cont').fadeIn();
+                          let downConfig = document.querySelector('._bibf_dc_div');
+                          downConfig.setAttribute("data-jds-id", jRes.jdsID);
+                        }
                       }
-                    }
-                  });
+                    });
+                  } else {
+                    swal({
+                      text: "Add "+jRes.filename+"."+jRes.extension+" to an existing J0INT group?",
+                      buttons: ["No", "Yes"],
+                    })
+                    .then((willAdd) => {
+                      if (willAdd) {
+                        swal("Choose where to add the file.");
+                        // TODO: Add file to existing J0INT group
+                      }
+                    })
+                  }
                 });
                 // swal({icon: "success", title: "File found!", text: jRes.filename+"."+jRes.extension+" is a downloadable file."});
                 $("div[data-jds-body]").hide();
