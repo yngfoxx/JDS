@@ -1,13 +1,16 @@
 # SCRIPT BY OSUNRINDE STEPHEN ADEBAYO
-import time, request, argparse
+import time, requests, argparse
 from pySmartDL import SmartDL
 
+
 # accepts argument from command e.g "python grab.py -u https://www.filedomain.com/file.zip"
-parser = argparse.ArgumentParser(prog='grab', description='download files from internet using Python')
+parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
+
 
 # accept URL with "-u" or "--url"
 parser.add_argument('-u', '--url', type=str, required=True, help='The URL of the target file')
 parser.add_argument('-i', '--id', type=str, help='The user/session id for further processing')
+
 
 # assign arguments to object
 args = parser.parse_args()
@@ -18,13 +21,42 @@ USER_ID = args.id
 
 
 # FILE DOWNLOAD MANAGER
-url = "https://www.exodusleague.com/media/img/logo/exodusleague.png"
-dest = "C:/Users/YoungFox/Downloads/"
+DESTINATION = "./"
 
-obj = SmartDL(url, dest)
 
-obj.start() 
+# DEFINE THE DOWNLOAD OBJECT
+obj = SmartDL(URL, DESTINATION)
+
+
+# INITIALIZE THE DOWNLOAD ----------------------------------------------------->
+obj.start(blocking=False)
+
+while not obj.isFinished():
+        print("Speed: %s" % obj.get_speed(human=True))
+        print("Already downloaded: %s" % obj.get_dl_size(human=True))
+        print("Eta: %s" % obj.get_eta(human=True))
+        print("Progress: %d%%" % (obj.get_progress()*100))
+        print("Progress bar: %s" % obj.get_progress_bar())
+        print("Status: %s" % obj.get_status())
+        print("\n"*2+"="*50+"\n"*2)
+        time.sleep(0.2)
+
+if obj.isSuccessful():
+        print("downloaded file to '%s'" % obj.get_dest())
+        print("download task took %ss" % obj.get_dl_time(human=True))
+        print("File hashes:")
+        print(" * MD5: %s" % obj.get_data_hash('md5'))
+        print(" * SHA1: %s" % obj.get_data_hash('sha1'))
+        print(" * SHA256: %s" % obj.get_data_hash('sha256'))
+else:
+        print("There were some errors:")
+        for e in obj.get_errors():
+                print(str(e))
+# ----------------------------------------------------------------------------->
+
 
 # [*] 0.23 Mb / 0.37 Mb @ 88.00Kb/s [##########——–] [60%, 2s left]
 
+
+# STORE DOWNLOADED FILE IN GIVEN DESTINATION
 path = obj.get_dest()

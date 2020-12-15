@@ -323,10 +323,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       echo json_encode($result);
       exit();
     }
-    $jointID = $std->db->escape_string($_POST['jdsID']);
-    $size = $std->db->escape_string($_POST['size']);
+
+    $svrID = $std->db->escape_string($_POST['svr']); // download request ID
+    $size = $std->db->escape_string($_POST['vol']);
     $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
-    $arr = array('uid' => $userID, 'jid' => $jointID, 'size' => $size);
+
+    $arr = array('uid' => $userID, 'svrID' => $svrID, 'size' => $size);
     echo $jds->set_max_chunk($arr);
     exit();
   }

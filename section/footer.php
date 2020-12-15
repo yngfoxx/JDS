@@ -110,15 +110,15 @@
   $('div[data-button="cls_config"]').on('click', function(e) {
     $('._bibf_div_c_cont').fadeOut();
     let form = document.querySelector('._bibf_dc_div');
-    let jointID = form.getAttribute('data-svr-id');
-    let maxChunk = document.querySelector('select[name="max_chunk"]').value;
+    let svrID = form.getAttribute('data-svr-id');
+    let maxChunk = $('.chunkInput').val();
     // modify chunk size
     ajx({
       type: 'POST',
       url: 'http://localhost/JDS/req/req_handler.php',
-      data: {modChunk: true, jdsID: jointID, size: maxChunk},
+      data: { modChunk: true, svr: svrID, vol: maxChunk },
       success: (res) => {
-        if (res) console.log("Max chunk for "+jointID+" has been changed to "+maxChunk+"MB");
+        if (res) console.log("Max chunk for request ID: "+svrID+" has been changed to "+maxChunk+"MB");
       },
       load: 'up'
     });
@@ -126,7 +126,7 @@
 
 
   // event listener for logout button
-  $("li[title='Logout']").on('click', function(e) {
+  $("a[title='Logout']").on('click', function(e) {
     window.location.href = "./?logout";
   });
 </script>

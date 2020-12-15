@@ -25,13 +25,9 @@ if (isset($_COOKIE['dKEY'])) {
 ?>
 
 <div class="_tnvbr">
-  <a class="icon-wrench-3 _tb_menu_btn"></a>
+  <a class="icon-menu _tb_menu_btn"></a>
   <h3 class="_tblgo" title="Joint Download Software">JDS</h3>
-  <ul class="_mnuli">
-    <li title="Logout">
-      <a class="icon-logout"></a>
-    </li>
-  </ul>
+  <a class="icon-logout _tb_menu_btn _mnuli" title="Logout"></a>
 </div>
 <div class="_bdyMain">
   <div class="_bdysec1">
