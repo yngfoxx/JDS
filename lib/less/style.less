@@ -323,28 +323,58 @@ select {
     overflow: auto;
     ._bs2_div_contr {
       position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      bottom: 0;
+      top: 0; left: 0; bottom: 0; right: 0;
       display: flex;
       ._bs2dc_pane {
         margin: 6px;
         .fill_width();
         background-color: var(--light-gray-v2);
         border-radius: 10px;
+        ._bs2dcp_row {
+          background: #5d5d5d;
+          margin: 6px 6px;
+          border-radius: 10px;
+          height: 100%;
+          position: relative;
+        }
         &._pane_l {
           max-width: 350px;
+          display: flex;
+          flex-flow: column;
+          ._bs2dcp_row {
+            height: 100%;
+            overflow: auto;
+            &._jds_holder {
+              height: auto;
+            	margin-bottom: 0px;
+            	padding: 20px;
+            	text-align: center;
+            	font-size: 25px;
+            	color: white;
+            	font-weight: bold;
+            }
+            ._bs2dcpr_container {
+            	padding: 8px;
+            	display: flex;
+            	flex-flow: column;
+            	position: absolute;
+              top: 0; left: 0; bottom: 0; right: 0;
+              ._bs2dcprc_title {
+              	background-color: #646464;
+              	color: white;
+              	padding: 10px;
+              	border-radius: 10px;
+              }
+            }
+          }
         }
         &._pane_r {
-          color: auto;
-          // background-color: green;
+          color: inherit;
         }
       }
     }
   }
 }
-
 
 .switch {
 	position: relative;

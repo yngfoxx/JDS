@@ -32,6 +32,7 @@
                     downConfig.setAttribute("data-svr-id", jRes.svrID);
                     // show panes
                     document.querySelector('._bs2_div_contr ').classList.remove('hide');
+                    document.querySelector('._jds_holder').innerText = jRes.jdsID;
                   } else {
                     // delete temporary group or add to existing group
                     swal({
