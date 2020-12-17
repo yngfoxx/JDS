@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
+    <title>JDS EUROPE SERVER</title>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      $(function () {
+        var socket = io(); // socket object
+        socket.emit('message', $('#m').val()); // send socket message
+        socket.on('message', function(msg) { // onReceive socket message
+          if (msg != null) $('#messages').append($('<li>').text(JSON.stringify(msg)));
+        });
+      });
+
+      // code to connect to SOCKET from external site
+      // const io = require('socket.io-client');
+      // const socket = io.connect('http://website.com');
+      //
+      // socket.on('connect', () => {
+        // console.log('Successfully connected!');
+      // });
+    </script>
+  </body>
+</html>

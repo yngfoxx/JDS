@@ -374,7 +374,14 @@ select {
           }
         }
         &._pane_r {
-          color: inherit;
+          display: flex;
+          flex-flow: column;
+          ._bs2dcp_row {
+            &._jds_info {
+              max-height: 150px;
+              margin-bottom: 0px !important;
+            }
+          }
         }
       }
     }

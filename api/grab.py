@@ -1,7 +1,28 @@
 # SCRIPT BY OSUNRINDE STEPHEN ADEBAYO
 import time, requests, argparse
 from pySmartDL import SmartDL
+import socketio
 
+# WebSocket object
+sio = socketio.Client()
+
+# Socket connection events
+@sio.event
+def connect():
+    print("[connected] socket_id: ", sio.sid)
+
+@sio.event
+def connect_error():
+    print("[failed] socket connection")
+
+@sio.event
+def disconnect():
+    print("[disconnected]")
+
+
+# Connect to websocket
+sio.connect('https://ws-jds-eu.herokuapp.com');
+# sio.connect('http://localhost:8000');
 
 # accepts argument from command e.g "python grab.py -u https://www.filedomain.com/file.zip"
 parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
@@ -32,22 +53,53 @@ obj = SmartDL(URL, DESTINATION)
 obj.start(blocking=False)
 
 while not obj.isFinished():
-        print("Speed: %s" % obj.get_speed(human=True))
-        print("Already downloaded: %s" % obj.get_dl_size(human=True))
-        print("Eta: %s" % obj.get_eta(human=True))
-        print("Progress: %d%%" % (obj.get_progress()*100))
-        print("Progress bar: %s" % obj.get_progress_bar())
-        print("Status: %s" % obj.get_status())
-        print("\n"*2+"="*50+"\n"*2)
+        sio.emit('message', {
+        'speed': obj.get_speed(human=True),
+        'downloaded': obj.get_dl_size(human=True),
+        'ETA': obj.get_eta(human=True),
+        'progress': (obj.get_progress()*100),
+        'bar': obj.get_progress_bar(),
+        'status': obj.get_status(),
+        });
+        print("|")
+        print("|")
+        print("|")
+        print("|-----> socket message sent")
+        print("|")
+        print("|")
+        print("|")
+
+        # print("Speed: %s" % obj.get_speed(human=True))
+        # print("Already downloaded: %s" % obj.get_dl_size(human=True))
+        # print("Eta: %s" % obj.get_eta(human=True))
+        # print("Progress: %d%%" % (obj.get_progress()*100))
+        # print("Progress bar: %s" % obj.get_progress_bar())
+        # print("Status: %s" % obj.get_status())
+        # print("\n"*2+"="*50+"\n"*2)
         time.sleep(0.2)
 
 if obj.isSuccessful():
-        print("downloaded file to '%s'" % obj.get_dest())
-        print("download task took %ss" % obj.get_dl_time(human=True))
-        print("File hashes:")
-        print(" * MD5: %s" % obj.get_data_hash('md5'))
-        print(" * SHA1: %s" % obj.get_data_hash('sha1'))
-        print(" * SHA256: %s" % obj.get_data_hash('sha256'))
+        sio.emit('message', {
+         'download_path': obj.get_dest(),
+         'download_time_length': obj.get_dl_time(human=True),
+         'MD5': obj.get_data_hash('md5'),
+         'SHA1': obj.get_data_hash('sha1'),
+         'SHA256': obj.get_data_hash('sha256')
+        });
+        print("|")
+        print("|")
+        print("|")
+        print("|-----> download took %ss" % obj.get_dl_time(human=True))
+        print("|")
+        print("|")
+        print("|")
+
+        # print("downloaded file to '%s'" % obj.get_dest())
+        # print("download task took %ss" % obj.get_dl_time(human=True))
+        # print("File hashes:")
+        # print(" * MD5: %s" % obj.get_data_hash('md5'))
+        # print(" * SHA1: %s" % obj.get_data_hash('sha1'))
+        # print(" * SHA256: %s" % obj.get_data_hash('sha256'))
 else:
         print("There were some errors:")
         for e in obj.get_errors():
@@ -60,3 +112,6 @@ else:
 
 # STORE DOWNLOADED FILE IN GIVEN DESTINATION
 path = obj.get_dest()
+
+# disconnect from socket server
+sio.disconnect()
