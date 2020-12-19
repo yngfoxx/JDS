@@ -2,6 +2,7 @@
 // USER HOME PAGE ------------------------------------------------------------->
  if (isset($_GET['home'])) { // HOME PAGE ?>
   <script type="text/javascript">
+  // user entered URL or CODE ------------------------------------------------->
   $('._bibf').on('submit', function(e) {
     e.preventDefault();
     let parm = srlToJson($(this));
@@ -71,9 +72,10 @@
       load: 'up'
     });
   });
+  // -------------------------------------------------------------------------->
 
 
-  // event listener for config options (manual or automatic)
+  // event listener for config options (manual or automatic) ------------------>
   $('input[name="auto_config"]').on('change', function(e) {
     let val = document.querySelector('input[name="auto_config"]').checked;
     if (val == true) {
@@ -88,8 +90,10 @@
       });
     }
   });
+  // -------------------------------------------------------------------------->
 
-  // event listener for Maximum chunk size select element
+
+  // event listener for Maximum chunk size select element --------------------->
   $('select[name="max_chunk"]').on('change', function(e) {
     $('.chunkInput').val($(this).val());
     if ($(this).val() == 's') {
@@ -99,15 +103,17 @@
       $('.chunkInput').css("display", "none");
     }
   });
+  // -------------------------------------------------------------------------->
 
 
-  // event listener for config button (open menu)
+  // event listener for config button (open menu) ----------------------------->
   $('button[data-button="config"]').on('click', function(e) {
     $('._bibf_div_c_cont').fadeIn();
   });
+  // -------------------------------------------------------------------------->
 
 
-  // event listener for config button (close menu)
+  // event listener for config button (close menu) ---------------------------->
   $('div[data-button="cls_config"]').on('click', function(e) {
     $('._bibf_div_c_cont').fadeOut();
     let form = document.querySelector('._bibf_dc_div');
@@ -124,6 +130,53 @@
       load: 'up'
     });
   });
+  // -------------------------------------------------------------------------->
+
+
+  // event listener for menu button-------------------------------------------->
+  $("._tb_menu_btn[data-btn='menu']").on('click', function(e) {
+    let menu = $("._tnvMnu");
+    if (menu.attr('data-state') == 'off') {
+      menu.fadeIn();
+      menu.attr('data-state', 'on');
+      // fetch joint groups that user belongs to
+      ajx({
+        type: 'POST',
+        url: 'http://localhost/JDS/req/req_handler.php',
+        data: {groupList: true},
+        success: (res) => {
+          let parDiv = document.querySelector('._tnvMnu_drpDwn');
+              parDiv.innerHTML = "";
+          let chdDiv = document.createElement('DIV');
+
+          if (res != 0) {
+            if (isJson(res)) {
+              // parameters expected -> uid, jid, role
+              let data = JSON.parse(res);
+              chdDiv.classList.add('_tnvMnu_drpDwn_btn');
+              chdDiv.innerText = data.jid;
+              parDiv.append(chdDiv);
+            } else {
+              chdDiv.classList.add('_tnvMnu_drpDwn_msg');
+              chdDiv.innerText = "Oops! something went wrong.";
+              parDiv.append(chdDiv);
+              console.error("An unexpected error occured. ajx.ln.[136]");
+            }
+          } else {
+            // user is not in any group
+            chdDiv.classList.add('_tnvMnu_drpDwn_msg');
+            chdDiv.innerText = "NO GROUPS";
+            parDiv.append(chdDiv);
+          }
+        },
+        load: 'up'
+      });
+    } else if (menu.attr('data-state') == 'on') {
+      menu.fadeOut();
+      menu.attr('data-state', 'off');
+    }
+  });
+// ---------------------------------------------------------------------------->
 
 
   // event listener for logout button

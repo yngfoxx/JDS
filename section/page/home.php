@@ -25,9 +25,19 @@ if (isset($_COOKIE['dKEY'])) {
 ?>
 
 <div class="_tnvbr">
-  <a class="icon-menu _tb_menu_btn"></a>
+  <a class="icon-menu _tb_menu_btn" data-btn="menu"></a>
   <h3 class="_tblgo" title="Joint Download Software">JDS</h3>
   <a class="icon-logout _tb_menu_btn _mnuli" title="Logout"></a>
+
+  <div class="_tnvMnu" data-state="off">
+    <div class="_tnvMnu_drpDwn" data-group-block="J0INT">
+      <a class="_tnvMnu_drpDwn_title">J0INT GROUPS</a>
+      <div class="_tnvMnu_drpDwn_msg">Loading</div>
+      <!-- <div class="_tnvMnu_drpDwn_btn">ASD12A0</div>
+      <div class="_tnvMnu_drpDwn_btn">34KDAW0</div> -->
+    </div>
+  </div>
+
 </div>
 <div class="_bdyMain">
   <div class="_bdysec1">

@@ -338,6 +338,28 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   if (isset($_POST['joint_init'])) {
     // TODO: Initialize joint download
   }
+
+
+  # get list of joint groups current user belongs to
+  if (isset($_POST['groupList'])) {
+    if (!$_POST['groupList']) exit();
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+
+    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+    $jointList = $jds->getUserJointList($userID);
+    if ($jointList == 0) { echo 0; } else { echo json_encode($jointList); }
+  }
   // -------------------------------------------------------------------------->
 }
 ?>

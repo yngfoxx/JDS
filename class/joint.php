@@ -57,6 +57,7 @@ class jointlib extends stdlib {
     return (($qry) ? mysqli_insert_id($this->db) : false); // return ID of inserted row
   }
 
+
   public function del_group($arr) {
     $uid = $this->db->escape_string($arr['uid']);
     $jid = $this->db->escape_string($arr['jid']);
@@ -73,6 +74,7 @@ class jointlib extends stdlib {
     $qry = mysqli_query($this->db, $sql);
     return (($qry) ? true : false);
   }
+
 
   public function set_max_chunk($arr) {
     $uid = $this->db->escape_string($arr['uid']);
@@ -92,6 +94,23 @@ class jointlib extends stdlib {
     ";
     $qry = mysqli_query($this->db, $sql);
     return (($qry) ? $svrID : false);
+  }
+
+
+  public function getUserJointList($uid)
+  {
+    $uid = $this->db->escape_string($uid);
+    $sql = "
+      SELECT joint_group_member.joint_id AS 'jid',
+	     joint_group_member.joint_role AS 'role',
+       user.user_id AS 'uid'
+      FROM joint_group_member
+      INNER JOIN user, joint_group
+      WHERE user.user_id = '$uid'
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    if (mysqli_num_rows($qry) == 0 || !$qry) return 0;
+    return mysqli_fetch_assoc($qry);
   }
 }
 ?>
