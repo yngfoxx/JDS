@@ -31,10 +31,8 @@ if (isset($_COOKIE['dKEY'])) {
 
   <div class="_tnvMnu" data-state="off">
     <div class="_tnvMnu_drpDwn" data-group-block="J0INT">
-      <a class="_tnvMnu_drpDwn_title">J0INT GROUPS</a>
-      <div class="_tnvMnu_drpDwn_msg">Loading</div>
-      <!-- <div class="_tnvMnu_drpDwn_btn">ASD12A0</div>
-      <div class="_tnvMnu_drpDwn_btn">34KDAW0</div> -->
+      <a class="_tnvMnu_drpDwn_title">GROUPS</a> <!-- skeleton -->
+      <div class="_tnvMnu_drpDwn_msg">Loading</div> <!-- skeleton -->
     </div>
   </div>
 

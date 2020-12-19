@@ -125,7 +125,10 @@
       url: 'http://localhost/JDS/req/req_handler.php',
       data: { modChunk: true, svr: svrID, vol: maxChunk },
       success: (res) => {
-        if (res) console.log("Max chunk for request ID: "+svrID+" has been changed to "+maxChunk+"MB");
+        if (res) {
+          swal({icon: "success", title: "Saved", text: "Download configuration has been updated!"});
+          console.log("Max chunk for request ID: "+svrID+" has been changed to "+maxChunk+"MB");
+        }
       },
       load: 'up'
     });
@@ -147,6 +150,11 @@
         success: (res) => {
           let parDiv = document.querySelector('._tnvMnu_drpDwn');
               parDiv.innerHTML = "";
+              let parTitle = document.createElement('A');
+                  parTitle.classList.add('_tnvMnu_drpDwn_title');
+                  parTitle.innerText = 'GROUPS';
+              parDiv.append(parTitle);
+
           let chdDiv = document.createElement('DIV');
 
           if (res != 0) {

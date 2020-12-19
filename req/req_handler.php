@@ -21,7 +21,7 @@ $result = array();
 */
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-  // POST request handler ----------------------------------------------------->
+  // POST request handler //////////////////////////////////////////////////////
   if (isset($_POST['regUser'])) { // REGISTER USER //
     // PASSWORD CHECK ---------------------------------<
     $pass = $std->db->escape_string(($_POST['password'] == $_POST['passConf']) ? $_POST['password'] : null);
@@ -334,12 +334,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   }
 
 
-  # initialize download request
-  if (isset($_POST['joint_init'])) {
-    // TODO: Initialize joint download
-  }
-
-
   # get list of joint groups current user belongs to
   if (isset($_POST['groupList'])) {
     if (!$_POST['groupList']) exit();
@@ -360,6 +354,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $jointList = $jds->getUserJointList($userID);
     if ($jointList == 0) { echo 0; } else { echo json_encode($jointList); }
   }
-  // -------------------------------------------------------------------------->
+
+
+  # initialize download request
+  if (isset($_POST['joint_init'])) {
+    // TODO: Initialize joint download
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
 }
 ?>
