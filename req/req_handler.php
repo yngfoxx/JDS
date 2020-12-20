@@ -357,6 +357,47 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
   }
 
+  # get group details, members and download requests
+  if (isset($_POST['jdsCheck'])) {
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+
+    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+    $jointID = $std->db->escape_string($_POST['jdsCheck']);
+    $GROUPDATA = array();
+
+    $jointInfo = $jds->getJointInfo($jointID); # Group info
+    if ($jointInfo == false) {
+      $result = array('server_error' => "group does not exist", 'code' => '404'); // group not found
+      echo json_encode($result);
+      exit();
+    }
+
+    // add group information to output
+    $GROUPDATA['info'] = $jointInfo;
+
+    $jointMembers = $jds->getJointMembers($jointID); # Group members
+    // add members data to output
+    $GROUPDATA['members'] = $jointMembers;
+
+    $jointDownloadList = $jds->getJointDownloadList($jointID);  # Download requests
+    // add list to output array if it's not empty
+    $GROUPDATA['downloads'] = ($jointDownloadList == 0) ? 0 : $jointDownloadList;
+
+    // output
+    echo json_encode($GROUPDATA);
+  }
+
 
   # initialize download request
   if (isset($_POST['joint_init'])) {

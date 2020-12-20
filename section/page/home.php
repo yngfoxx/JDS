@@ -93,7 +93,7 @@ if (isset($_COOKIE['dKEY'])) {
 
       <div class="_bs2dc_pane _pane_r">
         <div class="_bs2dcp_row _jds_info"></div>
-        <div class="_bs2dcp_row"></div>
+        <!-- <div class="_bs2dcp_row"></div> -->
       </div>
     </div>
   </div>

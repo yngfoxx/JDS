@@ -126,7 +126,7 @@
       data: { modChunk: true, svr: svrID, vol: maxChunk },
       success: (res) => {
         if (res) {
-          swal({icon: "success", title: "Saved", text: "Download configuration has been updated!"});
+          swal({icon: "success", title: "Saved", text: "Download configuration has been updated for this file"});
           console.log("Max chunk for request ID: "+svrID+" has been changed to "+maxChunk+"MB");
         }
       },

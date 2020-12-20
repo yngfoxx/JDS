@@ -400,6 +400,8 @@ select {
       position: absolute;
       top: 0; left: 0; bottom: 0; right: 0;
       display: flex;
+      transition: .3s;
+      @media screen and (max-width: 800px) { display: block }
       ._bs2dc_pane {
         margin: 6px;
         .fill_width();
@@ -416,6 +418,8 @@ select {
           max-width: 350px;
           display: flex;
           flex-flow: column;
+          transition: .3s;
+          @media screen and (max-width: 800px) { max-width: 100% }
           ._bs2dcp_row {
             height: 100%;
             overflow: auto;
@@ -444,8 +448,8 @@ select {
           }
         }
         &._pane_r {
-          display: flex;
-          flex-flow: column;
+          transition: .3s;
+          overflow: auto;
           ._bs2dcp_row {
             &._jds_info {
               max-height: 150px;

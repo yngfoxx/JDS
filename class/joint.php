@@ -115,5 +115,71 @@ class jointlib extends stdlib {
     while ($jData = mysqli_fetch_assoc($qry)) array_push($arr, $jData);
     return $arr;
   }
+
+
+  public function getJointDownloadList($jid)
+  {
+    $jid = $this->db->escape_string($jid);
+    $sql = "
+    SELECT
+      svr_download_request.request_id AS 'rid',
+      joint_group.joint_id AS 'jid',
+      svr_download_request.url AS 'url',
+      svr_download_request.max_chunk_size AS 'chunk_size',
+      user.user_id AS 'uid',
+      svr_download_request.init AS 'status'
+    FROM svr_download_request
+    INNER JOIN joint_group ON joint_group.joint_id = svr_download_request.joint_id
+    INNER JOIN user ON user.user_id = svr_download_request.user_id
+    WHERE svr_download_request.joint_id = '$jid'
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    if (mysqli_num_rows($qry) == 0 || !$qry) return 0;
+    $arr = array();
+    while ($jData = mysqli_fetch_assoc($qry)) array_push($arr, $jData);
+    return $arr;
+  }
+
+
+  public function getJointInfo($jid)
+  {
+    $jid = $this->db->escape_string($jid);
+    $sql = "
+    SELECT
+      joint_group.joint_id AS 'jid',
+      joint_group.user_id AS 'uid',
+      joint_group.access_limit AS 'capacity',
+      joint_group.date_created AS 'creationDate'
+     FROM joint_group
+     WHERE joint_group.joint_id = '$jid'";
+    $qry = mysqli_query($this->db, $sql);
+    if (mysqli_num_rows($qry) == 1) return mysqli_fetch_assoc($qry);
+    return false;
+  }
+
+
+  public function getJointMembers($jid)
+  {
+    $jid = $this->db->escape_string($jid);
+    $sql = "
+    SELECT
+      user.user_id AS 'uid',
+      joint_group.joint_id AS 'jid',
+      joint_group_member.joint_role AS 'role',
+      joint_group_member.date_added AS 'joined',
+      COUNT(svr_download_request.request_id) AS 'requests'
+    FROM joint_group_member
+    INNER JOIN user ON user.user_id = joint_group_member.user_id
+    INNER JOIN joint_group ON joint_group.joint_id = joint_group_member.joint_id
+    INNER JOIN svr_download_request ON svr_download_request.joint_id = joint_group.joint_id AND svr_download_request.user_id = joint_group_member.user_id
+    WHERE joint_group_member.joint_id = '$jid'
+    GROUP BY joint_group_member.id
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    if (mysqli_num_rows($qry) == 0 || !$qry) return 0;
+    $arr = array();
+    while ($jData = mysqli_fetch_assoc($qry)) array_push($arr, $jData);
+    return $arr;
+  }
 }
 ?>
