@@ -102,15 +102,18 @@ class jointlib extends stdlib {
     $uid = $this->db->escape_string($uid);
     $sql = "
       SELECT joint_group_member.joint_id AS 'jid',
-	     joint_group_member.joint_role AS 'role',
-       user.user_id AS 'uid'
+        joint_group_member.joint_role AS 'role',
+        user.user_id AS 'uid'
       FROM joint_group_member
-      INNER JOIN user, joint_group
+      INNER JOIN user ON user.user_id = joint_group_member.user_id
+      INNER JOIN joint_group ON joint_group.joint_id = joint_group_member.joint_id
       WHERE user.user_id = '$uid'
     ";
     $qry = mysqli_query($this->db, $sql);
     if (mysqli_num_rows($qry) == 0 || !$qry) return 0;
-    return mysqli_fetch_assoc($qry);
+    $arr = array();
+    while ($jData = mysqli_fetch_assoc($qry)) array_push($arr, $jData);
+    return $arr;
   }
 }
 ?>

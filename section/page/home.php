@@ -28,14 +28,12 @@ if (isset($_COOKIE['dKEY'])) {
   <a class="icon-menu _tb_menu_btn" data-btn="menu"></a>
   <h3 class="_tblgo" title="Joint Download Software">JDS</h3>
   <a class="icon-logout _tb_menu_btn _mnuli" title="Logout"></a>
-
-  <div class="_tnvMnu" data-state="off">
-    <div class="_tnvMnu_drpDwn" data-group-block="J0INT">
-      <a class="_tnvMnu_drpDwn_title">GROUPS</a> <!-- skeleton -->
-      <div class="_tnvMnu_drpDwn_msg">Loading</div> <!-- skeleton -->
-    </div>
+</div>
+<div class="_tnvMnu" data-state="off">
+  <div class="_tnvMnu_drpDwn" data-group-block="J0INT">
+    <a class="_tnvMnu_drpDwn_title">GROUPS</a> <!-- skeleton -->
+    <div class="_tnvMnu_drpDwn_msg">Loading</div> <!-- skeleton -->
   </div>
-
 </div>
 <div class="_bdyMain">
   <div class="_bdysec1">

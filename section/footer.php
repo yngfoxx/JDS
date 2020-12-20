@@ -31,9 +31,9 @@
                     $('._bibf_div_c_cont').fadeIn();
                     let downConfig = document.querySelector('._bibf_dc_div');
                     downConfig.setAttribute("data-svr-id", jRes.svrID);
-                    // show panes
-                    document.querySelector('._bs2_div_contr ').classList.remove('hide');
-                    document.querySelector('._jds_holder').innerText = jRes.jdsID;
+                    // show panes [LOAD JOINT GROUP] -------------------------->
+                    loadJDS(jRes.jdsID);
+                    // -------------------------------------------------------->
                   } else {
                     // delete temporary group or add to existing group
                     swal({
@@ -154,23 +154,29 @@
                   parTitle.classList.add('_tnvMnu_drpDwn_title');
                   parTitle.innerText = 'GROUPS';
               parDiv.append(parTitle);
-
-          let chdDiv = document.createElement('DIV');
-
           if (res != 0) {
             if (isJson(res)) {
               // parameters expected -> uid, jid, role
               let data = JSON.parse(res);
-              chdDiv.classList.add('_tnvMnu_drpDwn_btn');
-              chdDiv.innerText = data.jid;
-              parDiv.append(chdDiv);
+              for (var i = 0; i < data.length; i++) {
+                let chdDiv = document.createElement('DIV');
+                chdDiv.classList.add('_tnvMnu_drpDwn_btn');
+                chdDiv.innerText = data[i].jid;
+                chdDiv.setAttribute('jid', data[i].jid)
+                chdDiv.addEventListener('click', function() {
+                  loadJDS(this.getAttribute('jid'));
+                });
+                parDiv.append(chdDiv);
+              }
             } else {
+              let chdDiv = document.createElement('DIV');
               chdDiv.classList.add('_tnvMnu_drpDwn_msg');
               chdDiv.innerText = "Oops! something went wrong.";
               parDiv.append(chdDiv);
               console.error("An unexpected error occured. ajx.ln.[136]");
             }
           } else {
+            let chdDiv = document.createElement('DIV');
             // user is not in any group
             chdDiv.classList.add('_tnvMnu_drpDwn_msg');
             chdDiv.innerText = "NO GROUPS";

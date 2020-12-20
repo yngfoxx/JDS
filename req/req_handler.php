@@ -352,7 +352,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
     $jointList = $jds->getUserJointList($userID);
-    if ($jointList == 0) { echo 0; } else { echo json_encode($jointList); }
+    if ($jointList == 0) { echo 0; } else {
+      echo json_encode($jointList);
+    }
   }
 
 
