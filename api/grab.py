@@ -21,8 +21,8 @@ def disconnect():
 
 
 # Connect to websocket
-sio.connect('https://ws-jds-eu.herokuapp.com');
-# sio.connect('http://localhost:8000');
+# sio.connect('https://ws-jds-eu.herokuapp.com');
+sio.connect('http://localhost:8000');
 
 # accepts argument from command e.g "python grab.py -u https://www.filedomain.com/file.zip"
 parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
@@ -89,7 +89,7 @@ if obj.isSuccessful():
         print("|")
         print("|")
         print("|")
-        print("|-----> download took %ss" % obj.get_dl_time(human=True))
+        print("|-----> download took %s" % obj.get_dl_time(human=True))
         print("|")
         print("|")
         print("|")

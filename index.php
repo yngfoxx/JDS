@@ -1,5 +1,6 @@
 <?php
 session_start();
+header('Access-Control-Allow-Origin');
 
 if (isset($_COOKIE['dKEY'])) {
   // PACKAGES ---------------------------

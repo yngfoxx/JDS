@@ -9,7 +9,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       $(function () {
-        var socket = io('/dynamic-419'); // socket object
+        var socket = io(); // socket object
         socket.emit('message', $('#m').val()); // send socket message
         socket.on('message', function(msg) { // onReceive socket message
           if (msg != null) $('#messages').append($('<li>').text(JSON.stringify(msg)));
