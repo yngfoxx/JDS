@@ -1,6 +1,11 @@
 <?php
 session_start();
-header('Access-Control-Allow-Origin');
+// $allowed_origins = array(
+//   "http://localhost:8000"
+// );
+// header('Access-Control-Allow-Origin: ' . $allowed_origins);
+// header('Access-Control-Allow-Credentials: true');
+// header('Access-Control-Allow-Headers: Content-Type');
 
 if (isset($_COOKIE['dKEY'])) {
   // PACKAGES ---------------------------
