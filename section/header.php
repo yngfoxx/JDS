@@ -1,6 +1,5 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . '/JDS/config/app_config.php';
-
 $app = new app('APP_92ASA2_32S0');
 $NAME = $app->get_name();
 $DESCRIPTION = $app->get_desc();
@@ -32,11 +31,15 @@ $DOMAIN = "http://localhost/JDS/";
 <link rel="stylesheet" href="<?php echo "$DOMAIN"; ?>/lib/css/fontello/animation.css">
 <link rel="stylesheet" href="<?php echo "$DOMAIN"; ?>/lib/css/fontello/fontello.css">
 
+<script type="text/javascript">
+  less = { javascriptEnabled: true };
+</script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/3.9.0/less.min.js" ></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
 <script type="text/javascript" src="https://unpkg.com/vue-router"></script>
 <script src="//unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<script src="//js.pusher.com/5.1/pusher.min.js"></script>
+<script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+<script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/socket.js"></script>
 <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/script.js"></script>
 <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/ajx.js"></script>

@@ -227,6 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           'jid' => $jointID,
           'uid' => $userID,
           'url' => $data,
+          'ext' => $result['extension'],
           'max_chunk_size' => 5 // put default at first
         );
         $crt = $jds->crt_download($arrSVR);

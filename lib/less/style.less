@@ -504,6 +504,7 @@ select {
                       	transform: translate(-50%, -50%);
                       	font-size: 30px;
                       	font-weight: bold;
+                        text-transform: uppercase;
                       }
                     }
                   }
@@ -569,8 +570,8 @@ select {
                       display: flex;
                       flex-flow: row;
                       ._dwnld_bar_inner {
-                        .random(-100, 100);
-                      	width:  ~'@{random}px';
+                        .random(0, 100);
+                      	width:  ~'@{random}%';
                       	background: var(--light-green);
                       	border-radius: 5px;
                       	margin: 3px 4px;

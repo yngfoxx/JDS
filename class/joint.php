@@ -48,10 +48,11 @@ class jointlib extends stdlib {
     $uid = $this->db->escape_string($arr['uid']);
     $jid = $this->db->escape_string($arr['jid']);
     $url = $this->db->escape_string($arr['url']);
+    $ext = $this->db->escape_string($arr['ext']);
     $max_chunk_size = (isset($arr['max_chunk_size'])) ? $this->db->escape_string($arr['max_chunk_size']) : 5;
     $sql = "
-      INSERT INTO svr_download_request (joint_id, user_id, url, max_chunk_size)
-      VALUES('$jid', '$uid', '$url', '$max_chunk_size');
+      INSERT INTO svr_download_request (joint_id, user_id, url, ext, max_chunk_size)
+      VALUES('$jid', '$uid', '$url', '$ext', '$max_chunk_size');
     ";
     $qry = mysqli_query($this->db, $sql);
     return (($qry) ? mysqli_insert_id($this->db) : false); // return ID of inserted row
@@ -127,6 +128,7 @@ class jointlib extends stdlib {
       svr_download_request.url AS 'url',
       svr_download_request.max_chunk_size AS 'chunk_size',
       user.user_id AS 'uid',
+      svr_download_request.ext AS 'ext',
       svr_download_request.init AS 'status'
     FROM svr_download_request
     INNER JOIN joint_group ON joint_group.joint_id = svr_download_request.joint_id

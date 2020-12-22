@@ -8,6 +8,7 @@ app.get('/', (req, res) => {
 
 // SOCKET SECTION ------------------------------------------------------------->
 io.on("connection", (socket) => {
+  io.emit('message', 'A user has connected');
   // SOCKET HANDLING
   socket.on('message', (msg) => {
     io.emit('message', msg);
@@ -15,9 +16,17 @@ io.on("connection", (socket) => {
 
   // handle basic socket commands
   socket.on('disconnect', function () {
-      console.log('A user disconnected');
+      io.emit('message', 'A user disconnected');
+      // console.log('A user disconnected');
    });
 });
+
+// const dynamicNsp = io.of(/^\/dynamic-\d+$/).on('connection', (socket) => {
+//   const newNSP = socket.nsp; // newNamespace.name === '/dynamic-101'
+//
+//   // broadcast to all clients in the given sub-namespace
+//   newNSP.emit('hello');
+// });
 // ---------------------------------------------------------------------------->
 
 // http.listen(8000)
