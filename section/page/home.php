@@ -131,12 +131,18 @@ if (isset($_COOKIE['dKEY'])) {
                 </div>
               </div>
               <div class="_jdsirir_row">      <!-- sub row 1 2 2 -->
-                <div class="_dwnld_btn"><a class="icon-play _start"></a></div>
-                <div class="_dwnld_btn"><a class="icon-cog _conf"></a></div>
-                <div class="_dwnld_bar">
-                  <div class="_dwnld_bar_inner"></div>
+                <div class="_dwnld_btn">      <!-- sub row 1 2 2 1 -->
+                  <a class="icon-play _start"></a>
                 </div>
-                <div class="_dwnld_btn"><a class="icon-trash _del"></a></div>
+                <div class="_dwnld_btn">      <!-- sub row 1 2 2 2 -->
+                  <a class="icon-cog _conf"></a>      <!-- sub row 1 2 2 2 1 -->
+                </div>
+                <div class="_dwnld_bar">      <!-- sub row 1 2 2 3 -->
+                  <div class="_dwnld_bar_inner"></div>      <!-- sub row 1 2 2 3 1 -->
+                </div>
+                <div class="_dwnld_btn">      <!-- sub row 1 2 2 4 -->
+                  <a class="icon-trash _del"></a>      <!-- sub row 1 2 2 4 1 -->
+                </div>
               </div>
             </div>
           </div>
