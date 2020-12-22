@@ -136,7 +136,7 @@ class jointlib extends stdlib {
     $qry = mysqli_query($this->db, $sql);
     if (mysqli_num_rows($qry) == 0 || !$qry) return 0;
     $arr = array();
-    while ($jData = mysqli_fetch_assoc($qry)) array_push($arr, $jData);
+    while ($jData = mysqli_fetch_assoc($qry)) array_push($arr, $jData); // store sql result in array
     return $arr;
   }
 

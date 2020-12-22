@@ -12,6 +12,10 @@
   width: -moz-available;
   width: -webkit-fill-available;
 }
+
+.random(@min, @max) {
+  @random: `Math.round(Math.random() * (@{max} - @{min}) + @{min})`;
+}
 // ----------------------------------------------------->
 
 :root {
@@ -565,7 +569,8 @@ select {
                       display: flex;
                       flex-flow: row;
                       ._dwnld_bar_inner {
-                      	width: 100%;
+                        .random(-100, 100);
+                      	width:  ~'@{random}px';
                       	background: var(--light-green);
                       	border-radius: 5px;
                       	margin: 3px 4px;

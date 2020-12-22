@@ -110,9 +110,9 @@ if (isset($_COOKIE['dKEY'])) {
             <div class="_jdsiri_row">         <!-- sub row 1 2 -->
               <div class="_jdsirir_row">      <!-- sub row 1 2 1 -->
                 <div class="_jdsirir_itm">    <!-- sub row 1 2 1 1-->
-                  <a class="_jdsirir_itm_val">https://www.exodusleague.com/item/music.mp3</a>
+                  <a class="_jdsirir_itm_val">music.mp3</a>
                   <hr>
-                  <a class="_jdsirir_itm_label">URL</a>
+                  <a class="_jdsirir_itm_label">File</a>
                 </div>
                 <div class="_jdsirir_itm">    <!-- sub row 1 2 1 2-->
                   <a class="_jdsirir_itm_val">---</a>
