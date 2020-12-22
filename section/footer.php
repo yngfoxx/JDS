@@ -149,11 +149,9 @@
         data: {groupList: true},
         success: (res) => {
           let parDiv = document.querySelector('._tnvMnu_drpDwn');
-              parDiv.innerHTML = "";
-              let parTitle = document.createElement('A');
-                  parTitle.classList.add('_tnvMnu_drpDwn_title');
-                  parTitle.innerText = 'GROUPS';
-              parDiv.append(parTitle);
+              // parDiv.innerHTML = "";
+              $('._tnvMnu_drpDwn_msg').remove();
+              $('._tnvMnu_drpDwn_btn').remove();
           if (res != 0) {
             if (isJson(res)) {
               // parameters expected -> uid, jid, role

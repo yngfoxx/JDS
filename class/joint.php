@@ -164,6 +164,7 @@ class jointlib extends stdlib {
     $sql = "
     SELECT
       user.user_id AS 'uid',
+      user.username AS 'username',
       joint_group.joint_id AS 'jid',
       joint_group_member.joint_role AS 'role',
       joint_group_member.date_added AS 'joined',

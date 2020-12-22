@@ -29,15 +29,18 @@ if (isset($_COOKIE['dKEY'])) {
   <h3 class="_tblgo" title="Joint Download Software">JDS</h3>
   <a class="icon-logout _tb_menu_btn _mnuli" title="Logout"></a>
 </div>
+
+<!-- Menu -->
 <div class="_tnvMnu" data-state="off">
   <div class="_tnvMnu_drpDwn" data-group-block="J0INT">
     <a class="_tnvMnu_drpDwn_title">GROUPS</a> <!-- skeleton -->
     <div class="_tnvMnu_drpDwn_msg">Loading</div> <!-- skeleton -->
   </div>
 </div>
+
 <div class="_bdyMain">
   <div class="_bdysec1">
-
+    <!-- Input bar -->
     <form class="_bibf" method="POST">
       <div class="_bibf_div">
         <input class="_bibftxt" name="path_code" placeholder="Enter URL or JDS code" type="text" required>
@@ -87,12 +90,60 @@ if (isset($_COOKIE['dKEY'])) {
         <div class="_bs2dcp_row">
           <div class="_bs2dcpr_container">
             <div class="_bs2dcprc_title">Members</div>
+            <div class="_bs2dcprc_member">
+              <a class="_mem _name">Stephen</a>
+              <a class="_mem _stat">online</a>
+            </div> <!-- skeleton -->
           </div>
         </div>
       </div>
 
       <div class="_bs2dc_pane _pane_r">
-        <div class="_bs2dcp_row _jds_info"></div>
+
+        <div class="_bs2dcp_row _jds_info">   <!-- main row -->
+          <div class="_jdsi_row _info">       <!-- sub row 1 -->
+            <div class="_jdsiri_row _rext">   <!-- sub row 1 1 -->
+              <div class="_jdsiri_ext">       <!-- sub row 1 1 1 -->
+                <a class="_ext">EXT</a>       <!-- sub row 1 1 1 1 -->
+              </div>
+            </div>
+            <div class="_jdsiri_row">         <!-- sub row 1 2 -->
+              <div class="_jdsirir_row">      <!-- sub row 1 2 1 -->
+                <div class="_jdsirir_itm">    <!-- sub row 1 2 1 1-->
+                  <a class="_jdsirir_itm_val">https://www.exodusleague.com/item/music.mp3</a>
+                  <hr>
+                  <a class="_jdsirir_itm_label">URL</a>
+                </div>
+                <div class="_jdsirir_itm">    <!-- sub row 1 2 1 2-->
+                  <a class="_jdsirir_itm_val">---</a>
+                  <hr>
+                  <a class="_jdsirir_itm_label">Estimated size</a>
+                </div>
+                <div class="_jdsirir_itm">    <!-- sub row 1 2 1 3-->
+                  <a class="_jdsirir_itm_val">Downloading</a>
+                  <hr>
+                  <a class="_jdsirir_itm_label">Status</a>
+                </div>
+                <div class="_jdsirir_itm">    <!-- sub row 1 2 1 4-->
+                  <a class="_jdsirir_itm_val">-.-.-.-</a>
+                  <hr>
+                  <a class="_jdsirir_itm_label">Source IP address</a>
+                </div>
+              </div>
+              <div class="_jdsirir_row">      <!-- sub row 1 2 2 -->
+                <div class="_dwnld_btn"><a class="icon-play _start"></a></div>
+                <div class="_dwnld_btn"><a class="icon-cog _conf"></a></div>
+                <div class="_dwnld_bar">
+                  <div class="_dwnld_bar_inner"></div>
+                </div>
+                <div class="_dwnld_btn"><a class="icon-trash _del"></a></div>
+              </div>
+            </div>
+          </div>
+          <div class="_jdsi_row _options"></div> <!-- sub row 2 -->
+        </div>
+
+
         <!-- <div class="_bs2dcp_row"></div> -->
       </div>
     </div>

@@ -439,10 +439,23 @@ select {
             	position: absolute;
               top: 0; left: 0; bottom: 0; right: 0;
               ._bs2dcprc_title {
-              	background-color: #646464;
+                background-color: #424242;
+                color: white;
+                padding: 15px 10px;
+                border-radius: 10px;
+              }
+              ._bs2dcprc_member {
               	color: white;
-              	padding: 10px;
-              	border-radius: 10px;
+              	background-color: var(--sec-col);
+              	padding: 16px 10px;
+              	border-radius: 5px;
+              	margin-top: 5px;
+              	display: flex;
+                ._mem {
+                	margin: auto;
+                  &._name { margin-left: 0 }
+                  &._stat { margin-right: 0 }
+                }
               }
             }
           }
@@ -452,8 +465,115 @@ select {
           overflow: auto;
           ._bs2dcp_row {
             &._jds_info {
-              max-height: 150px;
               margin-bottom: 0px !important;
+              display: flex;
+              flex-flow: column;
+              height: max-content;
+              padding: 0px 0px 2px;
+              ._jdsi_row {
+              	margin: auto;
+                .fill_width();
+                &._info {
+                	display: flex;
+                	flex-flow: row;
+                	margin: 7px auto;
+                }
+                ._jdsiri_row {
+                	margin: 0px 5px 0px auto;
+                  .fill_width();
+                  display: flex;
+                  flex-flow: column;
+                  &._rext {
+                  	margin: auto 7px auto 7px;
+                    width: max-content;
+                    ._jdsiri_ext {
+                    	background-color: grey;
+                    	color: white;
+                    	width: 120px;
+                    	height: 120px;
+                    	border-radius: 5px;
+                    	position: relative;
+                      ._ext {
+                      	position: absolute;
+                      	top: 50%;
+                      	left: 50%;
+                      	transform: translate(-50%, -50%);
+                      	font-size: 30px;
+                      	font-weight: bold;
+                      }
+                    }
+                  }
+                  ._jdsirir_row {
+                  	margin: auto;
+                    .fill_width();
+                    display: flex;
+                    flex-flow: row;
+                    ._jdsirir_itm {
+                      .fill_width();
+                    	color: white;
+                    	margin: auto 13px auto auto;
+                      ._jdsirir_itm_val {
+                      	font-size: 16px;
+                      	max-width: 300px;
+                      	display: block;
+                      	overflow: hidden;
+                      	text-overflow: ellipsis;
+                        white-space: nowrap;
+                      }
+                      hr {
+                      	margin: 3px auto 2px;
+                      	height: 3px;
+                      	background-color: var(--light-gray-v2);
+                      	border: none;
+                      }
+                      ._jdsirir_itm_label {
+                      	color: var(--light-gray-v2);
+                      	font-weight: bold;
+                      	font-size: 13px;
+                      }
+                    }
+                    ._dwnld_btn {
+                    	position: relative;
+                    	background: #262626;
+                    	width: 64px;
+                    	border-radius: 10px;
+                    	margin-right: 5px;
+                      transition: .3s;
+                      &:hover {
+                      	background-color: grey;
+                      	cursor: pointer;
+                      }
+                      a {
+                      	color: #fff;
+                      	position: absolute;
+                      	top: 50%; left: 50%;
+                      	transform: translate(-50%, -50%);
+                        &._start {
+                        	color: #2adf2a;
+                        }
+                      }
+                    }
+                    ._dwnld_bar {
+                      .fill_width();
+                      min-height: 52px;
+                      background-color: #444;
+                      margin: auto 5px 0px auto !important;
+                      border-radius: 5px;
+                      position: relative;
+                      box-sizing: border-box;
+                      overflow: hidden;
+                      display: flex;
+                      flex-flow: row;
+                      ._dwnld_bar_inner {
+                      	width: 100%;
+                      	background: var(--light-green);
+                      	border-radius: 5px;
+                      	margin: 3px 4px;
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }

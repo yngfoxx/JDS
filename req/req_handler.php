@@ -388,11 +388,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     $jointMembers = $jds->getJointMembers($jointID); # Group members
     // add members data to output
-    $GROUPDATA['members'] = $jointMembers;
+    $GROUPDATA['member'] = $jointMembers;
 
     $jointDownloadList = $jds->getJointDownloadList($jointID);  # Download requests
     // add list to output array if it's not empty
-    $GROUPDATA['downloads'] = ($jointDownloadList == 0) ? 0 : $jointDownloadList;
+    $GROUPDATA['download'] = ($jointDownloadList == 0) ? 0 : $jointDownloadList;
 
     // output
     echo json_encode($GROUPDATA);
