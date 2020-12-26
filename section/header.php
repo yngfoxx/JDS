@@ -9,7 +9,7 @@ $DOMAIN = "http://localhost/JDS/";
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title><?php echo $NAME; ?></title>
-<link rel="icon" type="image/x-icon" href="favicon.ico">
+<!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
 <meta name="application-name" content="<?php echo $NAME; ?>">
 <!-- <meta property="og:image" content="../media/icons/logo_270x270.png"> -->
 <meta property="og:title" content="<?php echo $NAME; ?>">
@@ -31,9 +31,7 @@ $DOMAIN = "http://localhost/JDS/";
 <link rel="stylesheet" href="<?php echo "$DOMAIN"; ?>/lib/css/fontello/animation.css">
 <link rel="stylesheet" href="<?php echo "$DOMAIN"; ?>/lib/css/fontello/fontello.css">
 
-<script type="text/javascript">
-  less = { javascriptEnabled: true };
-</script>
+<script type="text/javascript">less = { javascriptEnabled: true };</script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/3.9.0/less.min.js" ></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
 <script type="text/javascript" src="https://unpkg.com/vue-router"></script>

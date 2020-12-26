@@ -6,6 +6,10 @@ import socketio
 # WebSocket object
 sio = socketio.Client()
 
+# Connect to websocket
+# sio.connect('http://localhost:8000/', namespaces='/py-1213'); # connect python api to a socket channel
+sio.connect('https://ws-jds-eu.herokuapp.com/', namespaces='/py-1247'); # connect python api to a socket channel
+
 # Socket connection events
 @sio.event
 def connect():
@@ -19,18 +23,14 @@ def connect_error():
 def disconnect():
     print("[disconnected]")
 
-
-# Connect to websocket
-# sio.connect('https://ws-jds-eu.herokuapp.com');
-sio.connect('http://localhost:8000');
-
 # accepts argument from command e.g "python grab.py -u https://www.filedomain.com/file.zip"
 parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
 
 
 # accept URL with "-u" or "--url"
 parser.add_argument('-u', '--url', type=str, required=True, help='The URL of the target file')
-parser.add_argument('-i', '--id', type=str, help='The user/session id for further processing')
+parser.add_argument('-j', '--jid', type=str, required=True, help='The joint id for further processing')
+parser.add_argument('-d', '--dest', type=str, help='Download destination')
 
 
 # assign arguments to object
@@ -38,11 +38,11 @@ args = parser.parse_args()
 
 # Assign arguments in object to variables
 URL = args.url
-USER_ID = args.id
+JOINT_ID = args.jid
 
 
 # FILE DOWNLOAD MANAGER
-DESTINATION = "./"
+DESTINATION = (args.dest || "./")
 
 
 # DEFINE THE DOWNLOAD OBJECT
@@ -53,14 +53,14 @@ obj = SmartDL(URL, DESTINATION)
 obj.start(blocking=False)
 
 while not obj.isFinished():
-        sio.emit('message', {
+        sio.emit('event', {
         'speed': obj.get_speed(human=True),
         'downloaded': obj.get_dl_size(human=True),
         'ETA': obj.get_eta(human=True),
         'progress': (obj.get_progress()*100),
         'bar': obj.get_progress_bar(),
-        'status': obj.get_status(),
-        });
+        'status': obj.get_status()
+        }, '/py-1213');
         print("|")
         print("|")
         print("|")
@@ -79,13 +79,13 @@ while not obj.isFinished():
         time.sleep(0.2)
 
 if obj.isSuccessful():
-        sio.emit('message', {
+        sio.emit('event', {
          'download_path': obj.get_dest(),
          'download_time_length': obj.get_dl_time(human=True),
          'MD5': obj.get_data_hash('md5'),
          'SHA1': obj.get_data_hash('sha1'),
          'SHA256': obj.get_data_hash('sha256')
-        });
+        }, '/py-1213');
         print("|")
         print("|")
         print("|")
