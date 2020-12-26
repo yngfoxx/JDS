@@ -100,9 +100,9 @@ else:
         for e in obj.get_errors():
                 print(str(e))
 # ----------------------------------------------------------------------------->
-
-
 # [*] 0.23 Mb / 0.37 Mb @ 88.00Kb/s [##########——–] [60%, 2s left]
+
+
 
 
 # STORE DOWNLOADED FILE IN GIVEN DESTINATION
