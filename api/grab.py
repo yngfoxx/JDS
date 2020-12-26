@@ -11,8 +11,8 @@ sio = socketio.Client()
 
 channel_id = "/py_" + str(math.floor((random.random() * (9999999 - 1000000 + 1)) + 1000000));
 
-sio.connect('http://localhost:8000/', namespaces=channel_id); # connect python api to a socket channel
-# sio.connect('http://localhost:8000/'); # connect python api to a socket channel
+sio.connect('https://ws-jds-eu.herokuapp.com/', namespaces=channel_id); # connect python api to a socket channel
+# sio.connect('http://localhost:8000/', namespaces=channel_id); # connect python api to a socket channel
 
 # sio.connect('https://ws-jds-eu.herokuapp.com', headers={'auth':'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'}, namespaces=channel_id); # connect python api to a socket channel
 
