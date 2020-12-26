@@ -1,26 +1,27 @@
-# SCRIPT BY OSUNRINDE STEPHEN ADEBAYO
+# SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)
 import time, requests, argparse, random, math
 from pySmartDL import SmartDL
 import socketio
 
-# WebSocket object
+# WebSocket object----------<
 sio = socketio.Client()
+# --------------------------<
 
-# Connect to websocket
-# sio.connect('http://localhost:8000/', namespaces='/py-1213'); # connect python api to a socket channel
+# CONNECT TO WEBSOCKET -------------------------------------------------------->
+channel_id = "/py_" + str(math.floor((random.random() * (9999999 - 1000000 + 1)) + 1000000)); # generate ID
 
-channel_id = "/py_" + str(math.floor((random.random() * (9999999 - 1000000 + 1)) + 1000000));
+sio.connect('https://ws-jds-eu.herokuapp.com/', namespaces=channel_id); # connect python api to generated socket channel id
+# sio.connect('https://ws-jds-eu.herokuapp.com', headers={'auth':'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'}, namespaces=channel_id); # connect python api to generated socket channel id
+# sio.connect('http://localhost:8000/', namespaces=channel_id); # connect python api to generated socket channel id
 
-sio.connect('https://ws-jds-eu.herokuapp.com/', namespaces=channel_id); # connect python api to a socket channel
-# sio.connect('http://localhost:8000/', namespaces=channel_id); # connect python api to a socket channel
+# ----------------------------------------------------------------------------->
 
-# sio.connect('https://ws-jds-eu.herokuapp.com', headers={'auth':'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'}, namespaces=channel_id); # connect python api to a socket channel
 
-# Socket connection events
+# SOCKET EVENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 @sio.event
 def connect():
+    sio.emit("msg", {"foo":"bar"}, channel_id)
     print("[connected] socket_id: ", sio.sid)
-    sio.emit("msg", {"txt":"Hello world"}, channel_id);
 
 @sio.event
 def connect_error():
@@ -30,7 +31,10 @@ def connect_error():
 def disconnect():
     print("[disconnected]")
 
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+
+# PARSE INLINE COMMAND ARGUMENTS ---------------------------------------------->
 # accepts argument from command e.g "python grab.py -u https://www.filedomain.com/file.zip"
 parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
 
@@ -49,8 +53,10 @@ URL = args.url
 JOINT_ID = args.jid
 
 DESTINATION = './'
+# ----------------------------------------------------------------------------->
 
-# DEFINE THE DOWNLOAD OBJECT
+
+# SMART DOWNLOADER OPERATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 obj = SmartDL(URL, DESTINATION)
 
 
@@ -103,10 +109,10 @@ else:
 # [*] 0.23 Mb / 0.37 Mb @ 88.00Kb/s [##########——–] [60%, 2s left]
 
 
-
-
 # STORE DOWNLOADED FILE IN GIVEN DESTINATION
 path = obj.get_dest()
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
 # disconnect from socket server
 sio.disconnect()
