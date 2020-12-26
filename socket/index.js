@@ -24,10 +24,16 @@ app.get('/', (req, res) => { // SERVER OUTPUT
    // res.json('Running');
 });
 
-let pkey = [
+const sukey = [
   'FMZur70PbXcT7dYOFdOuzjSpC4xdduMD',
   'u0xx53YtRC77iH1ROnIZSivPeKr2XzzP',
-  'Aj6dN8WfWbPq1HdnHJFXwsXV7MDRrCCU',
+];
+
+const usrkey = [
+  'Aj6dN8WfWbPq1HdnHJFXwsXV7MDRrCCU'
+];
+
+const pykey = [
   'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'
 ];
 
@@ -38,9 +44,9 @@ const user_nsp = io.of(/^\/usr_\d+$/);
 const cookie = require('cookie');
 
 
-// PYTHON API SOCKET NAMESPACE/CHANNELS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// ADMIN SOCKET NAMESPACE/CHANNELS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 admin_server_nsp.use((socket, next) => { // Authenticate admin channel
-  if (pkey.includes(socket.handshake.query.auth)) return next(); // check authenticity of key
+  if (sukey.includes(socket.handshake.query.auth)) return next(); // check authenticity of key
   admin_server_nsp.emit('msg', '{ADMIN} => ['+socket.id+'] ACCESS DENIED (Invalid key)');
   return next(new Error('authentication error'));
 });
@@ -68,7 +74,7 @@ admin_server_nsp.on('connection', (socket) => {
 
 // USER SOCKET NAMESPACE/CHANNEL>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 user_nsp.use((socket, next) => { // Authenticate admin channel
-  if (pkey.includes(socket.handshake.query.auth)) return next(); // check authenticity of key
+  if (usrkey.includes(socket.handshake.query.auth)) return next(); // check authenticity of key
   user_nsp.emit('msg', '{USER} => ['+socket.id+'] ACCESS DENIED (Invalid key)');
   return next(new Error('authentication error'));
 });
@@ -102,15 +108,27 @@ user_nsp.on('connection', (socket) => {
 
 
 // PYTHON API SOCKET NAMESPACE/CHANNELS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// python_server_nsp.use((socket, next) => { // Authenticate admin channel
+//   if (pykey.includes(socket.handshake.query.auth)) return next(); // check authenticity of key
+//   python_server_nsp.emit('msg', '{PYTHON} => ['+socket.id+'] ACCESS DENIED (Invalid key)');
+//   return next(new Error('authentication error'));
+// });
+
 python_server_nsp.on('connection', (socket) => {
   const python_channel = socket.nsp; // newNamespace.name === '/python
 
   // GET SOCKET DATA
-  // console.log(`python socket connections: ${python_channel.sockets.size}`);
+  python_server_nsp.emit('msg', '{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name);
+  console.log('{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name);
 
-  socket.on('event', (data) => {
-    console.log(data); // data received
-    python_channel.emit('event', data);
+  // SOCKET EVENT PROCESSING
+  socket.on('msg', (data) => {
+    python_server_nsp.emit('msg', data); // send message direct to the namespace
+  });
+
+  // BASIC SOCKET COMMANDS
+  socket.on('disconnect', function () {
+    python_server_nsp.emit('msg', `PYTHON SOCKET [${socket.id}] DISCONNECTED`);
   });
 });
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

@@ -61,16 +61,19 @@
     </div>
     <!-- <script src="/socket.io/socket.io.js"></script> -->
     <script>
-      const key = 'FMZur70PbXcT7dYOFdOuzjSpC4xdduMD';
-      // const key = 'wset23453';
+      const suKEY = 'FMZur70PbXcT7dYOFdOuzjSpC4xdduMD';
+      const usrKEY = 'Aj6dN8WfWbPq1HdnHJFXwsXV7MDRrCCU';
+      const pyKEY = 'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz';
+
       function rand(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
+      const UUID = rand(1000000000, 9999999999);
 
       $(function () {
-        const admin_socket = io('/su_'+rand(1000000000, 9999999999), { reconnectionDelayMax: 10000, query: { auth: key }, forceNew: true });
-        const python_socket = io('/py_'+rand(1000000000, 9999999999), { reconnectionDelayMax: 10000, query: { foo: 'bar' } });
-        const user_socket = io('/usr_'+rand(1000000000, 9999999999), { reconnectionDelayMax: 10000, query: { auth: key }, forceNew: true });
+        const admin_socket = io('/su_'+UUID, { reconnectionDelayMax: 10000, query: { auth: suKEY }, forceNew: true });
+        const python_socket = io('/py_'+UUID, { reconnectionDelayMax: 10000, query: { auth: pyKEY } });
+        const user_socket = io('/usr_'+UUID, { reconnectionDelayMax: 10000, query: { auth: usrKEY }, forceNew: true });
 
 
         // ADMIN -------------------------------------------------------------->
@@ -103,7 +106,7 @@
 
 
         // PYTHON ------------------------------------------------------------->
-        python_socket.on('event', (msg) => { // onReceive socket message
+        python_socket.on('msg', (msg) => { // onReceive socket message
           if (msg != null) {
             let parentDiv = document.querySelector('._pyt_pane');
             let newDiv = document.createElement('div');
