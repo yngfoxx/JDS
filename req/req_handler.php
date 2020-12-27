@@ -218,8 +218,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         echo json_encode($result);
         exit();
       }
+      // ----------------------------------------------------------------------<
 
-      // Add user to J0INT group as owner -------------------------------------<
+      // Add user to group as owner -------------------------------------------<
       $arrGRP = array('jid' => $jointID, 'uid' => $userID, 'role' => 'owner');
       if ($jds->group_add_member($arrGRP)) {
         // Add requested file to server download request
@@ -230,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           'ext' => $result['extension'],
           'max_chunk_size' => 5 // put default at first
         );
-        $crt = $jds->crt_download($arrSVR);
+        $crt = $jds->crt_download($arrSVR); # create new download request from URL recieved
         if ($crt != false) {
           $result['svrID'] = $crt;
           echo json_encode($result); // end of process
@@ -358,6 +359,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
   }
 
+
   # get group details, members and download requests
   if (isset($_POST['jdsCheck'])) {
     // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
@@ -401,8 +403,87 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
   # initialize download request
-  if (isset($_POST['joint_init'])) {
+  if (isset($_POST['jdsInit'])) {
+    if (!$_POST['jdsInit']) exit();
     // TODO: Initialize joint download
+    /*
+    #-> File authenticity check
+    #
+    #-> Create socket channel ID
+    #
+    #-> Store necessary file data
+    */
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+
+    // Necessary variables
+    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+    $requestID = $std->db->escape_string($_POST['rid']);
+    $jointID = $std->db->escape_string($_POST['jid']);
+
+    // Authenticating request from client -------------------------------------<
+    $requestData = $jds->getRequestInfo($requestID);
+    $jointData = $jds->getJointInfo($jointID);
+
+    if (!$requestData || !$jointData) {
+      $result = array('server_error' => "Not found!", 'code' => '404'); // request id or joint group id not found
+      echo json_encode($result);
+      exit();
+    }
+
+    if ($requestData['jid'] != $jointID) {
+      $result = array('server_error' => "ID match not found!", 'code' => '500'); // request id does not belong to the joint group
+      echo json_encode($result);
+      exit();
+    }
+    // ------------------------------------------------------------------------<
+
+
+    // FILE AUTHENTICITY CHECK ------------------------------------------------>
+    $file_url = $requestData['url'];
+    if (!$std->scanURL($file_url)) {
+      $result = array('server_error' => "File at URL not found!", 'code' => '404'); // request id or joint group id not found
+      echo json_encode($result);
+      exit();
+    }
+
+    // database fields : rid, jid, file_path, size, MD5, SHA1, SHA256, progress
+    $fileName = pathinfo($file_url, PATHINFO_FILENAME); # source file name
+    $fileExtension = pathinfo($file_url, PATHINFO_EXTENSION); # source file name
+    $socketChannel = $std->makeNumericKey(6);
+    $serverPath = "storage/$jointID/$requestID/";
+    $fileData = array(
+      'jid'         => $jointID,
+      'rid'         => $requestID,
+      'py_channel'  => $socketChannel,
+      'size'        => $std->formatUnit($std->getURLFileSize($file_url)),
+      'server_path' => $serverPath
+    );
+    $response = $jds->crt_file($fileData); // create file data in database
+    if ($response) {
+      // INITIALIZE PYTHON SCRIPT
+      # python grab.py -u '$file_url' -r '$requestID' -nsp '$socketChannel' -d '$serverPath'
+       $code = "python api/grab.py -u '$file_url' -r '$requestID' -nsp '$socketChannel' -d '$serverPath'";
+       $result = array("code" => $code);
+       echo json_encode($result);
+    } else {
+      $result = array('server_error' => "Unexpected error", 'code' => '500'); // Something unexpected has happened
+      echo json_encode($result);
+      exit();
+    }
+
+    // ------------------------------------------------------------------------>
+
   }
 
   //////////////////////////////////////////////////////////////////////////////

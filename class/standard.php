@@ -47,6 +47,15 @@ class stdlib {
   }
 
 
+  public function makeNumericKey($length) {
+    // MAKE KEY -----------------------------------------------------------------
+      # Generates random integers with given string length
+    // --------------------------------------------------------------------------
+    $str = '0123456789';
+    return substr(str_shuffle($str), 0, $length);
+  }
+
+
   public function makeUpperKey($length) {
     // MAKE KEY -----------------------------------------------------------------
       # Generates random strings with given length

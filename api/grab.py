@@ -3,18 +3,40 @@ import time, requests, argparse, random, math
 from pySmartDL import SmartDL
 import socketio
 
-# WebSocket object----------<
-sio = socketio.Client()
-# --------------------------<
+
+# PARSE INLINE COMMAND ARGUMENTS ---------------------------------------------->
+# accepts argument from command e.g "python grab.py -u https://www.filedomain.com/file.zip"
+parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
+
+
+# accept URL with "-u" or "--url"
+parser.add_argument('-u', '--url', type=str, required=True, help='The URL of the target file')
+parser.add_argument('-r', '--rid', type=str, required=True, help='The request id attached to the svr_download_request table')
+parser.add_argument('-nsp', '--namespace', type=str, required=True, help='Node.js Websocket namespace')
+parser.add_argument('-d', '--destination', type=str, required=True, help='Download destination also known as server_path')
+
+
+# assign arguments to object
+args = parser.parse_args()
+
+# Assign arguments in object to variables
+URL = args.url
+REQUEST_ID = args.rid
+NAMESPACE = args.namespace
+DESTINATION = args.destination
+# ----------------------------------------------------------------------------->
+
+
 
 # CONNECT TO WEBSOCKET -------------------------------------------------------->
-channel_id = "/py_" + str(math.floor((random.random() * (9999999 - 1000000 + 1)) + 1000000)); # generate ID
+sio = socketio.Client() # WebSocket object
+
+channel_id = "/py_" + NAMESPACE;
+# channel_id = "/py_" + str(math.floor((random.random() * (9999999 - 1000000 + 1)) + 1000000)); # generate ID
 
 sio.connect('https://ws-jds-eu.herokuapp.com/', namespaces=channel_id); # connect python api to generated socket channel id
 # sio.connect('https://ws-jds-eu.herokuapp.com', headers={'auth':'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'}, namespaces=channel_id); # connect python api to generated socket channel id
 # sio.connect('http://localhost:8000/', namespaces=channel_id); # connect python api to generated socket channel id
-
-# ----------------------------------------------------------------------------->
 
 
 # SOCKET EVENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -32,27 +54,6 @@ def disconnect():
     print("[disconnected]")
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-# PARSE INLINE COMMAND ARGUMENTS ---------------------------------------------->
-# accepts argument from command e.g "python grab.py -u https://www.filedomain.com/file.zip"
-parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
-
-
-# accept URL with "-u" or "--url"
-parser.add_argument('-u', '--url', type=str, required=True, help='The URL of the target file')
-parser.add_argument('-j', '--jid', type=str, required=True, help='The joint id for further processing')
-parser.add_argument('-d', '--dest', type=str, help='Download destination')
-
-
-# assign arguments to object
-args = parser.parse_args()
-
-# Assign arguments in object to variables
-URL = args.url
-JOINT_ID = args.jid
-
-DESTINATION = './'
 # ----------------------------------------------------------------------------->
 
 

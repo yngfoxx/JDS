@@ -45,10 +45,10 @@ class jointlib extends stdlib {
 
 
   public function crt_download($arr) {
-    $uid = $this->db->escape_string($arr['uid']);
-    $jid = $this->db->escape_string($arr['jid']);
-    $url = $this->db->escape_string($arr['url']);
-    $ext = $this->db->escape_string($arr['ext']);
+    $uid = $this->db->escape_string($arr['uid']); # User ID
+    $jid = $this->db->escape_string($arr['jid']); # Joint ID
+    $url = $this->db->escape_string($arr['url']); # File requested
+    $ext = $this->db->escape_string($arr['ext']); # File extension
     $max_chunk_size = (isset($arr['max_chunk_size'])) ? $this->db->escape_string($arr['max_chunk_size']) : 5;
     $sql = "
       INSERT INTO svr_download_request (joint_id, user_id, url, ext, max_chunk_size)
@@ -183,6 +183,49 @@ class jointlib extends stdlib {
     $arr = array();
     while ($jData = mysqli_fetch_assoc($qry)) array_push($arr, $jData);
     return $arr;
+  }
+
+
+  public function getRequestInfo($rid)
+  {
+    $rid = $this->db->escape_string($rid);
+    $sql = "
+    SELECT
+      svr_download_request.request_id AS 'rid',
+      joint_group.joint_id AS 'jid',
+      svr_download_request.url AS 'url',
+      svr_download_request.max_chunk_size AS 'chunk_size',
+      user.user_id AS 'uid',
+      svr_download_request.ext AS 'ext',
+      svr_download_request.init AS 'status'
+    FROM svr_download_request
+    INNER JOIN joint_group ON joint_group.joint_id = svr_download_request.joint_id
+    INNER JOIN user ON user.user_id = svr_download_request.user_id
+    WHERE svr_download_request.request_id = '$rid'
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    if (mysqli_num_rows($qry) == 1) return mysqli_fetch_assoc($qry);
+    return false;
+  }
+
+
+  public function crt_file($arr)
+  {
+    $jid = $this->db->escape_string($arr['jid']);
+    $rid = $this->db->escape_string($arr['rid']);
+    $channel = $this->db->escape_string($arr['py_channel']);
+    $size = $this->db->escape_string($arr['size']);
+    $serverPath = $this->db->escape_string($arr['server_path']);
+    $sql = "
+      INSERT INTO file(request_id, joint_id, py_channel, server_path, size)
+      VALUES ('$rid', '$jid', '$channel', '$serverPath', '$size');
+
+      UPDATE svr_download_request SET init = '1'
+      WHERE request_id = '$rid'
+      AND joint_id = '$jid';
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    return (($qry) ? true : false);
   }
 }
 ?>

@@ -40,4 +40,4 @@ $DOMAIN = "http://localhost/JDS/";
 <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
 <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/script.js"></script>
 <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/ajx.js"></script>
-<script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/socket.js"></script>
+<?php if (isset($_GET['home'])) echo '<script type="text/javascript" src="'.$DOMAIN.'/lib/js/socket.js"></script>'; ?>
