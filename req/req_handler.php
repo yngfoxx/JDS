@@ -461,7 +461,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $fileName = pathinfo($file_url, PATHINFO_FILENAME); # source file name
     $fileExtension = pathinfo($file_url, PATHINFO_EXTENSION); # source file name
     $socketChannel = $std->makeNumericKey(6);
-    $serverPath = "storage/$jointID/$requestID/";
+    $serverPath = "D:/JDS/storage/$jointID/$requestID/";
     $fileData = array(
       'jid'         => $jointID,
       'rid'         => $requestID,
@@ -472,10 +472,33 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $response = $jds->crt_file($fileData); // create file data in database
     if ($response) {
       // INITIALIZE PYTHON SCRIPT
-      # python grab.py -u '$file_url' -r '$requestID' -nsp '$socketChannel' -d '$serverPath'
-       $code = "python api/grab.py -u '$file_url' -r '$requestID' -nsp '$socketChannel' -d '$serverPath'";
-       $result = array("code" => $code);
-       echo json_encode($result);
+        // $script_path = $_SERVER['DOCUMENT_ROOT'] . '/JDS/req/script.sh';
+        //
+        // $python_path = 'C:/Users/YoungFox/AppData/Local/Programs/Python/Python39/python.exe';
+        //
+        // $script_path = $_SERVER['DOCUMENT_ROOT'] . '/JDS/api/grab.py';
+        //
+        // $code = "$python_path $script_path -u '$file_url' -r '$requestID' -nsp '$socketChannel' -d '$serverPath'";
+        //
+        // // $result_last_line = Shell_Exec($code.' 2>&1 &');
+        //
+        // exec("$code 2>&1", $out, $status);
+        // if (0 === $status) {
+        //     var_dump($out);
+        // } else {
+        //     echo "Command failed with status: $status";
+        // }
+        // exit();
+
+        // if ($result_last_line) {
+        //   echo "Script is running..";
+        // } else {
+        //   echo "Script failed to init...";
+        // }
+
+        // EXECUTE SCRIPT WITH PYTHON FLASK API (fetch.py)
+        # http://127.0.0.1:5000/?url="https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe"&rid="13RWS2"&nsp="1234531"&dest="C:/JDS/storage"
+
     } else {
       $result = array('server_error' => "Unexpected error", 'code' => '500'); // Something unexpected has happened
       echo json_encode($result);

@@ -22,7 +22,7 @@ if (isset($_COOKIE['dKEY'])) {
 
   $dKEY = $std->db->escape_string($_COOKIE['dKEY']);
   if ($auth->getUserIdByDeviceID($dKEY) != false && !isset($_GET['home'])) {
-    $_SESSION['userID'] = $auth->getUserIdByDeviceID($dKEY)['user_id'];
+    $_SESSION['userID'] = $auth->getUserIdByDeviceID($dKEY);
     $_SESSION['logged_in'] = true;
     header("location: ./?home");
   }

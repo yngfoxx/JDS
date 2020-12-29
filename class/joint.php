@@ -217,14 +217,10 @@ class jointlib extends stdlib {
     $size = $this->db->escape_string($arr['size']);
     $serverPath = $this->db->escape_string($arr['server_path']);
     $sql = "
-      INSERT INTO file(request_id, joint_id, py_channel, server_path, size)
-      VALUES ('$rid', '$jid', '$channel', '$serverPath', '$size');
-
-      UPDATE svr_download_request SET init = '1'
-      WHERE request_id = '$rid'
-      AND joint_id = '$jid';
+      INSERT INTO file(request_id, joint_id, py_channel, server_path, size) VALUES ('$rid', '$jid', '$channel', '$serverPath', '$size');
+      UPDATE svr_download_request SET init = '1' WHERE request_id = '$rid' AND joint_id = '$jid';
     ";
-    $qry = mysqli_query($this->db, $sql);
+    $qry = mysqli_multi_query($this->db, $sql);
     return (($qry) ? true : false);
   }
 }

@@ -88,11 +88,34 @@
         admin_socket.on('msg', (data) => {
           // onReceive socket message
            if (data != null) {
-             let parentDiv = document.querySelector('._su_pane');
-             let newDiv = document.createElement('div');
-                 newDiv.setAttribute('class', 'skt_msg');
-                 newDiv.innerText = JSON.stringify(data);
-             parentDiv.append(newDiv);
+              switch (data.socket_type) {
+                case 'admin':
+                  let parentDivAdmin = document.querySelector('._su_pane');
+                  let newDivAdmin = document.createElement('div');
+                      newDivAdmin.setAttribute('class', 'skt_msg');
+                      newDivAdmin.innerText = "// "+JSON.stringify(data.socket_data) + " // => [Admin NSP]";
+                  parentDivAdmin.append(newDivAdmin);
+                  break;
+
+                case 'user':
+                  let parentDivUser = document.querySelector('._usr_pane');
+                  let newDivUser = document.createElement('div');
+                      newDivUser.setAttribute('class', 'skt_msg');
+                      newDivUser.innerText = "// "+JSON.stringify(data.socket_data) + " // => [Admin NSP]";
+                  parentDivUser.append(newDivUser);
+                  break;
+
+                case 'python':
+                    let parentDivPython = document.querySelector('._pyt_pane');
+                    let newDivPython = document.createElement('div');
+                        newDivPython.setAttribute('class', 'skt_msg');
+                        newDivPython.innerText = "// "+JSON.stringify(data.socket_data) + " // => [Admin NSP]";
+                    parentDivPython.append(newDivPython);
+                    break;
+                    
+                default:
+                    break;
+              }
            }
         });
 

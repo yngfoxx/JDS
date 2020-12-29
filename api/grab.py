@@ -34,9 +34,9 @@ sio = socketio.Client() # WebSocket object
 channel_id = "/py_" + NAMESPACE;
 # channel_id = "/py_" + str(math.floor((random.random() * (9999999 - 1000000 + 1)) + 1000000)); # generate ID
 
-sio.connect('https://ws-jds-eu.herokuapp.com/', namespaces=channel_id); # connect python api to generated socket channel id
+# sio.connect('https://ws-jds-eu.herokuapp.com/', namespaces=channel_id); # connect python api to generated socket channel id
 # sio.connect('https://ws-jds-eu.herokuapp.com', headers={'auth':'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'}, namespaces=channel_id); # connect python api to generated socket channel id
-# sio.connect('http://localhost:8000/', namespaces=channel_id); # connect python api to generated socket channel id
+sio.connect('http://localhost:8000/', namespaces=channel_id); # connect python api to generated socket channel id
 
 
 # SOCKET EVENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -65,7 +65,7 @@ obj = SmartDL(URL, DESTINATION)
 obj.start(blocking=False)
 
 while not obj.isFinished():
-        sio.emit('msg', {
+        sio.emit('event', {
             'speed': obj.get_speed(human=True),
             'downloaded': obj.get_dl_size(human=True),
             'ETA': obj.get_eta(human=True),
@@ -76,17 +76,10 @@ while not obj.isFinished():
         print("|")
         print("|-----> socket message sent")
         print("|")
-        # print("Speed: %s" % obj.get_speed(human=True))
-        # print("Already downloaded: %s" % obj.get_dl_size(human=True))
-        # print("Eta: %s" % obj.get_eta(human=True))
-        # print("Progress: %d%%" % (obj.get_progress()*100))
-        # print("Progress bar: %s" % obj.get_progress_bar())
-        # print("Status: %s" % obj.get_status())
-        # print("\n"*2+"="*50+"\n"*2)
         time.sleep(0.2)
 
 if obj.isSuccessful():
-        sio.emit('msg', {
+        sio.emit('event', {
             'download_path': obj.get_dest(),
             'download_time_length': obj.get_dl_time(human=True),
             'MD5': obj.get_data_hash('md5'),
@@ -96,12 +89,6 @@ if obj.isSuccessful():
         print("|")
         print("|-----> download took %s" % obj.get_dl_time(human=True))
         print("|")
-        # print("downloaded file to '%s'" % obj.get_dest())
-        # print("download task took %ss" % obj.get_dl_time(human=True))
-        # print("File hashes:")
-        # print(" * MD5: %s" % obj.get_data_hash('md5'))
-        # print(" * SHA1: %s" % obj.get_data_hash('sha1'))
-        # print(" * SHA256: %s" % obj.get_data_hash('sha256'))
 else:
         print("There were some errors:")
         for e in obj.get_errors():

@@ -47,25 +47,25 @@ const cookie = require('cookie');
 // ADMIN SOCKET NAMESPACE/CHANNELS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 admin_server_nsp.use((socket, next) => { // Authenticate admin channel
   if (sukey.includes(socket.handshake.query.auth)) return next(); // check authenticity of key
-  admin_server_nsp.emit('msg', '{ADMIN} => ['+socket.id+'] ACCESS DENIED (Invalid key)');
+    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{ADMIN} => ['+socket.id+'] ACCESS DENIED (Invalid key)'}); // send message direct to the admin namespace
   return next(new Error('authentication error'));
 });
 
 admin_server_nsp.on('connection', (socket) => {
   const admin_channel = socket.nsp; // newNamespace.name === '/su_123456'
 
-  admin_server_nsp.emit('msg', '{ADMIN} => ['+socket.id+'] NEW CONNECTION TO '+admin_channel.name);
-  console.log('{ADMIN} => ['+socket.id+'] NEW CONNECTION TO '+admin_channel.name);
+  admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{ADMIN} => ['+socket.id+'] NEW CONNECTION TO '+admin_channel.name}); // send message direct to the admin namespace
+  // console.log('{ADMIN} => ['+socket.id+'] NEW CONNECTION TO '+admin_channel.name);
 
   // SOCKET EVENT PROCESSING
   socket.on('msg', (data) => {
     console.log('ADMIN_MSG => '+JSON.stringify(data)); // data received
-    admin_server_nsp.emit('msg', data); // send message direct to the namespace
+    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: data}); // send message direct to the admin namespace
   });
 
   // BASIC SOCKET COMMANDS
   socket.on('disconnect', function () {
-    admin_server_nsp.emit('msg', `ADMIN [${socket.id}] DISCONNECTED`);
+    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: `ADMIN [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
   });
 });
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -75,7 +75,7 @@ admin_server_nsp.on('connection', (socket) => {
 // USER SOCKET NAMESPACE/CHANNEL>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 user_nsp.use((socket, next) => { // Authenticate admin channel
   if (usrkey.includes(socket.handshake.query.auth)) return next(); // check authenticity of key
-  user_nsp.emit('msg', '{USER} => ['+socket.id+'] ACCESS DENIED (Invalid key)');
+  admin_server_nsp.emit('msg', {socket_type: 'user', socket_data: '{USER} => ['+socket.id+'] ACCESS DENIED (Invalid key)'}); // send message direct to the admin namespace
   return next(new Error('authentication error'));
 });
 
@@ -83,8 +83,9 @@ user_nsp.on('connection', (socket) => {
   const user_channel = socket.nsp; // newNamespace.name === '/usr_123456
 
   // Announce user connection
-  user_nsp.emit('msg', '{USER} => ['+socket.id+'] NEW CONNECTION TO '+user_channel.name);
-  console.log('{USER} => ['+socket.id+'] NEW CONNECTION TO '+user_channel.name);
+  admin_server_nsp.emit('msg', {socket_type: 'user', socket_data: '{USER} => ['+socket.id+'] NEW CONNECTION TO '+user_channel.name}); // send message direct to the admin namespace
+  // user_nsp.emit('msg', '{USER} => ['+socket.id+'] NEW CONNECTION TO '+user_channel.name);
+  // console.log('{USER} => ['+socket.id+'] NEW CONNECTION TO '+user_channel.name);
 
   // GET DEVICE KEY
   const cookies = cookie.parse(socket.request.headers.cookie || '');
@@ -93,14 +94,15 @@ user_nsp.on('connection', (socket) => {
 
   // SOCKET EVENT PROCESSING
   socket.on('msg', (data) => {
-    console.log('USER_MSG => '+JSON.stringify(data)); // data received
+    // console.log('USER_MSG => '+JSON.stringify(data)); // data received
     user_channel.emit('msg', data); // send message direct to the namespace
+    admin_server_nsp.emit('msg', {socket_type: 'user', socket_data: data}); // send message direct to the admin namespace
   });
 
   // BASIC SOCKET COMMANDS
   socket.on('disconnect', function () {
-    console.log(`{USER} => [${socket.id}] DISCONNECTED`);
-    user_nsp.emit('msg', `USER [${socket.id}] DISCONNECTED`);
+    // console.log(`{USER} => [${socket.id}] DISCONNECTED`);
+    admin_server_nsp.emit('msg', {socket_type: 'user', socket_data: `USER [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
   });
 });
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -118,17 +120,19 @@ python_server_nsp.on('connection', (socket) => {
   const python_channel = socket.nsp; // newNamespace.name === '/python
 
   // GET SOCKET DATA
-  python_server_nsp.emit('msg', '{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name);
-  console.log('{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name);
+  admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: '{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name}); // send message direct to the admin namespace
+  // console.log('{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name);
 
   // SOCKET EVENT PROCESSING
-  socket.on('msg', (data) => {
-    python_server_nsp.emit('msg', data); // send message direct to the namespace
+  socket.on('event', (data) => {
+    python_channel.emit('event', data); // send message direct to the namespace
+    admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: data}); // send message direct to the admin namespace
+    console.log(data);
   });
 
   // BASIC SOCKET COMMANDS
   socket.on('disconnect', function () {
-    python_server_nsp.emit('msg', `PYTHON SOCKET [${socket.id}] DISCONNECTED`);
+    admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `PYTHON SOCKET [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
   });
 });
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

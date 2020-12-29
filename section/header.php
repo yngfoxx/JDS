@@ -3,7 +3,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/JDS/config/app_config.php';
 $app = new app('APP_92ASA2_32S0');
 $NAME = $app->get_name();
 $DESCRIPTION = $app->get_desc();
-$DOMAIN = "http://localhost/JDS/";
+$DOMAIN = "http://localhost/JDS";
 ?>
 
 <meta charset="utf-8">
