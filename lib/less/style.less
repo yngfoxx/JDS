@@ -497,6 +497,10 @@ select {
                     	height: 120px;
                     	border-radius: 5px;
                     	position: relative;
+                      @media screen and (max-width: 800px) {
+                        width: 103px;
+                        height: 226px;
+                      }
                       ._ext {
                       	position: absolute;
                       	top: 50%;
@@ -505,6 +509,9 @@ select {
                       	font-size: 30px;
                       	font-weight: bold;
                         text-transform: uppercase;
+                        @media screen and (max-width: 800px) {
+                          font-size: 24px;
+                        }
                       }
                     }
                   }
@@ -513,6 +520,10 @@ select {
                     .fill_width();
                     display: flex;
                     flex-flow: row;
+                    @media screen and (max-width: 800px) {
+                      &:first-child { flex-flow: column; }
+                      font-size: 12px;
+                    }
                     ._jdsirir_itm {
                       .fill_width();
                     	color: white;
@@ -524,6 +535,9 @@ select {
                       	overflow: hidden;
                       	text-overflow: ellipsis;
                         white-space: nowrap;
+                        @media screen and (max-width: 800px) {
+                          font-size: 12px;
+                        }
                       }
                       hr {
                       	margin: 3px auto 2px;
@@ -548,6 +562,9 @@ select {
                       	background-color: grey;
                       	cursor: pointer;
                       }
+                      @media screen and (max-width: 800px) {
+                        padding: 6px;
+                      }
                       a {
                       	color: #fff;
                         &._start {
@@ -566,6 +583,10 @@ select {
                       overflow: hidden;
                       display: flex;
                       flex-flow: row;
+                      @media screen and (max-width: 800px) {
+                        min-height: 30px;
+                        min-width: 100px;
+                      }
                       ._dwnld_bar_inner {
                         // .random(0, 100);
                       	// width:  ~'@{random}%';

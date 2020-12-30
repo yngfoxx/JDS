@@ -229,6 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           'uid' => $userID,
           'url' => $data,
           'ext' => $result['extension'],
+          'size' => $result['size'],
           'max_chunk_size' => 5 // put default at first
         );
         $crt = $jds->crt_download($arrSVR); # create new download request from URL recieved
