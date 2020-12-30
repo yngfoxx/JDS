@@ -306,17 +306,32 @@ class stdlib {
 
 
   // PHP ASYNC REQUEST -------------------------------------------------------->
-  function wget_request($url, $post_array, $check_ssl=false) {
-    # CREDIT: https://stackoverflow.com/users/1096794/ben-d
-    # SRC: https://stackoverflow.com/questions/2190854/sending-post-requests-without-waiting-for-response/10895584
-    $cmd = "curl -X POST -H 'Content-Type: application/json'";
-    $cmd.= " -d '" . json_encode($post_array) . "' '" . $url . "'";
+  function cUrlRequest($url, $arr, $method) {
 
-    if (!$check_ssl) $cmd.= "'  --insecure"; // this can speed things up, though it's not secure
-    $cmd .= " > /dev/null 2>&1 &"; //just dismiss the response
+    if ($method == 'GET') {
+      // GET request
+      $cURLConnection = curl_init();
+      $serial = $url.'?';
+      $arrCount = count($arr);
+      $count = 0;
+      foreach ($arr as $key => $value) {
+        $serial = $serial.''.$key.'='.$value;
+        if($count != $arrCount) $count += 1;
+        if($count < $arrCount) $serial = $serial.'&';
+      }
+      curl_setopt($cURLConnection, CURLOPT_URL, $serial);
+      curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
+    } else if ($method == 'POST') {
+      // POST request
+      $cURLConnection = curl_init($url);
+      curl_setopt($cURLConnection, CURLOPT_POSTFIELDS, $postRequest);
+      curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
+    }
 
-    exec($cmd, $output, $exit);
-    return $exit == 0;
+    $response = curl_exec($cURLConnection);
+    curl_close($cURLConnection);
+
+    return $response;
   }
   // ------------------------------------------------------------------------>
 }

@@ -461,7 +461,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $fileName = pathinfo($file_url, PATHINFO_FILENAME); # source file name
     $fileExtension = pathinfo($file_url, PATHINFO_EXTENSION); # source file name
     $socketChannel = $std->makeNumericKey(6);
-    $serverPath = "D:/JDS/storage/$jointID/$requestID/";
+    // $serverPath = "C:/xampp/htdocs/JDS/storage/$jointID/$requestID/";
+
+    // Make directory to store files per request
+    $serverPath = "C:/xampp/htdocs/JDS/storage/$jointID/$requestID/";
+    mkdir($serverPath, 0777, true); chmod($serverPath, 0777);
+
     $fileData = array(
       'jid'         => $jointID,
       'rid'         => $requestID,
@@ -471,7 +476,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     );
     $response = $jds->crt_file($fileData); // create file data in database
     if ($response) {
-      // INITIALIZE PYTHON SCRIPT
+      // INITIALIZE PYTHON SCRIPT [Initial failed attempt]
         // $script_path = $_SERVER['DOCUMENT_ROOT'] . '/JDS/req/script.sh';
         //
         // $python_path = 'C:/Users/YoungFox/AppData/Local/Programs/Python/Python39/python.exe';
@@ -489,23 +494,23 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         //     echo "Command failed with status: $status";
         // }
         // exit();
-
         // if ($result_last_line) {
         //   echo "Script is running..";
         // } else {
         //   echo "Script failed to init...";
         // }
 
-        // EXECUTE SCRIPT WITH PYTHON FLASK API (fetch.py) [THIS WORKS BETTER]
-        # http://127.0.0.1:5000/?url=https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe&rid=13RWS2&nsp=1234531&dest=C:\JDS\storage
-        $arr = array(
-          'url'   => $file_url,
-          'rid'   => $requestID,
-          'nsp'   => $socketChannel,
-          'dest'  => $serverPath
-        );
-        echo $std->wget_request('http://127.0.0.1:5000/', $arr);
-
+      // EXECUTE SCRIPT WITH PYTHON FLASK API (fetch.py) [THIS WORKS BETTER]
+      # http://127.0.0.1:5000/?url=https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe&rid=13RWS2&nsp=1234531&dest=C:\JDS\storage
+      $arr = array(
+        'url'   => $file_url,
+        'rid'   => $requestID,
+        'nsp'   => $socketChannel,
+        'dest'  => $serverPath
+      );
+      $apiResponse = $std->cUrlRequest('http://127.0.0.1:5000/', $arr, 'GET'); // Target Flask API server
+      echo json_encode($apiResponse);
+      exit();
     } else {
       $result = array('server_error' => "Unexpected error", 'code' => '500'); // Something unexpected has happened
       echo json_encode($result);
