@@ -1,3 +1,4 @@
+# SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)
 import threading
 from threading import Thread
 
@@ -60,3 +61,4 @@ def main():
 
 
 app.run()
+# SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)
