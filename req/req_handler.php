@@ -496,8 +496,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         //   echo "Script failed to init...";
         // }
 
-        // EXECUTE SCRIPT WITH PYTHON FLASK API (fetch.py)
-        # http://127.0.0.1:5000/?url="https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe"&rid="13RWS2"&nsp="1234531"&dest="C:/JDS/storage"
+        // EXECUTE SCRIPT WITH PYTHON FLASK API (fetch.py) [THIS WORKS BETTER]
+        # http://127.0.0.1:5000/?url=https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe&rid=13RWS2&nsp=1234531&dest=C:\JDS\storage
+        $arr = array(
+          'url'   => $file_url,
+          'rid'   => $requestID,
+          'nsp'   => $socketChannel,
+          'dest'  => $serverPath
+        );
+        echo $std->wget_request('http://127.0.0.1:5000/', $arr);
 
     } else {
       $result = array('server_error' => "Unexpected error", 'code' => '500'); // Something unexpected has happened

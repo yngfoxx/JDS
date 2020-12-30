@@ -303,6 +303,22 @@ class stdlib {
 
     return $metaData;
   }
+
+
+  // PHP ASYNC REQUEST -------------------------------------------------------->
+  function wget_request($url, $post_array, $check_ssl=false) {
+    # CREDIT: https://stackoverflow.com/users/1096794/ben-d
+    # SRC: https://stackoverflow.com/questions/2190854/sending-post-requests-without-waiting-for-response/10895584
+    $cmd = "curl -X POST -H 'Content-Type: application/json'";
+    $cmd.= " -d '" . json_encode($post_array) . "' '" . $url . "'";
+
+    if (!$check_ssl) $cmd.= "'  --insecure"; // this can speed things up, though it's not secure
+    $cmd .= " > /dev/null 2>&1 &"; //just dismiss the response
+
+    exec($cmd, $output, $exit);
+    return $exit == 0;
+  }
+  // ------------------------------------------------------------------------>
 }
 
 ?>
