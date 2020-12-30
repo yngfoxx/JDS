@@ -23,6 +23,7 @@ def main():
     # http://127.0.0.1:5000/?url="https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe"&rid="13RWS2"&nsp='1234531'&dest='C:/JDS/storage/'
     # ----------------------------------------------------------------------------------------------------------------->
     url = str(request.args['url'])
+    jid = str(request.args['jid'])
     rid = str(request.args['rid'])
     nsp = str(request.args['nsp'])
     dest = str(request.args['dest'])
@@ -31,7 +32,7 @@ def main():
     # BREAKTHROUGH
     # thread = Thread(target=flaskgrab.download, args={'URL': url, 'REQUEST_ID': rid, 'NAMESPACE': nsp, 'DESTINATION': dest}) # Failed attempt
     # flaskgrab.download(URL=url, REQUEST_ID=rid, NAMESPACE=nsp, DESTINATION=dest)
-    thread = Thread(target=download, args=[url, rid, nsp, dest])
+    thread = Thread(target=download, args=[url, jid, rid, nsp, dest])
     thread.setDaemon(True)
     thread.start()
 

@@ -28,7 +28,7 @@ from pySmartDL import SmartDL
 # DESTINATION = args.destination
 # ----------------------------------------------------------------------------->
 
-def download(URL, REQUEST_ID, NAMESPACE, DESTINATION):
+def download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION):
     # CONNECT TO WEBSOCKET -------------------------------------------------------->
     sio = socketio.Client()  # WebSocket object
 
@@ -67,29 +67,45 @@ def download(URL, REQUEST_ID, NAMESPACE, DESTINATION):
 
     while not obj.isFinished():
         sio.emit('event', {
-            'speed': obj.get_speed(human=True),
-            'downloaded': obj.get_dl_size(human=True),
-            'ETA': obj.get_eta(human=True),
-            'progress': (obj.get_progress() * 100),
-            'bar': obj.get_progress_bar(),
-            'status': obj.get_status()
+            'namespace': NAMESPACE,
+            'request_id': REQUEST_ID,
+            'joint_id': JOINT_ID,
+            'file_data': {
+                'speed': obj.get_speed(human=True),
+                'downloaded': obj.get_dl_size(human=True),
+                'ETA': obj.get_eta(human=True),
+                'progress': (obj.get_progress() * 100),
+                'bar': obj.get_progress_bar(),
+                'status': obj.get_status()
+            }
         }, channel_id);
-        print("|")
+        # Update PHP of file status
+        print("||")
+        print("||")
         print("|-----> socket message sent")
-        print("|")
+        print("||")
+        print("||")
         time.sleep(0.2)
 
     if obj.isSuccessful():
         sio.emit('event', {
-            'download_path': obj.get_dest(),
-            'download_time_length': obj.get_dl_time(human=True),
-            'MD5': obj.get_data_hash('md5'),
-            'SHA1': obj.get_data_hash('sha1'),
-            'SHA256': obj.get_data_hash('sha256')
+            'namespace': NAMESPACE,
+            'request_id': REQUEST_ID,
+            'joint_id': JOINT_ID,
+            'file_data': {
+                'download_path': obj.get_dest(),
+                'download_time_length': obj.get_dl_time(human=True),
+                'MD5': obj.get_data_hash('md5'),
+                'SHA1': obj.get_data_hash('sha1'),
+                'SHA256': obj.get_data_hash('sha256')
+            }
         }, channel_id)
-        print("|")
+        # Update PHP of file status
+        print("||")
+        print("||")
         print("|-----> download took %s" % obj.get_dl_time(human=True))
-        print("|")
+        print("||")
+        print("||")
     else:
         print("There were some errors:")
         for e in obj.get_errors():
@@ -108,8 +124,9 @@ def download(URL, REQUEST_ID, NAMESPACE, DESTINATION):
 if __name__ == '__main__':
     # Get arguments from user
     URL = sys.argv[1]
-    REQUEST_ID = sys.argv[2]
-    NAMESPACE = sys.argv[3]
-    DESTINATION = sys.argv[4]
+    JOINT_ID = sys.argv[2]
+    REQUEST_ID = sys.argv[3]
+    NAMESPACE = sys.argv[4]
+    DESTINATION = sys.argv[5]
     download(URL, REQUEST_ID, NAMESPACE, DESTINATION)
 # SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)

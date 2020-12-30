@@ -22,9 +22,10 @@ class jointlib extends stdlib {
   public function crt_group($userID) {
     $uid = $this->db->escape_string($userID);
     $jointID = $this->std->makeUpperKey(6);
+    $channel = $this->std->makeNumericKey(6);
     $sql = "
-      INSERT INTO joint_group (joint_id, user_id, expiry_date)
-      VALUES('$jointID', '$uid', ADDDATE(NOW(), INTERVAL 30 DAY) );
+      INSERT INTO joint_group (joint_id, user_id, py_channel, expiry_date)
+      VALUES('$jointID', '$uid', '$channel', ADDDATE(NOW(), INTERVAL 30 DAY) );
     ";
     $qry = mysqli_query($this->db, $sql);
     return (($qry) ? $jointID : false);
@@ -150,6 +151,7 @@ class jointlib extends stdlib {
     SELECT
       joint_group.joint_id AS 'jid',
       joint_group.user_id AS 'uid',
+      joint_group.py_channel AS 'channel',
       joint_group.access_limit AS 'capacity',
       joint_group.date_created AS 'creationDate'
      FROM joint_group

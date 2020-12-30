@@ -70,7 +70,7 @@ if (isset($_COOKIE['dKEY'])) {
               <option value="200">200 MB</option>
               <option value="s">Specify</option>
             </select>
-            <input type="text" style="display: none;" name="chunk_max_size" class="chunkInput" placeholder="Specify chunk size (MB)">
+            <input type="text" style="display: none;" name="chunk_max_size" value="5" class="chunkInput" placeholder="Specify chunk size (MB)">
           </div>
         </div>
         <div class="_bibfdcd_section">

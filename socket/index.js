@@ -125,7 +125,8 @@ python_server_nsp.on('connection', (socket) => {
 
   // SOCKET EVENT PROCESSING
   socket.on('event', (data) => {
-    python_channel.emit('event', data); // send message direct to the namespace
+    data.channel = python_channel.name;
+    python_server_nsp.emit('msg', data); // send message direct to the namespace
     admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: data}); // send message direct to the admin namespace
     console.log(data);
   });

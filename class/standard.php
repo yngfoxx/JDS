@@ -305,9 +305,8 @@ class stdlib {
   }
 
 
-  // PHP ASYNC REQUEST -------------------------------------------------------->
+  // PHP CURL REQUEST -------------------------------------------------------->
   function cUrlRequest($url, $arr, $method) {
-
     if ($method == 'GET') {
       // GET request
       $cURLConnection = curl_init();

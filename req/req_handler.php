@@ -460,7 +460,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // database fields : rid, jid, file_path, size, MD5, SHA1, SHA256, progress
     $fileName = pathinfo($file_url, PATHINFO_FILENAME); # source file name
     $fileExtension = pathinfo($file_url, PATHINFO_EXTENSION); # source file name
-    $socketChannel = $std->makeNumericKey(6);
+    // $socketChannel = $std->makeNumericKey(6); // Get joint group socket channel
+    $socketChannel = $jointData['channel']; // Get joint group socket channel
     // $serverPath = "C:/xampp/htdocs/JDS/storage/$jointID/$requestID/";
 
     // Make directory to store files per request
@@ -503,10 +504,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       // EXECUTE SCRIPT WITH PYTHON FLASK API (fetch.py) [THIS WORKS BETTER]
       # http://127.0.0.1:5000/?url=https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe&rid=13RWS2&nsp=1234531&dest=C:\JDS\storage
       $arr = array(
-        'url'   => $file_url,
-        'rid'   => $requestID,
-        'nsp'   => $socketChannel,
-        'dest'  => $serverPath
+        'url'   => $file_url, // File URL
+        'jid'   => $jointID, // File Joint Group ID
+        'rid'   => $requestID, // File Request ID
+        'nsp'   => $socketChannel, // File Joint Group socket namespace
+        'dest'  => $serverPath // File download destination
       );
       $apiResponse = $std->cUrlRequest('http://127.0.0.1:5000/', $arr, 'GET'); // Target Flask API server
       echo json_encode($apiResponse);
