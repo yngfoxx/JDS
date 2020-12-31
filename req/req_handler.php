@@ -558,7 +558,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $response = $jds->updateDownloadData($arr);
     if ($response) {
       echo $response;
-      echo "MD5 hash: ".$arr['md5_hash'];
     } else {
       echo $response;
     }
