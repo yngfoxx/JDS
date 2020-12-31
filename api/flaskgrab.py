@@ -1,6 +1,7 @@
 # SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)
 import sys
 import time
+import requests
 
 import socketio
 from pySmartDL import SmartDL
@@ -78,11 +79,24 @@ def download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION):
                 'bar': obj.get_progress_bar(),
                 'status': obj.get_status()
             }
-        }, channel_id);
+        }, channel_id)
         # Update PHP of file status
+        payload = {
+            'jdsUpd': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
+            'joint_id': JOINT_ID,
+            'request_id': REQUEST_ID,
+            'progress': (obj.get_progress() * 100),
+            'status': obj.get_status()
+        }
+        req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
         print("||")
         print("||")
-        print("|-----> socket message sent")
+        if req:
+            print("|-----> JDS UPDATED BY SOCKET AND POST REQUEST")
+        else:
+            print("|-----> JDS WAS NOT UPDATED")
+        print(req)
+        print(req.text)
         print("||")
         print("||")
         time.sleep(0.2)
@@ -101,9 +115,27 @@ def download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION):
             }
         }, channel_id)
         # Update PHP of file status
+        payload = {
+            'jdsUpd': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
+            'joint_id': JOINT_ID,
+            'request_id': REQUEST_ID,
+            'progress': 100,
+            'status': 'Completed',
+            'md5_hash': obj.get_data_hash('md5'),
+            'sha1_hash': obj.get_data_hash('sha1'),
+            'sha256_hash': obj.get_data_hash('sha256'),
+            'download_path': obj.get_dest(),
+            'download_time_length': obj.get_dl_time(human=True)
+        }
+        req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
         print("||")
         print("||")
-        print("|-----> download took %s" % obj.get_dl_time(human=True))
+        if req:
+            print("|-----> download took %s" % obj.get_dl_time(human=True))
+        else:
+            print("|-----> JDS WAS NOT UPDATED [100%]")
+        print(req)
+        print(req.text)
         print("||")
         print("||")
     else:
@@ -128,5 +160,5 @@ if __name__ == '__main__':
     REQUEST_ID = sys.argv[3]
     NAMESPACE = sys.argv[4]
     DESTINATION = sys.argv[5]
-    download(URL, REQUEST_ID, NAMESPACE, DESTINATION)
+    download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION)
 # SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)

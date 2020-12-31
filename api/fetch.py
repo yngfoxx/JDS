@@ -39,7 +39,8 @@ def main():
     for thread in threading.enumerate():
         print(thread.name)
 
-    return make_response(jsonify({'thread_name': str(thread.name), 'started': True}), 200)
+    # return make_response(jsonify({'thread_name': str(thread.name), 'started': True}), 200)
+    return jsonify({'thread_name': str(thread.name), 'started': True})
 
     # if 'url' in request.args:
     #     url = str(request.args['url'])

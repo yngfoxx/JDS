@@ -227,5 +227,31 @@ class jointlib extends stdlib {
     $qry = mysqli_multi_query($this->db, $sql);
     return (($qry) ? true : false);
   }
+
+
+  public function updateDownloadData($arr)
+  {
+    $jid = $arr['jid'];
+    $rid = $arr['rid'];
+    $progress = $arr['progress'];
+
+    if (!empty($arr['md5_hash'])) {
+      // Update file complete data
+      $md5 = $arr['md5_hash'];
+      $sha1 = $arr['sha1_hash'];
+      $sha256 = $arr['sha256_hash'];
+      $sql = "
+        UPDATE svr_download_request SET init = '2' WHERE request_id = '$rid' AND joint_id = '$jid';
+        UPDATE file SET md5_hash = '$md5', sha1_hash = '$sha1', sha256_hash = '$sha256' WHERE request_id = '$rid' AND joint_id = '$jid';
+      ";
+      $qry = mysqli_multi_query($this->db, $sql);
+      return (($qry) ? true : $this->db->error);
+    } else {
+      // Update file download progress
+      $sql = "UPDATE file SET progress = '$progress' WHERE joint_id = '$jid' AND request_id = '$rid'";
+      $qry = mysqli_query($this->db, $sql);
+      return (($qry) ? true : $this->db->error);
+    }
+  }
 }
 ?>

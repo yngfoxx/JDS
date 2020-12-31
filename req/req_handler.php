@@ -512,7 +512,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         'dest'  => $serverPath // File download destination
       );
       $apiResponse = $std->cUrlRequest('http://127.0.0.1:5000/', $arr, 'GET'); // Target Flask API server
-      echo json_encode($apiResponse);
+      echo $apiResponse; // result is already json encoded
       exit();
     } else {
       $result = array('server_error' => "Unexpected error", 'code' => '500'); // Something unexpected has happened
@@ -524,6 +524,48 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
   }
 
+
+  # Update MySQL from python flask API
+  if (isset($_POST['jdsUpd'])) {
+    if ($_POST['jdsUpd'] != 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs') {
+      $result = array('server_error' => "Unexpected origin of request", 'code' => '500'); // invalid request origin
+      echo json_encode($result);
+      exit();
+    }
+    /* payload = {
+        'jdsUpd': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
+        'data': {
+            'joint_id': JOINT_ID,
+            'request_id': REQUEST_ID,
+            'progress': 100,
+            'status': 'Completed',
+            'download_path': obj.get_dest(),
+            'download_time_length': obj.get_dl_time(human=True),
+            'MD5': obj.get_data_hash('md5'),
+            'SHA1': obj.get_data_hash('sha1'),
+            'SHA256': obj.get_data_hash('sha256')
+        }
+    } */
+    $arr = array();
+    $arr['jid'] = $std->db->escape_string($_POST['joint_id']);
+    $arr['rid'] = $std->db->escape_string($_POST['request_id']);
+    $arr['progress'] = $std->db->escape_string($_POST['progress']);
+    $arr['status'] = $std->db->escape_string($_POST['status']);
+    $arr['md5_hash'] = (isset($_POST['md5_hash'])) ? $std->db->escape_string($_POST['md5_hash']) : '';
+    $arr['sha1_hash'] = (isset($_POST['sha1_hash'])) ? $std->db->escape_string($_POST['sha1_hash']) : '';
+    $arr['sha256_hash'] = (isset($_POST['sha256_hash'])) ? $std->db->escape_string($_POST['sha256_hash']) : '';
+
+    $response = $jds->updateDownloadData($arr);
+    if ($response) {
+      echo $response;
+      echo "MD5 hash: ".$arr['md5_hash'];
+    } else {
+      echo $response;
+    }
+
+
+    // Update MySQL with new data
+  }
   //////////////////////////////////////////////////////////////////////////////
 }
 ?>
