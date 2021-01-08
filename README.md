@@ -9,7 +9,7 @@ Joint Downloading System (JDS) is an online content downloader that eases file d
 * npm
 
 #### Installation
-1. Copy all files to c:/xampp/htdocs/JDS
+1. Copy all files to *c:/xampp/htdocs/JDS*
 2. Start apache and mysql service in xampp
-3. Run "c:/xampp/htdocs/JDS/api/fetch.py" in PyCharm or run "python c:/xampp/htdocs/JDS/api/fetch.py" in a command prompt to start the python flask server on port 5000
-4. Run "npm start dev" in "c:/xampp/htdocs/JDS/socket" to start the socket server on port 8000
+3. Run *c:/xampp/htdocs/JDS/api/fetch.py* in PyCharm or run *python c:/xampp/htdocs/JDS/api/fetch.py* in a command prompt to start the python flask server on port 5000
+4. Run *npm start dev* in *c:/xampp/htdocs/JDS/socket* to start the socket server on port 8000
