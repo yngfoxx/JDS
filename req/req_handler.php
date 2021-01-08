@@ -556,11 +556,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $arr['sha256_hash'] = (isset($_POST['sha256_hash'])) ? $std->db->escape_string($_POST['sha256_hash']) : '';
 
     $response = $jds->updateDownloadData($arr);
-    if ($response) {
-      echo $response;
-    } else {
-      echo $response;
-    }
+    echo $response;
 
 
     // Update MySQL with new data
