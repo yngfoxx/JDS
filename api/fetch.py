@@ -22,45 +22,28 @@ def main():
     # [TEST URL] ------------------------------------------------------------------------------------------------------>
     # http://127.0.0.1:5000/?url="https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe"&rid="13RWS2"&nsp='1234531'&dest='C:/JDS/storage/'
     # ----------------------------------------------------------------------------------------------------------------->
-    url = str(request.args['url'])
-    jid = str(request.args['jid'])
-    rid = str(request.args['rid'])
-    nsp = str(request.args['nsp'])
-    dest = str(request.args['dest'])
+
+    if 'url' in request.args and 'jid' in request.args and 'rid' in request.args and 'nsp' in request.args and 'dest' in request.args:
+        url = str(request.args['url'])
+        jid = str(request.args['jid'])
+        rid = str(request.args['rid'])
+        nsp = str(request.args['nsp'])
+        dest = str(request.args['dest'])
 
 
-    # BREAKTHROUGH
-    # thread = Thread(target=flaskgrab.download, args={'URL': url, 'REQUEST_ID': rid, 'NAMESPACE': nsp, 'DESTINATION': dest}) # Failed attempt
-    # flaskgrab.download(URL=url, REQUEST_ID=rid, NAMESPACE=nsp, DESTINATION=dest)
-    thread = Thread(target=download, args=[url, jid, rid, nsp, dest])
-    thread.setDaemon(True)
-    thread.start()
+        # Add the download request to a thread
+        # thread = Thread(target=flaskgrab.download, args={'URL': url, 'REQUEST_ID': rid, 'NAMESPACE': nsp, 'DESTINATION': dest}) # Failed attempt
+        thread = Thread(target=download, args=[url, jid, rid, nsp, dest])
+        thread.setDaemon(True)
+        thread.start()
 
-    for thread in threading.enumerate():
-        print(thread.name)
+        for thread in threading.enumerate():
+            print(thread.name)
 
-    # return make_response(jsonify({'thread_name': str(thread.name), 'started': True}), 200)
-    return jsonify({'thread_name': str(thread.name), 'started': True})
-
-    # if 'url' in request.args:
-    #     url = str(request.args['url'])
-    #     if 'rid' in request.args:
-    #         rid = str(request.args['rid'])
-    #         if 'nsp' in request.args:
-    #             nsp = str(request.args['nsp'])
-    #             if 'dest' in request.args:
-    #                 dest = str(request.args['dest'])
-    #
-    #                 # return json.dumps(request.args)
-    #             else:
-    #                 return "Error: no destination specified"
-    #         else:
-    #             return "Error: no namespace specified"
-    #     else:
-    #         return "Error: no request ID specified"
-    # else:
-    #     return "Error: no url specified"
-
+            # return make_response(jsonify({'thread_name': str(thread.name), 'started': True}), 200)
+            return jsonify({'thread_name': str(thread.name), 'started': True})
+    else:
+        return jsonify({'response': 'Invalid parameter'})
 
 app.run()
 # SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)
