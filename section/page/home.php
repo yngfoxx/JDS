@@ -53,10 +53,10 @@ if (isset($_COOKIE['dKEY'])) {
     <div class="_bibf_div_c_cont">
       <form class="_bibf_dc_div">
         <div class="_bibfdcd_section">
-          <div class="_bibfdcds_title">Download configuration</div>
+          <div class="_bibfdcds_title">Chunk configuration</div>
         </div>
         <div class="_bibfdcd_section">
-          <div class="_bibfdcds_text">Manual configuration</div>
+          <div class="_bibfdcds_text">Split manually</div>
           <label class="switch"><input type="checkbox" name="auto_config"><span class="slider round"></span></label>
         </div>
         <div class="_bibfdcd_section">
