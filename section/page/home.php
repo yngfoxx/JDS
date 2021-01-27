@@ -61,9 +61,10 @@ if (isset($_COOKIE['dKEY'])) {
         </div>
         <div class="_bibfdcd_section">
           <div class="_bibfdcds_text v_row">
-            <label>Maximum chunk size</label>
+            <label>Maximum chunk size [MB]</label>
             <select style="background: #EEE;" name="max_chunk" disabled class="_bibfdcds_select">
-              <option value="5" selected>5 MB</option>
+              <option value="auto" selected>auto</option>
+              <option value="5">5 MB</option>
               <option value="10">10 MB</option>
               <option value="50">50 MB</option>
               <option value="100">100 MB</option>

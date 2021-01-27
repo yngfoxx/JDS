@@ -36,7 +36,7 @@ $DOMAIN = "http://localhost/JDS";
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
 <script type="text/javascript" src="https://unpkg.com/vue-router"></script>
 <script src="//unpkg.com/swiper/swiper-bundle.min.js"></script>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
 <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/script.js"></script>
 <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/ajx.js"></script>

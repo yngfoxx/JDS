@@ -78,17 +78,14 @@
   // event listener for config options (manual or automatic) ------------------>
   $('input[name="auto_config"]').on('change', function(e) {
     let val = document.querySelector('input[name="auto_config"]').checked;
-    if (val == true) {
-      document.querySelectorAll('._bibfdcds_select').forEach((e, i) => {
-        e.removeAttribute('disabled');
-      });
-    } else {
-      document.querySelectorAll('._bibfdcds_select').forEach((e, i) => {
-        e.setAttribute('disabled', 'true');
-        $('select[name="max_chunk"]').val('5');
-        $('.chunkInput').css("display", "none");
-      });
+    if (val == true) { // manual
+      document.querySelector('._bibfdcds_select').removeAttribute('disabled');
+    } else { // automatic
+      document.querySelector('._bibfdcds_select').setAttribute('disabled', 'true');
+      $('.chunkInput').css("display", "none");
     }
+    $('select[name="max_chunk"]').val('5');
+    $('.chunkInput').val('5');
   });
   // -------------------------------------------------------------------------->
 
@@ -117,8 +114,9 @@
   $('div[data-button="cls_config"]').on('click', function(e) {
     $('._bibf_div_c_cont').fadeOut();
     let form = document.querySelector('._bibf_dc_div');
+    let checkBoxInput = document.querySelector('input[name="auto_config"]');
     let svrID = form.getAttribute('data-svr-id');
-    let maxChunk = $('.chunkInput').val();
+    let maxChunk = (checkBoxInput.checked == true) ? $('.chunkInput').val() : 'auto';
     // modify chunk size
     ajx({
       type: 'POST',
@@ -127,7 +125,7 @@
       success: (res) => {
         if (res) {
           swal({icon: "success", title: "Saved", text: "Download configuration has been updated for this file"});
-          console.log("Max chunk for request ID: "+svrID+" has been changed to "+maxChunk+"MB");
+          console.log("Max chunk for request ID: "+svrID+" has been changed to "+maxChunk+" MB");
         }
       },
       load: 'up'
