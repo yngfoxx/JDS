@@ -400,6 +400,8 @@ select {
     margin: 7px 0px;
     border-radius: 10px;
     overflow: auto;
+    &::-webkit-scrollbar{ display: none; }
+    scrollbar-width: none;
     ._bs2_div_contr {
       position: absolute;
       top: 0; left: 0; bottom: 0; right: 0;
@@ -420,11 +422,11 @@ select {
         }
         &._pane_l {
           &::-webkit-scrollbar{ display: none; }
+          scrollbar-width: none;
           max-width: 350px;
           display: flex;
           flex-flow: column;
           transition: .3s;
-          scrollbar-width: none;
           @media screen and (max-width: 1160px) { max-width: 100% }
           ._bs2dcp_row {
             height: 100%;
