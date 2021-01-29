@@ -25,9 +25,11 @@
                   icon: "success",
                   text: "\""+jRes.filename+"."+jRes.extension+"\" is a downloadable file, do you wish to create a new J0INT group?",
                   buttons: ["No", "Yes"],
+                  closeOnClickOutside: false,
+                  closeOnEsc: false,
                 })
                 .then((willCreate) => {
-                  if (willCreate) {
+                  if (willCreate == true) {
                     $('._bibf_div_c_cont').fadeIn();
                     let downConfig = document.querySelector('._bibf_dc_div');
                     downConfig.setAttribute("data-svr-id", jRes.svrID);
@@ -39,27 +41,83 @@
                     swal({
                       text: "Add "+jRes.filename+"."+jRes.extension+" to an existing J0INT group?",
                       buttons: ["No", "Yes"],
+                      closeOnClickOutside: false,
+                      closeOnEsc: false,
                     }).then((willAdd) => {
-                      if (willAdd) {
-                        swal("Choose where to add the file.");
-                        // TODO: Add file to existing J0INT group
-                      } else {
-                        ajx({
-                          type: 'POST',
-                          url: 'http://localhost/JDS/req/req_handler.php',
-                          data: {delReq: true, jdsID: jRes.jdsID},
-                          success: (res) => {
-                            if (res) console.log("temporary J0INT group deleted!");
-                          },
-                          load: 'up'
+                      ajx({
+                        type: 'POST',
+                        url: 'http://localhost/JDS/req/req_handler.php',
+                        data: {delReq: true, jdsID: jRes.jdsID},
+                        success: (res) => {
+                          if (res) console.log("temporary J0INT group deleted!");
+                        },
+                        load: 'up'
+                      });
+                      if (willAdd == true) { // Yes, add to an existing joint group
+                        // Add file to existing J0INT group ---------------------------->
+                        swal({
+                          title: 'Enter a joint group code',
+                          content: "input",
+                          buttons: ["Cancel", "Add"],
+                          closeOnClickOutside: false,
+                          closeOnEsc: false,
+                        }).then(jid => {
+                          if (!jid) throw null;
+                          return fetch("http://localhost/JDS/req/req_handler.php?groupCheck="+jid);
+                        }).then(results => {
+                          return results.json();
+                        }).then(json => {
+                          // Add file to validated joint group download request list
+                          if (json.response == false) {
+                            swal({
+                              dangerMode: true,
+                              icon: 'error',
+                              title: 'Not found!',
+                              text: "Group code does not exist!",
+                              button: "Cancel"
+                            });
+                            return;
+                          }
+                          const parm = {
+                            crtDownload : true,
+                            jointID : json.jid,
+                            url : jRes.input,
+                            origin : jRes.origin,
+                            ext : jRes.extension,
+                            realSize : jRes.realSize
+                          };
+                          ajx({
+                            type: 'POST',
+                            url: 'http://localhost/JDS/req/req_handler.php',
+                            data: parm,
+                            success: (result) => {
+                              swal({
+                                icon: 'success',
+                                title: 'Done',
+                                text: "Request has been added to "+json.jid+" successfully",
+                                button: "Awesome!"
+                              });
+                              // use websocket to inform users listening on the joint groups socket channel
+                              loadJDS(json.jid); // load joint group into view
+                            },
+                            load: 'up'
+                          });
+                          // AJAX REQUEST TO ADD URL TO GROUP
+                        }).catch(err => {
+                          if (err) {
+                            console.log(err);
+                            swal("Oh noes!", "The AJAX request failed!", "error");
+                          } else {
+                            swal.stopLoading();
+                            swal.close();
+                          }
                         });
+                        // --------------------------------------------------------------->
                       }
                     })
                   }
                 });
-                // swal({icon: "success", title: "File found!", text: jRes.filename+"."+jRes.extension+" is a downloadable file."});
                 $("div[data-jds-body]").hide();
-                // REQUEST TYPE IS A URL
               }
             }
             document.querySelector('._bdysec1').classList.add('_pcntd');
@@ -124,7 +182,7 @@
       data: { modChunk: true, svr: svrID, vol: maxChunk },
       success: (res) => {
         if (res) {
-          swal({icon: "success", title: "Saved", text: "Download configuration has been updated for this file"});
+          swal({icon: "success", title: "Saved", text: "Chunk configuration has been updated for this file"});
           console.log("Max chunk for request ID: "+svrID+" has been changed to "+maxChunk+" MB");
         }
       },

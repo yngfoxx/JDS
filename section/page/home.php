@@ -88,7 +88,7 @@ if (isset($_COOKIE['dKEY'])) {
 
       <div class="_bs2dc_pane _pane_l">
         <div class="_bs2dcp_row _jds_holder">[CODE HERE]</div>
-        <div class="_bs2dcp_row">
+        <div class="_bs2dcp_row _jds_member">
           <div class="_bs2dcpr_container">
             <div class="_bs2dcprc_title">Members</div>
             <div class="_bs2dcprc_member">
@@ -100,7 +100,9 @@ if (isset($_COOKIE['dKEY'])) {
       </div>
 
       <div class="_bs2dc_pane _pane_r">
+        <div class="_bs2dcpr_title">Downloads</div>
 
+        <!-- SAMPLE -->
         <div class="_bs2dcp_row _jds_info">   <!-- main row -->
           <div class="_jdsi_row _info">       <!-- sub row 1 -->
             <div class="_jdsiri_row _rext">   <!-- sub row 1 1 -->

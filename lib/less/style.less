@@ -64,7 +64,7 @@ select {
 	font-size: 25px;
 	.fill_width();
   text-align: center;
-  @media screen and (max-width: 800px) { font-size: 19px; }
+  @media screen and (max-width: 1160px) { font-size: 19px; }
 }
 
 
@@ -96,7 +96,7 @@ select {
   overflow: auto;
   display: flex;
   flex-flow: column;
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 1160px) {
     position: sticky;
     top: 5px;
     right: 0px;
@@ -116,7 +116,7 @@ select {
       background-color: var(--light-gray);
       cursor: pointer;
     }
-    @media screen and (max-width: 800px) {
+    @media screen and (max-width: 1160px) {
       background-color: transparent;
     }
   }
@@ -135,7 +135,7 @@ select {
       height: 3px;
       background-color: var(--dark-gray);
       content: '';
-      @media screen and (max-width: 800px) {
+      @media screen and (max-width: 1160px) {
         top: 8px; left: -13px; right: -13px; bottom: 8px;
         background-color: transparent;
         height: auto;
@@ -143,7 +143,7 @@ select {
         border-right: 3px solid var(--dark-gray);
       }
     }
-    @media screen and (max-width: 800px) {
+    @media screen and (max-width: 1160px) {
       margin: auto;
       background-color: transparent;
       background-image: none;
@@ -153,7 +153,7 @@ select {
   ._mnuli { // menu button container
     margin-bottom: 0;
     margin-top: auto;
-    @media screen and (max-width: 800px) {
+    @media screen and (max-width: 1160px) {
     }
     li {
       margin: 0;
@@ -201,7 +201,7 @@ select {
   display: none;
   z-index: 1;
   color: white;
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 1160px) {
     top: 67px; left: 4px; bottom: 0px; right: 4px;
     &[data-state="off"] { top: 67px; left: -5px; bottom: 6px;}
     border-bottom-left-radius: 0px;
@@ -246,7 +246,7 @@ select {
 	display: flex;
   flex-flow: column;
   margin: 0px 9px 0px 82px;
-  @media screen and (max-width: 800px) { margin: auto 5px; }
+  @media screen and (max-width: 1160px) { margin: auto 5px; }
   ._bdysec1 {
     min-height: 500px;
     background-image: linear-gradient(rgba(26, 26, 26, 0.58), var(--dark-gray)), url('../../media/img/bg/fast.jpg');
@@ -258,7 +258,7 @@ select {
     margin-top: 5px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
-    @media screen and (max-width: 800px) {
+    @media screen and (max-width: 1160px) {
       min-height: 400px;
       margin-top: 11px;
     }
@@ -274,7 +274,7 @@ select {
       font-size: 20px;
       max-width: 700px;
       width: 100%;
-      @media screen and (max-width: 800px) { width: 90% }
+      @media screen and (max-width: 1160px) { width: 90% }
       ._bibf_div {
         background-color: var(--white);
         display: flex;
@@ -405,7 +405,7 @@ select {
       top: 0; left: 0; bottom: 0; right: 0;
       display: flex;
       transition: .3s;
-      @media screen and (max-width: 800px) { display: block }
+      @media screen and (max-width: 1160px) { display: block }
       ._bs2dc_pane {
         margin: 6px;
         .fill_width();
@@ -419,16 +419,24 @@ select {
           position: relative;
         }
         &._pane_l {
+          &::-webkit-scrollbar{ display: none; }
           max-width: 350px;
           display: flex;
           flex-flow: column;
           transition: .3s;
-          @media screen and (max-width: 800px) { max-width: 100% }
+          scrollbar-width: none;
+          @media screen and (max-width: 1160px) { max-width: 100% }
           ._bs2dcp_row {
             height: 100%;
             overflow: auto;
+            &._jds_member {
+              @media screen and (max-width: 1160px) { height: max-content; }
+              .fill_width();
+              overflow: hidden;
+            }
             &._jds_holder {
-              height: auto;
+              height: max-content;
+              overflow: hidden;
             	margin-bottom: 0px;
             	padding: 20px;
             	text-align: center;
@@ -440,8 +448,9 @@ select {
             	padding: 8px;
             	display: flex;
             	flex-flow: column;
-            	position: absolute;
-              top: 0; left: 0; bottom: 0; right: 0;
+            	// position: absolute;
+              // top: 0; left: 0; bottom: 0; right: 0;
+              height: max-content;
               ._bs2dcprc_title {
                 background-color: #424242;
                 color: white;
@@ -465,11 +474,23 @@ select {
           }
         }
         &._pane_r {
+          &::-webkit-scrollbar { display: none; }
           transition: .3s;
           overflow: auto;
+          scrollbar-width: none;
+          ._bs2dcpr_title {
+            background-color: #424242;
+            color: white;
+            padding: 15px 10px;
+            border: 6px solid var(--light-gray-v2);
+            position: sticky;
+            top: 0;
+            z-index: 9;
+            border-radius: 10px;
+          }
           ._bs2dcp_row {
             &._jds_info {
-              margin-bottom: 0px !important;
+              // margin-bottom: 0px !important;
               display: flex;
               flex-flow: column;
               height: max-content;
@@ -497,7 +518,7 @@ select {
                     	height: 120px;
                     	border-radius: 5px;
                     	position: relative;
-                      @media screen and (max-width: 800px) {
+                      @media screen and (max-width: 1160px) {
                         width: 103px;
                         height: 226px;
                       }
@@ -509,7 +530,7 @@ select {
                       	font-size: 30px;
                       	font-weight: bold;
                         text-transform: uppercase;
-                        @media screen and (max-width: 800px) {
+                        @media screen and (max-width: 1160px) {
                           font-size: 24px;
                         }
                       }
@@ -520,7 +541,7 @@ select {
                     .fill_width();
                     display: flex;
                     flex-flow: row;
-                    @media screen and (max-width: 800px) {
+                    @media screen and (max-width: 1160px) {
                       &:first-child { flex-flow: column; }
                       font-size: 12px;
                     }
@@ -535,7 +556,7 @@ select {
                       	overflow: hidden;
                       	text-overflow: ellipsis;
                         white-space: nowrap;
-                        @media screen and (max-width: 800px) {
+                        @media screen and (max-width: 1160px) {
                           font-size: 12px;
                           max-width: 168px;
                         }
@@ -568,7 +589,7 @@ select {
                       	background-color: grey;
                       	cursor: pointer;
                       }
-                      @media screen and (max-width: 800px) {
+                      @media screen and (max-width: 1160px) {
                         padding: 6px;
                       }
                       a {
@@ -589,7 +610,7 @@ select {
                       overflow: hidden;
                       display: flex;
                       flex-flow: row;
-                      @media screen and (max-width: 800px) {
+                      @media screen and (max-width: 1160px) {
                         min-height: 30px;
                         min-width: 100px;
                       }

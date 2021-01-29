@@ -150,11 +150,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $data = urldecode($std->db->escape_string($_POST['path_code']));
     # check if path_code is a URL or code
     if (filter_var($data, FILTER_VALIDATE_URL)) {
-    //------------------------------------------------------------------------\\
-    #                        |========================|                        #
-    #                    //--| URL RECEIVED FROM USER |--\\                    #
-    #                        |========================|                        #
-    //------------------------------------------------------------------------\\
+      //------------------------------------------------------------------------\\
+      #                        |========================|                        #
+      #                    //--| URL RECEIVED FROM USER |--\\                    #
+      #                        |========================|                        #
+      //------------------------------------------------------------------------\\
 
       /* $metaData = $std->getMeta($data); # fetch URL metadata */
 
@@ -224,15 +224,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       $arrGRP = array('jid' => $jointID, 'uid' => $userID, 'role' => 'owner');
       if ($jds->group_add_member($arrGRP)) {
         // Add requested file to server download request
+        # Create new download request from URL recieved -----------------------\/
         $arrSVR = array(
           'jid' => $jointID,
           'uid' => $userID,
           'url' => $data,
           'ext' => $result['extension'],
           'size' => $result['size'],
-          'max_chunk_size' => 5 // put default at first
+          'max_chunk_size' => 'auto' // put default at first
         );
-        $crt = $jds->crt_download($arrSVR); # create new download request from URL recieved
+        $crt = $jds->crt_download($arrSVR);
         if ($crt != false) {
           $result['svrID'] = $crt;
           echo json_encode($result); // end of process
@@ -240,6 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           $result = array('server_error' => "Unrecoverable error v2!");
           echo json_encode($result);
         }
+        # ---------------------------------------------------------------------/\
       } else {
         $result = array('server_error' => "Unrecoverable error v3!");
         echo json_encode($result);
@@ -283,8 +285,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       // ----------------------------------------------------------------------->
 
     } else {
-      // Not an HTTP URL
-      echo "checking if code exists";
+      // Not an HTTP URL [CHECK IF group code exists]
+      $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+      if ($jds->validateGroup($data)) {
+        $arrGRP = array('jid' => $data, 'uid' => $userID, 'role' => 'member');
+        if ($jds->group_add_member($arrGRP)) echo "user added to group";
+      } else {
+        echo "group code does not exist";
+      }
     }
   }
 
@@ -561,6 +569,64 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     // Update MySQL with new data
   }
+
+  if (isset($_POST['crtDownload'])) {
+    // Add requested file to server download request
+    $jointID = $std->db->escape_string($_POST['jointID']);
+    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+    $url = $std->db->escape_string($_POST['url']);
+
+    // EXIT CODE IF URL IS NOT VALID
+    if (!filter_var($url, FILTER_VALIDATE_URL)) exit();
+
+    $ext = $std->db->escape_string($_POST['ext']);
+    $realSize = $std->db->escape_string($_POST['realSize']);
+    $formattedSize = $std->formatUnit($realSize);
+    $fileOrigin = $_POST['origin']; // object contains url broken into scheme, host and path
+
+    # Create new download request from URL recieved -----------------------\/
+    $arrSVR = array(
+      'jid' => $jointID,
+      'uid' => $userID,
+      'url' => $url,
+      'ext' => $ext,
+      'size' => $formattedSize,
+      'max_chunk_size' => 'auto' // put default at first
+    );
+    $crt = $jds->crt_download($arrSVR);
+    if ($crt != false) {
+      $result['svrID'] = $crt;
+      echo json_encode($result); // end of process
+    } else {
+      $result = array('server_error' => "Unrecoverable error v2!");
+      echo json_encode($result);
+    }
+    # ---------------------------------------------------------------------/\
+  }
   //////////////////////////////////////////////////////////////////////////////
+} else if ($_SERVER['REQUEST_METHOD'] == "GET") {
+  if (isset($_GET['groupCheck'])) {
+    if (empty($_GET['groupCheck'])) exit();
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+
+    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+    $jID = $std->db->escape_string($_GET['groupCheck']);
+
+    $res = ($jds->validateGroup($jID) == true) ? true : false;
+    $result = array('response' => $res, 'jid' => $jID);
+    echo json_encode($result);
+    exit();
+  }
 }
 ?>

@@ -32,6 +32,14 @@ class jointlib extends stdlib {
   }
 
 
+  public function validateGroup($jID) {
+    $sql = "SELECT joint_id FROM joint_group WHERE joint_id = '$jID'";
+    $qry = mysqli_query($this->db, $sql);
+    if (mysqli_num_rows($qry) == 1) return true;
+    return false;
+  }
+
+
   public function group_add_member($arr) {
     $uid = $this->db->escape_string($arr['uid']);
     $jid = $this->db->escape_string($arr['jid']);
@@ -173,12 +181,10 @@ class jointlib extends stdlib {
       user.username AS 'username',
       joint_group.joint_id AS 'jid',
       joint_group_member.joint_role AS 'role',
-      joint_group_member.date_added AS 'joined',
-      COUNT(svr_download_request.request_id) AS 'requests'
+      joint_group_member.date_added AS 'joined'
     FROM joint_group_member
     INNER JOIN user ON user.user_id = joint_group_member.user_id
     INNER JOIN joint_group ON joint_group.joint_id = joint_group_member.joint_id
-    INNER JOIN svr_download_request ON svr_download_request.joint_id = joint_group.joint_id AND svr_download_request.user_id = joint_group_member.user_id
     WHERE joint_group_member.joint_id = '$jid'
     GROUP BY joint_group_member.id
     ";
