@@ -131,6 +131,13 @@ python_server_nsp.on('connection', (socket) => {
     console.log(data);
   });
 
+  // SOCKET MESSAGE PROCESSING
+  socket.on('msg', (data) => {
+    console.log('ADMIN_MSG => '+JSON.stringify(data)); // data received
+    data.sid = socket.id;
+    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: data}); // send message direct to the admin namespace
+  });
+
   // BASIC SOCKET COMMANDS
   socket.on('disconnect', function () {
     admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `PYTHON SOCKET [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace

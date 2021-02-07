@@ -246,7 +246,10 @@ select {
 	display: flex;
   flex-flow: column;
   margin: 0px 9px 0px 82px;
-  @media screen and (max-width: 1160px) { margin: auto 5px; }
+  @media screen and (max-width: 1160px) {
+    display: block;
+    margin: auto 5px;
+  }
   ._bdysec1 {
     min-height: 500px;
     background-image: linear-gradient(rgba(26, 26, 26, 0.58), var(--dark-gray)), url('../../media/img/bg/fast.jpg');
@@ -402,12 +405,22 @@ select {
     overflow: auto;
     &::-webkit-scrollbar{ display: none; }
     scrollbar-width: none;
+    @media screen and (max-width: 1160px) {
+      position: sticky;
+      padding-top: 1px;
+      padding-bottom: 1px;
+      top: 0px;
+      height: calc(100% - 76px);
+    }
     ._bs2_div_contr {
       position: absolute;
       top: 0; left: 0; bottom: 0; right: 0;
       display: flex;
       transition: .3s;
-      @media screen and (max-width: 1160px) { display: block }
+      @media screen and (max-width: 1160px) {
+        display: block;
+        position: static;
+      }
       ._bs2dc_pane {
         margin: 6px;
         .fill_width();
@@ -432,9 +445,13 @@ select {
             height: 100%;
             overflow: auto;
             &._jds_member {
+              &::-webkit-scrollbar{ display: none; }
+              scrollbar-width: none;
               @media screen and (max-width: 1160px) { height: max-content; }
               .fill_width();
-              overflow: hidden;
+              height: max-content;
+              max-height: 400px;
+              overflow: auto;
             }
             &._jds_holder {
               height: max-content;
@@ -450,14 +467,14 @@ select {
             	padding: 8px;
             	display: flex;
             	flex-flow: column;
-            	// position: absolute;
-              // top: 0; left: 0; bottom: 0; right: 0;
               height: max-content;
               ._bs2dcprc_title {
                 background-color: #424242;
                 color: white;
                 padding: 15px 10px;
                 border-radius: 10px;
+                position: sticky;
+                top: 7px;
               }
               ._bs2dcprc_member {
               	color: white;
@@ -479,6 +496,7 @@ select {
           &::-webkit-scrollbar { display: none; }
           transition: .3s;
           overflow: auto;
+          @media screen and (max-width: 1000px) { overflow: unset; }
           scrollbar-width: none;
           ._bs2dcpr_title {
             background-color: #424242;
@@ -487,7 +505,7 @@ select {
             border: 6px solid var(--light-gray-v2);
             position: sticky;
             top: 0;
-            z-index: 9;
+            z-index: 1;
             border-radius: 10px;
           }
           ._bs2dcp_row {
