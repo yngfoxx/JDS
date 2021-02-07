@@ -395,6 +395,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       exit();
     }
 
+    $GROUPDATA['UID'] = $userID;
+
     // add group information to output
     $GROUPDATA['info'] = $jointInfo;
 

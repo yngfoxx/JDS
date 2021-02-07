@@ -43,6 +43,8 @@ const python_server_nsp = io.of(/^\/py_\d+$/);
 const user_nsp = io.of(/^\/usr_\d+$/);
 const cookie = require('cookie');
 
+let user_array = [];
+
 
 // ADMIN SOCKET NAMESPACE/CHANNELS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 admin_server_nsp.use((socket, next) => { // Authenticate admin channel
@@ -118,10 +120,33 @@ user_nsp.on('connection', (socket) => {
 
 python_server_nsp.on('connection', (socket) => {
   const python_channel = socket.nsp; // newNamespace.name === '/python
+  let handshake = socket.handshake;
 
   // GET SOCKET DATA
   admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: '{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name}); // send message direct to the admin namespace
-  // console.log('{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name);
+
+  // CHECK FOR USER OR ADD NEW USER SOCKET ID AND UID ------------------------->
+  if (user_array.length > 0) {
+    let inList = false;
+    for (var i = 0; i < user_array.length; i++) {
+      if (user_array[i].uid == handshake.query.uid) {
+        inList = true;
+        user_array[i].sid = socket.id;
+        user_array[i].status = 'connected';
+        break;
+      }
+    }
+    if (!inList) {
+      user_array.push({uid: handshake.query.uid, sid: socket.id, status: 'connected'});
+    }
+  } else {
+    user_array.push({uid: handshake.query.uid, sid: socket.id, status: 'connected'});
+  }
+  // -------------------------------------------------------------------------->
+
+   // send message direct to the admin namespace [Emit user array list]
+  admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{ALL_USERS} =>'+JSON.stringify(user_array)});
+
 
   // SOCKET EVENT PROCESSING
   socket.on('event', (data) => {
@@ -136,11 +161,36 @@ python_server_nsp.on('connection', (socket) => {
     console.log('ADMIN_MSG => '+JSON.stringify(data)); // data received
     data.sid = socket.id;
     admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: data}); // send message direct to the admin namespace
+    if (data.hasOwnProperty('action')) {
+      switch (data.action) {
+        case 'user_status':
+           // return user status list to channel
+           if (data.hasOwnProperty('targetUID')) {
+             let t_uid = data.targetUID;
+             for (var i = 0; i < user_array.length; i++) {
+               if (user_array[i].uid == t_uid) {
+                 let res = {response: 'user_status', data: user_array[i]};
+                 python_server_nsp.emit('msg', res); // send status of all users in the channel
+               }
+             }
+           }
+          break;
+        default:
+
+      }
+    }
   });
 
-  // BASIC SOCKET COMMANDS
-  socket.on('disconnect', function () {
+  // SOCKET ON DISCONNECT EVENT
+  socket.on('disconnect', () => {
     admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `PYTHON SOCKET [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
+    for (var i = 0; i < user_array.length; i++) {
+      if (user_array[i].sid == socket.id) {
+        user_array[i].status = 'disconnected';
+        admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{ALL_USERS} =>'+JSON.stringify(user_array[i])});
+        break;
+      }
+    }
   });
 });
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
