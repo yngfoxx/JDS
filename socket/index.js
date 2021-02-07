@@ -187,6 +187,8 @@ python_server_nsp.on('connection', (socket) => {
     for (var i = 0; i < user_array.length; i++) {
       if (user_array[i].sid == socket.id) {
         user_array[i].status = 'disconnected';
+        let res = {response: 'user_status', data: user_array[i]};
+        python_server_nsp.emit('msg', res); // send status of all users in the channel
         admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{ALL_USERS} =>'+JSON.stringify(user_array[i])});
         break;
       }

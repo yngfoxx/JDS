@@ -72,7 +72,7 @@
 
       $(function () {
         const admin_socket = io('/su_'+UUID, { reconnectionDelayMax: 10000, query: { auth: suKEY }, forceNew: true });
-        const python_socket = io('/py_'+UUID, { reconnectionDelayMax: 10000, query: { auth: pyKEY } });
+        const python_socket = io('/py_'+UUID, { reconnectionDelayMax: 10000, query: { auth: pyKEY, uid: 'administrator'  } });
         const user_socket = io('/usr_'+UUID, { reconnectionDelayMax: 10000, query: { auth: usrKEY }, forceNew: true });
 
 
@@ -112,7 +112,7 @@
                         newDivPython.innerText = "// "+JSON.stringify(data.socket_data) + " // => [Admin NSP]";
                     parentDivPython.append(newDivPython);
                     break;
-                    
+
                 default:
                     break;
               }
