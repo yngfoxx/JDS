@@ -288,10 +288,28 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       // Not an HTTP URL [CHECK IF group code exists]
       $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
       if ($jds->validateGroup($data)) {
-        $arrGRP = array('jid' => $data, 'uid' => $userID, 'role' => 'member');
-        if ($jds->group_add_member($arrGRP)) echo "user added to group";
+        // check if user is a member of the group
+        $members = $jds->getJointMembers($data);
+        $isMember = false;
+        for ($i=0; $i < sizeof($members); $i++) {
+          if ($members[$i]['uid'] == $userID) {
+            $isMember = true;
+            break;
+          }
+        }
+        if (!$isMember) {
+          $arrGRP = array('jid' => $data, 'uid' => $userID, 'role' => 'member');
+          if ($jds->group_add_member($arrGRP)) {
+            echo json_encode(array('isMember' => true, 'jid' => $data, 'type' => 'code')); exit();
+          }
+          echo json_encode(array('isMember' => false, 'jid' => $data, 'type' => 'code')); exit();
+        }
+        // User is a member of the group
+        echo json_encode(array('isMember' => true, 'jid' => $data, 'type' => 'code')); exit();
+
       } else {
         echo "group code does not exist";
+        exit();
       }
     }
   }

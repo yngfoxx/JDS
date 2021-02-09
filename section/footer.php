@@ -118,6 +118,15 @@
                   }
                 });
                 $("div[data-jds-body]").hide();
+              } else if (jRes.type == 'code') {
+                if (jRes.hasOwnProperty('isMember')) {
+                  // only members of the group can view the group
+                  if (jRes.isMember == true) {
+                    loadJDS(jRes.jid);
+                  } else {
+                    swal({icon: 'error', title: 'Uh oh!', text: 'Failed to join group.'});
+                  }
+                }
               }
             }
             document.querySelector('._bdysec1').classList.add('_pcntd');
