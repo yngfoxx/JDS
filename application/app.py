@@ -3,7 +3,7 @@ import os
 from PyQt5.QtWidgets import QMainWindow,QHBoxLayout,QWidget,QApplication
 from PyQt5.QtWebEngineWidgets import *
 from PyQt5.QtCore import QUrl
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 
 
 class JDS_CLIENT(QMainWindow):
@@ -12,10 +12,17 @@ class JDS_CLIENT(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        # self.setFixedWidth(1400)
-        # self.setFixedHeight(800)
+        self.resize(1200, 800)
+        self.setMinimumSize(800, 800)
         self.setWindowTitle("Joint Downloading System [Desktop client]")
-        self.setStyleSheet("QMainWindow {background: '#2d2d2d';}")
+        # self.setWindowFlags(QtCore.Qt.FramelessWindowHint) # make window frameless
+        self.setStyleSheet("""
+            QMainWindow {
+                background: '#2d2d2d';
+                padding: 0px;
+                margin: 0;
+            }
+            """)
 
         scriptDir = os.path.dirname(os.path.realpath(__file__))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'logo-512x512.png'))
@@ -25,6 +32,7 @@ class JDS_CLIENT(QMainWindow):
         self.loadWebPage()
 
         horizontalLayout = QHBoxLayout()
+        horizontalLayout.setContentsMargins(0, 0, 0, 0);
         horizontalLayout.addWidget(self.webEngineView)
 
         widget = QWidget()
@@ -70,7 +78,7 @@ class JDS_DEBUGGER(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     clientApp = JDS_CLIENT() # CLIENT APPLICATION
-    clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
+    #clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
 
     print("APP INITIALIZED")
 
