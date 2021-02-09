@@ -5,29 +5,27 @@ from PyQt5.QtWebEngineWidgets import *
 from PyQt5.QtCore import QUrl
 from PyQt5 import QtGui
 
+
 class JDS_CLIENT(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
-        self.setFixedWidth(1400)
-        self.setFixedHeight(800)
+        # self.setFixedWidth(1400)
+        # self.setFixedHeight(800)
         self.setWindowTitle("Joint Downloading System [Desktop client]")
-        self.setStyleSheet("QMainWindow {background: '#151515';}")
+        self.setStyleSheet("QMainWindow {background: '#2d2d2d';}")
 
         scriptDir = os.path.dirname(os.path.realpath(__file__))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'logo-512x512.png'))
 
         self.webEngineView = QWebEngineView()
-        self.webEngineDebugger = QWebEngineView()
 
         self.loadWebPage()
-        self.loadDebbuger()
 
         horizontalLayout = QHBoxLayout()
         horizontalLayout.addWidget(self.webEngineView)
-        horizontalLayout.addWidget(self.webEngineDebugger)
 
         widget = QWidget()
         widget.setLayout(horizontalLayout)
@@ -38,12 +36,42 @@ class JDS_CLIENT(QMainWindow):
     def loadWebPage(self):
         self.webEngineView.load(QUrl("http://localhost/JDS"))
 
-    def loadDebbuger(self):
-        self.webEngineDebugger.load(QUrl("http://127.0.0.1:1231"))
+
+class JDS_DEBUGGER(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        # self.setFixedWidth(1400)
+        # self.setFixedHeight(800)
+        self.setWindowTitle("Joint Downloading System [Desktop client debugger]")
+
+        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'logo-512x512.png'))
+
+        self.webEngineView = QWebEngineView()
+
+        self.loadWebPage()
+
+        horizontalLayout = QHBoxLayout()
+        horizontalLayout.addWidget(self.webEngineView)
+
+        widget = QWidget()
+        widget.setLayout(horizontalLayout)
+
+        self.setCentralWidget(widget)
+        self.show()
+
+    def loadWebPage(self):
+        self.webEngineView.load(QUrl("http://127.0.0.1:1231"))
+
 
 def main():
     app = QApplication(sys.argv)
-    clientApp = JDS_CLIENT()
+    clientApp = JDS_CLIENT() # CLIENT APPLICATION
+    clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
+
     print("APP INITIALIZED")
 
     sys.exit(app.exec_())
