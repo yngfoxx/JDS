@@ -1,5 +1,6 @@
 /node_modules
 /api/fetch
+/api/v2/venv
 /app/venv
 /app/.idea
 /application/venv
