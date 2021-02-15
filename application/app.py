@@ -1,9 +1,10 @@
 import sys
 import os
-from PyQt5.QtWidgets import QMainWindow,QHBoxLayout,QWidget,QApplication
-from PyQt5.QtWebEngineWidgets import *
+from PyQt5 import QtGui, QtCore, QtNetwork
 from PyQt5.QtCore import QUrl
-from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QMainWindow,QHBoxLayout,QWidget,QApplication
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWebChannel import QWebChannel
 
 
 class JDS_CLIENT(QMainWindow):
@@ -79,9 +80,7 @@ def main():
     app = QApplication(sys.argv)
     clientApp = JDS_CLIENT() # CLIENT APPLICATION
     clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
-
     print("APP INITIALIZED")
-
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
