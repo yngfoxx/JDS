@@ -35,10 +35,10 @@ def download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION):
 
     channel_id = "/py_" + NAMESPACE
 
-    sio.connect('https://ws-jds-eu.herokuapp.com/', headers={'foo':'bar'}, namespaces=channel_id)  # connect python api to generated
+    sio.connect('https://ws-jds-eu.herokuapp.com/', headers={'foo':'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'}, namespaces=channel_id)  # connect python api to generated
     # sio.connect('http://localhost:8000/', namespaces=channel_id)  # connect python api to generated socket channel id
 
-    # SOCKET EVENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # SOCKET EVENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\/
     @sio.event
     def connect():
         sio.emit("msg", {"foo": "bar"}, channel_id)
@@ -52,38 +52,53 @@ def download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION):
     def disconnect():
         print("[disconnected]")
 
-    # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>/\
     # ----------------------------------------------------------------------------->
 
-    # SMART DOWNLOADER OPERATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # SMART DOWNLOADER OPERATION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\/
     obj = SmartDL(URL, DESTINATION)
 
-    # INITIALIZE THE DOWNLOAD ----------------------------------------------------->
+    # INITIALIZE THE DOWNLOAD ------------------------------------------------->
     obj.start(blocking=False)
 
     while not obj.isFinished():
-        sio.emit('event', {
-            'namespace': NAMESPACE,
-            'request_id': REQUEST_ID,
-            'joint_id': JOINT_ID,
-            'file_data': {
-                'speed': obj.get_speed(human=True),
-                'downloaded': obj.get_dl_size(human=True),
-                'ETA': obj.get_eta(human=True),
+        try:
+            sio.emit('event', {
+                'namespace': NAMESPACE,
+                'request_id': REQUEST_ID,
+                'joint_id': JOINT_ID,
+                'file_data': {
+                    'speed': obj.get_speed(human=True),
+                    'downloaded': obj.get_dl_size(human=True),
+                    'ETA': obj.get_eta(human=True),
+                    'progress': (obj.get_progress() * 100),
+                    'bar': obj.get_progress_bar(),
+                    'status': obj.get_status()
+                }
+            }, channel_id)
+
+            # Update PHP of file status
+            payload = {
+                'jdsUpd': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
+                'joint_id': JOINT_ID,
+                'request_id': REQUEST_ID,
                 'progress': (obj.get_progress() * 100),
-                'bar': obj.get_progress_bar(),
                 'status': obj.get_status()
             }
-        }, channel_id)
-        # Update PHP of file status
-        payload = {
-            'jdsUpd': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
-            'joint_id': JOINT_ID,
-            'request_id': REQUEST_ID,
-            'progress': (obj.get_progress() * 100),
-            'status': obj.get_status()
-        }
-        req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
+            req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
+        except:
+            # Update PHP of file status
+            payload = {
+                'jdsUpd': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
+                'joint_id': JOINT_ID,
+                'request_id': REQUEST_ID,
+                'progress': 0,
+                'status': "internal_error",
+                'error_msg': "Failed to send socket data."
+            }
+            req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
+            obj.stop()
+
         print("||")
         print("||")
         if req:
@@ -137,12 +152,12 @@ def download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION):
         print("There were some errors:")
         for e in obj.get_errors():
             print(str(e))
-    # ----------------------------------------------------------------------------->
+    # ------------------------------------------------------------------------->
     # [*] 0.23 Mb / 0.37 Mb @ 88.00Kb/s [##########——–] [60%, 2s left]
 
     # STORE DOWNLOADED FILE IN GIVEN DESTINATION
     path = obj.get_dest()
-    # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>/\
 
     # disconnect from socket server
     sio.disconnect()

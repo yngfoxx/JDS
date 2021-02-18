@@ -120,8 +120,7 @@ user_nsp.on('connection', (socket) => {
 python_server_nsp.on('connection', (socket) => {
   const python_channel = socket.nsp;
   let handshake = socket.handshake;
-  console.log(handshake);
-
+  if (handshake.hasOwnProperty('foo')) console.log("Token: "+handshake.foo);
 
   // GET SOCKET DATA
   admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: '{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name}); // send message direct to the admin namespace
