@@ -38,6 +38,6 @@ $DOMAIN = "http://localhost/JDS";
 <script src="//unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
-<script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/script.js"></script>
- <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/socket.js"></script>
+<script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/script.js<?php echo "?v=".rand(100000000, 999999999);  ?> "></script>
+ <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/socket.js<?php echo "?v=".rand(100000000, 999999999);  ?> "></script>
 <!-- <script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/require.js"></script> -->
