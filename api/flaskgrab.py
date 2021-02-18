@@ -35,7 +35,8 @@ def download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION):
 
     channel_id = "/py_" + NAMESPACE
 
-    sio.connect('https://ws-jds-eu.herokuapp.com/', headers={'foo':'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'}, namespaces=channel_id)  # connect python api to generated
+    # sio.connect('https://ws-jds-eu.herokuapp.com/', headers={'foo':'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'}, namespaces=channel_id)  # connect python api to generated
+    sio.connect('http://localhost:8000/', headers={'room':NAMESPACE}, namespaces=channel_id)  # connect python api to generated
     # sio.connect('http://localhost:8000/', namespaces=channel_id)  # connect python api to generated socket channel id
 
     # SOCKET EVENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\/

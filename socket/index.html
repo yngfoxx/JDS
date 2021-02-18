@@ -73,10 +73,10 @@
         reconnectionDelayMax: 10000,
         query: { uChannel: UUID }
       });
-      
+
       $(function () {
         const admin_socket = io('/su_'+UUID, { reconnectionDelayMax: 10000, auth: { token: suKEY }, forceNew: true });
-        const python_socket = io('/py_'+UUID, { reconnectionDelayMax: 10000, auth: { token: pyKEY, uid: 'administrator'  } });
+        const python_socket = io('/py_'+UUID, { reconnectionDelayMax: 10000, auth: { token: pyKEY, uid: 'administrator', gc: 'administrator'  } });
         const user_socket = io('/usr_'+UUID, { reconnectionDelayMax: 10000, auth: { token: usrKEY }, forceNew: true });
 
 

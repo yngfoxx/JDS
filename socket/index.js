@@ -39,7 +39,6 @@ const pykey = [
 
 // SOCKET SECTION ============================================================================================================================================================>
 const admin_server_nsp = io.of(/^\/su_\d+$/);
-const python_server_nsp = io.of(/^\/py_\d+$/);
 const user_nsp = io.of(/^\/usr_\d+$/);
 const cookie = require('cookie');
 
@@ -110,92 +109,110 @@ user_nsp.on('connection', (socket) => {
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>/\
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // PYTHON API SOCKET NAMESPACE/CHANNELS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\/
-// python_server_nsp.use((socket, next) => { // Authenticate admin channel
-//   if (pykey.includes(socket.handshake.auth.token)) return next(); // check authenticity of key
-//   python_server_nsp.emit('msg', '{PYTHON} => ['+socket.id+'] ACCESS DENIED (Invalid key)');
-//   return next(new Error('authentication error'));
-// });
+const python_server_nsp = io.of(/^\/py_\d+$/);
+let pyClients = [];
 
 python_server_nsp.on('connection', (socket) => {
+
   const python_channel = socket.nsp;
   let handshake = socket.handshake;
-  if (handshake.hasOwnProperty('foo')) console.log("Token: "+handshake.foo);
-
-  // GET SOCKET DATA
-  admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: '{PYTHON} => ['+socket.id+'] NEW CONNECTION TO '+python_channel.name}); // send message direct to the admin namespace
-
-  // CHECK FOR USER OR ADD NEW USER SOCKET ID AND UID ------------------------->
-  if (user_array.length > 0) {
-    let inList = false;
-    for (var i = 0; i < user_array.length; i++) {
-      if (user_array[i].uid == handshake.auth.uid) {
-        inList = true;
-        user_array[i].sid = socket.id;
-        user_array[i].status = 'connected';
-        break;
-      }
-    }
-    if (!inList) {
-      user_array.push({uid: handshake.auth.uid, sid: socket.id, status: 'connected'});
-    }
-  } else {
-    user_array.push({uid: handshake.auth.uid, sid: socket.id, status: 'connected'});
-  }
-  // -------------------------------------------------------------------------->
-
-   // send message direct to the admin namespace [Emit user array list]
-  admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{ALL_USERS} =>'+JSON.stringify(user_array)});
-
-
-  // SOCKET EVENT PROCESSING
-  socket.on('event', (data) => {
-    data.channel = python_channel.name;
-    python_server_nsp.emit('msg', data); // send message direct to the namespace
-    admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: data}); // send message direct to the admin namespace
-    console.log(data);
-  });
-
-  // SOCKET MESSAGE PROCESSING
-  socket.on('msg', (data) => {
-    console.log('ADMIN_MSG => '+JSON.stringify(data)); // data received
-    data.sid = socket.id;
-    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: data}); // send message direct to the admin namespace
-    if (data.hasOwnProperty('action')) {
-      switch (data.action) {
-        case 'user_status':
-           // return user status list to channel
-           if (data.hasOwnProperty('targetUID')) {
-             let t_uid = data.targetUID;
-             for (var i = 0; i < user_array.length; i++) {
-               if (user_array[i].uid == t_uid) {
-                 let res = {response: 'user_status', data: user_array[i]};
-                 python_server_nsp.emit('msg', res); // send status of all users in the channel
-               }
-             }
-           }
-          break;
-        default:
-
-      }
-    }
-  });
+  let socketGC = (handshake.auth.gc) ? handshake.auth.gc : ((handshake.room) ? handshake.room : 'general');
+  if (socketGC != 'general') socket.join(socketGC); // add only users to rooms
+  let uData = {
+    uuid: handshake.auth.uid,
+    room: socketGC
+  };
+  pyClients.push(uData);
 
   // SOCKET ON DISCONNECT EVENT
   socket.on('disconnect', () => {
+    pyClients.splice(pyClients.indexOf(uData), 1); // remove user from client list
     admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `PYTHON SOCKET [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
-    for (var i = 0; i < user_array.length; i++) {
-      if (user_array[i].sid == socket.id) {
-        user_array[i].status = 'disconnected';
-        let res = {response: 'user_status', data: user_array[i]};
-        python_server_nsp.emit('msg', res); // send status of all users in the channel
-        admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{ALL_USERS} =>'+JSON.stringify(user_array[i])});
-        break;
+    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '[-]{USERS} =>'+JSON.stringify(pyClients)});
+  });
+
+  // python_server_nsp.to(socketGC).emit('msg', 'Welcome to Joint Downloading System'); // send status of all users in the channel
+  admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '[+]{USERS} =>'+JSON.stringify(pyClients)}); // Notify admin
+
+  // SOCKET { MSG } PROCESSING
+  socket.on('msg', (data) => {
+    data.sid = socket.id;
+    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: data}); // send message direct to the admin namespace
+
+    if (data.hasOwnProperty('action')) {
+      switch (data.action) {
+        case 'user_status': // get user status in specified room
+           if (data.hasOwnProperty('gc') && data.hasOwnProperty('uid')) {
+             let t_gc = data.gc;
+             let t_uid = data.uid;
+             let inList = false;
+             let index;
+             pyClients.forEach((item, i) => {
+              if (getKeyByValue(item, t_uid) == 'uuid' && pyClients[i].room == t_gc) {
+                inList = true;
+                index = i;
+              }
+             });
+             let arr = (inList) ? {gc: pyClients[index].room, uid: pyClients[index].uuid, status: 'connected'} : {gc: t_gc, uid: t_uid, status: 'disconnected'};
+             python_server_nsp.to(t_gc).emit('msg', {response: 'user_status', data: arr}); // send status of all users in the channel
+           }
+          break;
+
+        default:
+          break;
       }
     }
+
   });
 });
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>/\
+
+
+
+function getKeyByValue(object, value) {
+  return Object.keys(object).find(key => object[key] === value);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ===========================================================================================================================================================================>
 
