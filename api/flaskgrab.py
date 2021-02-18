@@ -87,6 +87,7 @@ def download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION):
             }
             req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
         except:
+            print("Failed to connect to socket")
             # Update PHP of file status
             payload = {
                 'jdsUpd': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
