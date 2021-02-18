@@ -132,64 +132,72 @@ user_nsp.on('connection', (socket) => {
 
 
 
-// PYTHON API SOCKET NAMESPACE/CHANNELS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\/
-const python_server_nsp = io.of(/^\/py_\d+$/);
-let pyClients = [];
+// PYTHON API SOCKET NAMESPACE/CHANNELS =====================================================================================================================================\/
+  const python_server_nsp = io.of(/^\/py_\d+$/);
+  let pyClients = [];
 
-python_server_nsp.on('connection', (socket) => {
+  python_server_nsp.on('connection', (socket) => {
+    const python_channel = socket.nsp;
+    let handshake = socket.handshake;
+    let socketGC = (handshake.auth.gc) ? handshake.auth.gc : ((handshake.room) ? handshake.room : 'general');
+    if (socketGC != 'general') socket.join(socketGC); // add only users to rooms
+    let uData = {
+      uuid: handshake.auth.uid,
+      room: socketGC
+    };
+    if (socketGC != 'general') pyClients.push(uData);
 
-  const python_channel = socket.nsp;
-  let handshake = socket.handshake;
-  let socketGC = (handshake.auth.gc) ? handshake.auth.gc : ((handshake.room) ? handshake.room : 'general');
-  if (socketGC != 'general') socket.join(socketGC); // add only users to rooms
-  let uData = {
-    uuid: handshake.auth.uid,
-    room: socketGC
-  };
-  pyClients.push(uData);
+    // SOCKET ON DISCONNECT EVENT
+    socket.on('disconnect', () => {
+      if (socketGC != 'general') pyClients.splice(pyClients.indexOf(uData), 1); // remove user from client list
+      admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `[-] PYTHON SOCKET [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
+      admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{USERS} =>'+JSON.stringify(pyClients)});
+    });
 
-  // SOCKET ON DISCONNECT EVENT
-  socket.on('disconnect', () => {
-    pyClients.splice(pyClients.indexOf(uData), 1); // remove user from client list
-    admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `PYTHON SOCKET [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
-    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '[-]{USERS} =>'+JSON.stringify(pyClients)});
-  });
+    // python_server_nsp.to(socketGC).emit('msg', 'Welcome to Joint Downloading System'); // send status of all users in the channel
+    admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `[+] PYTHON SOCKET [${socket.id}] CONNECTED`}); // send message direct to the admin namespace
+    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{USERS} =>'+JSON.stringify(pyClients)}); // Notify admin
 
-  // python_server_nsp.to(socketGC).emit('msg', 'Welcome to Joint Downloading System'); // send status of all users in the channel
-  admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '[+]{USERS} =>'+JSON.stringify(pyClients)}); // Notify admin
+    // SOCKET { EVENT } PROCESSING
+    socket.on('event', (data) => { // File download event
+      data.channel = python_channel.name;
+      python_server_nsp.to(data.namespace).emit('msg', data); // send message direct to the namespace
+      admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: data}); // send message direct to the admin namespace
+      if (data.file_data.progress) console.log(data.file_data.progress);
+    });
 
-  // SOCKET { MSG } PROCESSING
-  socket.on('msg', (data) => {
-    data.sid = socket.id;
-    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: data}); // send message direct to the admin namespace
+    // SOCKET { MSG } PROCESSING
+    socket.on('msg', (data) => {
+      data.sid = socket.id;
+      admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: data}); // send message direct to the admin namespace
 
-    if (data.hasOwnProperty('action')) {
-      switch (data.action) {
-        case 'user_status': // get user status in specified room
-           if (data.hasOwnProperty('gc') && data.hasOwnProperty('uid')) {
-             let t_gc = data.gc;
-             let t_uid = data.uid;
-             let inList = false;
-             let index;
-             pyClients.forEach((item, i) => {
-              if (getKeyByValue(item, t_uid) == 'uuid' && pyClients[i].room == t_gc) {
-                inList = true;
-                index = i;
-              }
-             });
-             let arr = (inList) ? {gc: pyClients[index].room, uid: pyClients[index].uuid, status: 'connected'} : {gc: t_gc, uid: t_uid, status: 'disconnected'};
-             python_server_nsp.to(t_gc).emit('msg', {response: 'user_status', data: arr}); // send status of all users in the channel
-           }
-          break;
+      if (data.hasOwnProperty('action')) {
+        switch (data.action) {
+          case 'user_status': // get user status in specified room
+             if (data.hasOwnProperty('gc') && data.hasOwnProperty('uid')) {
+               let t_gc = data.gc;
+               let t_uid = data.uid;
+               let inList = false;
+               let index;
+               pyClients.forEach((item, i) => {
+                if (getKeyByValue(item, t_uid) == 'uuid' && pyClients[i].room == t_gc) {
+                  inList = true;
+                  index = i;
+                }
+               });
+               let arr = (inList) ? {gc: pyClients[index].room, uid: pyClients[index].uuid, status: 'connected'} : {gc: t_gc, uid: t_uid, status: 'disconnected'};
+               python_server_nsp.to(t_gc).emit('msg', {response: 'user_status', data: arr}); // send status of all users in the channel
+             }
+            break;
 
-        default:
-          break;
+          default:
+            break;
+        }
       }
-    }
 
+    });
   });
-});
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>/\
+// ==========================================================================================================================================================================/\
 
 
 
