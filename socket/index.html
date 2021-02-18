@@ -69,22 +69,18 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
       const UUID = rand(1000000000, 9999999999);
-
+      const manager = io('/', {
+        reconnectionDelayMax: 10000,
+        query: { uChannel: UUID }
+      });
+      
       $(function () {
-        const admin_socket = io('/su_'+UUID, { reconnectionDelayMax: 10000, query: { auth: suKEY }, forceNew: true });
-        const python_socket = io('/py_'+UUID, { reconnectionDelayMax: 10000, query: { auth: pyKEY, uid: 'administrator'  } });
-        const user_socket = io('/usr_'+UUID, { reconnectionDelayMax: 10000, query: { auth: usrKEY }, forceNew: true });
+        const admin_socket = io('/su_'+UUID, { reconnectionDelayMax: 10000, auth: { token: suKEY }, forceNew: true });
+        const python_socket = io('/py_'+UUID, { reconnectionDelayMax: 10000, auth: { token: pyKEY, uid: 'administrator'  } });
+        const user_socket = io('/usr_'+UUID, { reconnectionDelayMax: 10000, auth: { token: usrKEY }, forceNew: true });
 
 
         // ADMIN -------------------------------------------------------------->
-        // admin_socket.on('connect', ()=> {
-        //   let parentDiv = document.querySelector('._su_pane');
-        //   let newDiv = document.createElement('div');
-        //       newDiv.setAttribute('class', 'skt_msg');
-        //       newDiv.innerText = '{ADMIN} => ['+admin_socket.id+'] CONNECTED';
-        //   parentDiv.append(newDiv);
-        // });
-
         admin_socket.on('msg', (data) => {
           // onReceive socket message
            if (data != null) {
@@ -118,7 +114,6 @@
               }
            }
         });
-
         admin_socket.on("connect_error", err => {
           if (err instanceof Error) {
             console.error(err.message); // not authorized

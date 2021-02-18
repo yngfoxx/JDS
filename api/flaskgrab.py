@@ -34,13 +34,8 @@ def download(URL, JOINT_ID, REQUEST_ID, NAMESPACE, DESTINATION):
     sio = socketio.Client()  # WebSocket object
 
     channel_id = "/py_" + NAMESPACE
-    # channel_id = "/py_" + str(math.floor((random.random() * (9999999 - 1000000 + 1)) + 1000000)); # generate ID
 
-    # socket channel id sio.connect('https://ws-jds-eu.herokuapp.com', headers={
-    # 'auth':'qPyFMKAdjtfL3Gq5pk2xDgy0SKMpEmLz'}, namespaces=channel_id); # connect python api to generated socket
-    # channel id
-
-    sio.connect('https://ws-jds-eu.herokuapp.com/', namespaces=channel_id)  # connect python api to generated
+    sio.connect('https://ws-jds-eu.herokuapp.com/', headers={'foo':'bar'}, namespaces=channel_id)  # connect python api to generated
     # sio.connect('http://localhost:8000/', namespaces=channel_id)  # connect python api to generated socket channel id
 
     # SOCKET EVENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

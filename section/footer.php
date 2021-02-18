@@ -1,3 +1,4 @@
+<script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/ajx.js"></script>
 <?php
 // USER HOME PAGE ------------------------------------------------------------->
  if (isset($_GET['home'])) { // HOME PAGE ?>
@@ -267,7 +268,7 @@
 
 
 <?php
-// USER LOGIN PAGE ------------------------------------------------------------>
+  // USER LOGIN PAGE ------------------------------------------------------------>
  if (isset($_GET['login'])) { // LOGIN PAGE ?>
   <script type="text/javascript">
     $('a[data-show-key]').on('click', function(e) {
