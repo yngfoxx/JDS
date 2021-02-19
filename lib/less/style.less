@@ -196,7 +196,6 @@ select {
   position: fixed;
   top: 4px; left: 82px; bottom: 6px;
   transition: left .3s, top .3s;
-  z-index: -1;
   &[data-state="off"] { top: 4px; left: -5px; bottom: 6px;}
   background-color: var(--sec-col);
   border-radius: 6px;
@@ -204,7 +203,7 @@ select {
   .fill_width();
   overflow: auto;
   display: none;
-  z-index: 1;
+  z-index: 2;
   color: white;
   @media screen and (max-width: 1160px) {
     top: 67px; left: 0px; bottom: 0px; right: 0px;

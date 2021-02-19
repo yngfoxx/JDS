@@ -12,7 +12,6 @@
       url: '/JDS/req/req_handler.php',
       data: parm,
       success: (res) => {
-        console.log(res);
         if (isJson(res)) {
           let jRes = JSON.parse(res);
           if (jRes.hasOwnProperty('server_error')) {
@@ -28,14 +27,13 @@
                   buttons: ["No", "Yes"],
                   closeOnClickOutside: false,
                   closeOnEsc: false,
-                })
-                .then((willCreate) => {
+                }).then((willCreate) => {
                   if (willCreate == true) {
                     $('._bibf_div_c_cont').fadeIn();
                     let downConfig = document.querySelector('._bibf_dc_div');
                     downConfig.setAttribute("data-svr-id", jRes.svrID);
                     // show panes [LOAD JOINT GROUP] -------------------------->
-                    loadJDS(jRes.jdsID);
+                    loadJDS({ jID: jRes.jdsID });
                     // -------------------------------------------------------->
                   } else {
                     // delete temporary group or add to existing group
@@ -99,7 +97,7 @@
                                 button: "Awesome!"
                               });
                               // use websocket to inform users listening on the joint groups socket channel
-                              loadJDS(json.jid); // load joint group into view
+                              loadJDS({ jID: json.jid }); // load jds into view
                             },
                             load: 'up'
                           });
@@ -122,8 +120,11 @@
               } else if (jRes.type == 'code') {
                 if (jRes.hasOwnProperty('isMember')) {
                   // only members of the group can view the group
-                  if (jRes.isMember == true) {
-                    loadJDS(jRes.jid);
+                  if (jRes.hasOwnProperty('isNew') && jRes.isMember == true) {
+                    // user just joined the group newly
+                    loadJDS({ jID: jRes.jid, membership: 'new_member' });
+                  } else if (jRes.isMember == true) {
+                    loadJDS({ jID: jRes.jid });
                   } else {
                     swal({icon: 'error', title: 'Uh oh!', text: 'Failed to join group.'});
                   }
@@ -135,7 +136,7 @@
         }
       },
       complete: () => {
-        console.log("Done!");
+        console.log("Done! Ln 10 footer");
       },
       load: 'up'
     });
@@ -228,7 +229,8 @@
                 chdDiv.innerText = data[i].jid;
                 chdDiv.setAttribute('jid', data[i].jid)
                 chdDiv.addEventListener('click', function() {
-                  loadJDS(this.getAttribute('jid'));
+                  // loadJDS(this.getAttribute('jid'));
+                  loadJDS({ jID: this.getAttribute('jid') });
                 });
                 parDiv.append(chdDiv);
               }

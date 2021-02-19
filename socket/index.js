@@ -204,6 +204,8 @@ python_server_nsp.on('connection', (socket) => {
         case 'user_status': // get user status in specified room
            if (data.hasOwnProperty('gc')) {
              let t_gc = data.gc;
+             let t_uid = data.uid;
+
              console.log("\nFRM: "+t_gc);
              console.log("FRM: "+socketGC);
 
@@ -218,7 +220,6 @@ python_server_nsp.on('connection', (socket) => {
              console.log('[SNT] emitting_to => ['+t_gc+'] data: '+JSON.stringify(uArray)+'\n');
 
              logArr.forEach((item, i) => console.log('[LOG] connected_user => ['+item.gc+'] data: '+JSON.stringify(item)));
-             // console.log(pyClients);
            }
           break;
 

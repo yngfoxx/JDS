@@ -300,7 +300,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         if (!$isMember) {
           $arrGRP = array('jid' => $data, 'uid' => $userID, 'role' => 'member');
           if ($jds->group_add_member($arrGRP)) {
-            echo json_encode(array('isMember' => true, 'jid' => $data, 'type' => 'code')); exit();
+            echo json_encode(array('isMember' => true, 'jid' => $data, 'type' => 'code', 'isNew' => true)); exit();
           }
           echo json_encode(array('isMember' => false, 'jid' => $data, 'type' => 'code')); exit();
         }
