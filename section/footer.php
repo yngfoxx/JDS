@@ -1,4 +1,4 @@
-<script type="text/javascript" src="<?php echo "$DOMAIN"; ?>/lib/js/ajx.js"></script>
+<script type="text/javascript" src="/JDS/lib/js/ajx.js"></script>
 <?php
 // USER HOME PAGE ------------------------------------------------------------->
  if (isset($_GET['home'])) { // HOME PAGE ?>
