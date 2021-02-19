@@ -141,26 +141,27 @@ python_server_nsp.on('connection', (socket) => {
   const python_channel = socket.nsp;
   let handshake = socket.handshake;
   let socketGC = (handshake.auth.gc) ? handshake.auth.gc : ((handshake.room) ? handshake.room : 'general');
-  console.log(socket.rooms);
-  if (socketGC != 'general') {
-    socket.join(socketGC); // add only users to rooms
-  }
-  console.log(socket.rooms);
-  let uData = {
-    uuid: handshake.auth.uid,
-    room: socketGC
-  };
-  if (socketGC != 'general') pyClients.push(uData);
-  console.log(pyClients);
+
+  console.log("\n============================================================================================>");
+  // ADD NEW USER TO pyClients ARRAY (temporary database)
+  let uData = { uuid: handshake.auth.uid, room: handshake.auth.gc };
+  pyClients.push(uData);
 
   // SOCKET ON DISCONNECT EVENT
   socket.on('disconnect', () => {
-    console.log("DISCONNECTED");
-    if (socketGC != 'general') {
-      let arr = {gc: pyClients[pyClients.indexOf(uData)].room, uid: pyClients[pyClients.indexOf(uData)].uuid, status: 'disconnected'};
-      python_server_nsp.to(pyClients[pyClients.indexOf(uData)].room).emit('msg', {response: 'user_status', data: arr}); // send status of all users in the channel
+    socket.leave(handshake.auth.gc);
+    let user = pyClients[pyClients.indexOf(uData)]
+    console.log("\n============================================================================================>");
+    console.log("\n[*] DISCONNECTED FROM SOCKET: "+user.room);
 
-      if (pyClients[pyClients.indexOf(uData)].room != 'general') pyClients.splice(pyClients.indexOf(uData), 1); // remove user from client list
+
+    if (socketGC != 'general') {
+      // let arr = {gc: pyClients[pyClients.indexOf(uData)].room, uid: pyClients[pyClients.indexOf(uData)].uuid, status: 'disconnected'};
+      // python_server_nsp.to(pyClients[pyClients.indexOf(uData)].room).emit('msg', {response: 'user_status', data: arr}); // send status of all users in the channel
+
+      if (socketGC != 'general') pyClients.splice(pyClients.indexOf(uData), 1); // remove user from client list
+    } else {
+      console.log("Socket is in general room");
     }
 
     admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `[-] PYTHON SOCKET [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
@@ -179,38 +180,81 @@ python_server_nsp.on('connection', (socket) => {
     if (data.file_data.progress) console.log(data.file_data.progress);
   });
 
+  socket.on('join', function(userData) {
+    socket.join(userData.gc); // add only users to rooms
+    console.log("[+] User entered -> "+userData.gc);
+    socket.broadcast.to(socket.id).emit('msg', '['+userData.gc+'/'+userData.uid+'] JUST CONNECTED');
+
+    // send all user status in group
+    let uArr1 = [];
+    pyClients.forEach((item, i) => {
+      let arr1 = {gc: pyClients[i].room, uid: pyClients[i].uuid};
+      if (pyClients[i].room === userData.gc) uArr1.push(arr1);
+    });
+    socket.broadcast.to(socket.id).emit('msg', {response: 'user_status', data: uArr1}); // send status of all users in the channel
+    console.log('[NEW] emitting_to => ['+userData.gc+'] data: '+JSON.stringify(uArr1)+'\n');
+  });
+
   // SOCKET { MSG } PROCESSING
   socket.on('msg', (data) => {
     data.sid = socket.id;
-    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: data}); // send message direct to the admin namespace
-
     if (data.hasOwnProperty('action')) {
+      admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: data}); // send message direct to the admin namespace
       switch (data.action) {
         case 'user_status': // get user status in specified room
-           if (data.hasOwnProperty('gc') && data.hasOwnProperty('uid')) {
+           if (data.hasOwnProperty('gc')) {
              let t_gc = data.gc;
-             let t_uid = data.uid;
-             let inList = false;
-             let index;
+             console.log("\nFRM: "+t_gc);
+             console.log("FRM: "+socketGC);
+
+             let logArr = [];
+             let uArray = [];
              pyClients.forEach((item, i) => {
-               if (pyClients[i].room == t_gc) {
-                 if (getKeyByValue(item, t_uid) == 'uuid') {
-                   inList = true;
-                   index = i;
-                 }
-               }
+               let arr = {gc: pyClients[i].room, uid: pyClients[i].uuid};
+               if (pyClients[i].room === t_gc) uArray.push(arr);
+               logArr.push(arr);
              });
-             let arr = (inList === true) ? {gc: pyClients[index].room, uid: pyClients[index].uuid, status: 'connected'} : {gc: t_gc, uid: t_uid, status: 'disconnected'};
-             python_server_nsp.to(socketGC).emit('msg', {response: 'user_status', data: arr}); // send status of all users in the channel
-             console.log('emitting_to => ['+socketGC+'] data: '+JSON.stringify(arr));
+             socket.broadcast.to(t_gc).emit('msg', {response: 'user_status', data: uArray}); // send status of all users in the channel
+             console.log('[SNT] emitting_to => ['+t_gc+'] data: '+JSON.stringify(uArray)+'\n');
+
+             logArr.forEach((item, i) => console.log('[LOG] connected_user => ['+item.gc+'] data: '+JSON.stringify(item)));
+             // console.log(pyClients);
            }
+          break;
+
+        case 'clients':
+          let userChannel = data.cid;
+          let userGroup = data.gc;
+          let userID = data.uid;
+
+          let uArray = [];
+          pyClients.forEach((item, i) => {
+            let arr = {gc: pyClients[i].room, uid: pyClients[i].uuid};
+            if (pyClients[i].room === userGroup) uArray.push(arr);
+          });
+
+          let response = {user_status: uArray};
+          python_server_nsp.emit(userChannel, response); // send status of all users in the channel
+          console.log("[+] Client reached -> "+userGroup+"/"+userID);
+
+          // LOG ALL USERS IN ROOM
+          uArray.forEach((item, i) => console.log('[LOG] connected_user => ['+item.gc+'] data: '+JSON.stringify(item)));
+          break;
+
+        case 'disconnect':
+          let uGroup = data.gc;
+          let uID = data.uid;
+          let arr = {
+            disconnected_user: { uid: uID, gc: uGroup }
+          };
+          socket.broadcast.to(uGroup).emit('msg', arr); // send status of all users in the channel
+          console.log('[SNT] emitting_to => ['+uGroup+'] data: User disconnected\n');
           break;
 
         default:
           break;
       }
     }
-
   });
 });
 // ==========================================================================================================================================================================/\

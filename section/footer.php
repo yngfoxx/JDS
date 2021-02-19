@@ -9,7 +9,7 @@
     let parm = srlToJson($(this));
     ajx({
       type: 'POST',
-      url: 'http://localhost/JDS/req/req_handler.php',
+      url: '/JDS/req/req_handler.php',
       data: parm,
       success: (res) => {
         console.log(res);
@@ -47,7 +47,7 @@
                     }).then((willAdd) => {
                       ajx({
                         type: 'POST',
-                        url: 'http://localhost/JDS/req/req_handler.php',
+                        url: '/JDS/req/req_handler.php',
                         data: {delReq: true, jdsID: jRes.jdsID},
                         success: (res) => {
                           if (res) console.log("temporary J0INT group deleted!");
@@ -64,7 +64,7 @@
                           closeOnEsc: false,
                         }).then(jid => {
                           if (!jid) throw null;
-                          return fetch("http://localhost/JDS/req/req_handler.php?groupCheck="+jid);
+                          return fetch("/JDS/req/req_handler.php?groupCheck="+jid);
                         }).then(results => {
                           return results.json();
                         }).then(json => {
@@ -89,7 +89,7 @@
                           };
                           ajx({
                             type: 'POST',
-                            url: 'http://localhost/JDS/req/req_handler.php',
+                            url: '/JDS/req/req_handler.php',
                             data: parm,
                             success: (result) => {
                               swal({
@@ -188,7 +188,7 @@
     // modify chunk size
     ajx({
       type: 'POST',
-      url: 'http://localhost/JDS/req/req_handler.php',
+      url: '/JDS/req/req_handler.php',
       data: { modChunk: true, svr: svrID, vol: maxChunk },
       success: (res) => {
         if (res) {
@@ -211,7 +211,7 @@
       // fetch joint groups that user belongs to
       ajx({
         type: 'POST',
-        url: 'http://localhost/JDS/req/req_handler.php',
+        url: '/JDS/req/req_handler.php',
         data: {groupList: true},
         success: (res) => {
           let parDiv = document.querySelector('._tnvMnu_drpDwn');
@@ -291,7 +291,7 @@
       parm.logUser = true;
       ajx({
         type: 'POST',
-        url: 'http://localhost/JDS/req/req_handler.php',
+        url: '/JDS/req/req_handler.php',
         data: parm,
         success: (res) => {
           if (res == true) {
@@ -340,7 +340,7 @@
       parm.regUser = true; // register user
       ajx({
         type: 'POST',
-        url: 'http://localhost/JDS/req/req_handler.php',
+        url: '/JDS/req/req_handler.php',
         data: parm,
         success: (x) => {
           if (isJson(x)) {
