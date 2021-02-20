@@ -531,7 +531,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         // }
 
       // EXECUTE SCRIPT WITH PYTHON FLASK API (fetch.py) [THIS WORKS BETTER]
-      # http://127.0.0.1:5000/?url=https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe&rid=13RWS2&nsp=1234531&dest=C:\JDS\storage
+      # 127.0.0.1:5000/?url=https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe&rid=12&jid=13RWS2&nsp=1234531&dest=C:\JDS\storage
       $arr = array(
         'url'   => $file_url, // File URL
         'jid'   => $jointID, // File Joint Group ID

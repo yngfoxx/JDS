@@ -5,7 +5,7 @@ from threading import Thread
 import flask
 from flask import request, jsonify, make_response
 
-from flaskgrab import download
+from flaskgrab import jdsDownloader
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -20,7 +20,7 @@ def not_found(error):
 def main():
     # Data needed URL, REQUEST_ID, SOCKET NAMESPACE, DOWNLOAD DESTINATION
     # [TEST URL] ------------------------------------------------------------------------------------------------------>
-    # http://127.0.0.1:5000/?url="https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe"&rid="13RWS2"&nsp='1234531'&dest='C:/JDS/storage/'
+    # 127.0.0.1:5000/?url=https://i.pinimg.com/originals/bf/82/f6/bf82f6956a32819af48c2572243e8286.jpg&rid=12&jid=13RWS2&nsp=1234531&dest=C:\JDS\storage
     # ----------------------------------------------------------------------------------------------------------------->
 
     if 'url' in request.args and 'jid' in request.args and 'rid' in request.args and 'nsp' in request.args and 'dest' in request.args:
@@ -32,13 +32,12 @@ def main():
 
 
         # Add the download request to a thread
-        # thread = Thread(target=flaskgrab.download, args={'URL': url, 'REQUEST_ID': rid, 'NAMESPACE': nsp, 'DESTINATION': dest}) # Failed attempt
-        thread = Thread(target=download, args=[url, jid, rid, nsp, dest])
+        thread = Thread(target=jdsDownloader(nsp, jid).download, args=[url, rid, dest])
         thread.setDaemon(True)
         thread.start()
 
         for thread in threading.enumerate():
-            print(thread.name)
+            print("Thread name => ",thread.name)
 
             # return make_response(jsonify({'thread_name': str(thread.name), 'started': True}), 200)
             return jsonify({'thread_name': str(thread.name), 'started': True})
