@@ -15,7 +15,7 @@ class jdsDownloader():
 
 
     def connecsocket(self):
-        self.socket = socketio.Client(  )
+        self.socket = socketio.Client()
 
         # self.socket.connect('https://localhost:8000'+self.namespace, headers={'room':self.namespace})
         self.socket.connect('https://ws-jds-eu.herokuapp.com', headers={'room':self.namespace}, namespaces=[self.namespace])
