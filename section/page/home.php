@@ -2,12 +2,14 @@
 // PACKAGES ---------------------------
 include_once $_SERVER['DOCUMENT_ROOT'] . '/JDS/class/standard.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/JDS/class/auth.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/JDS/class/user.php';
 // ------------------------------------
 
 
 // OBJECTS [reusable] -----------------
 $std = new stdlib();
 $auth = new auth();
+$usr = new user();
 // ------------------------------------
 
 
@@ -17,11 +19,17 @@ if (isset($_COOKIE['dKEY'])) {
     $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
     // echo json_encode($result);
     header("location: ./?logout");
+    exit();
   }
 } else {
   $_SESSION['error'] = "Unauthorized access";
   header("location: ./?logout");
+  exit();
 }
+
+// GET USER DATA
+$userData = $usr->getUserByDeviceID($_COOKIE['dKEY']);
+
 ?>
 
 <div class="_tnvbr">
@@ -32,10 +40,22 @@ if (isset($_COOKIE['dKEY'])) {
 
 <!-- Menu -->
 <div class="_tnvMnu" data-state="off">
+
+  <div data-group-block="PROFILE" class="_tnvMnu_drpProf">
+    <div class="_tnvMnu_drpProf_img" style="background-image: linear-gradient(to top, #484848 0%, #0000002e 30%), url('https://itsyoungfox.github.io/static/media/original-favicon.e5940a02.png');">
+      <label for="uprofchange" class="_tnvMnu_drpProf_img_edit">
+        <i aria-hidden="true" class="icon-pencil"></i>
+      </label>
+      <input type="file" name="uprofile" id="uprofchange" class="hide"/>
+    </div>
+    <div class="_tnvMnu_drpProf_uname">Username</div>
+  </div>
+
   <div class="_tnvMnu_drpDwn" data-group-block="J0INT">
     <a class="_tnvMnu_drpDwn_title">GROUPS</a> <!-- skeleton -->
     <div class="_tnvMnu_drpDwn_msg">Loading</div> <!-- skeleton -->
   </div>
+
 </div>
 
 <div class="_bdyMain">

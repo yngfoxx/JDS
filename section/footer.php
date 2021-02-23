@@ -213,7 +213,7 @@
       ajx({
         type: 'POST',
         url: '/JDS/req/req_handler.php',
-        data: {groupList: true},
+        data: {menuData: true},
         success: (res) => {
           let parDiv = document.querySelector('._tnvMnu_drpDwn');
               // parDiv.innerHTML = "";
@@ -258,6 +258,12 @@
   });
 // ---------------------------------------------------------------------------->
 
+
+// Profile changer ------------------------------------------------------------>
+$("#uprofchange").on('change', function(e) {
+  console.log("Change profile");
+});
+// ---------------------------------------------------------------------------->
 
   // event listener for logout button
   $("a[title='Logout']").on('click', function(e) {

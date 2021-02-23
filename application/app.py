@@ -79,7 +79,7 @@ class JDS_DEBUGGER(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     clientApp = JDS_CLIENT() # CLIENT APPLICATION
-    clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
+    # clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
     print("APP INITIALIZED")
     sys.exit(app.exec_())
 

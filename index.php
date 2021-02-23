@@ -48,7 +48,6 @@ if (isset($_COOKIE['dKEY'])) {
         if (isset($_GET['logout'])) require $_SERVER['DOCUMENT_ROOT'] . '/JDS/section/page/logout.php';
         else
         echo "ERROR 404"; // error page
-
       ?>
     </div>
     <?php require $_SERVER['DOCUMENT_ROOT'] . '/JDS/section/footer.php'; ?>

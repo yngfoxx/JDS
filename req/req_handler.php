@@ -364,8 +364,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
   # get list of joint groups current user belongs to
-  if (isset($_POST['groupList'])) {
-    if (!$_POST['groupList']) exit();
+  if (isset($_POST['menuData'])) {
+    if (!$_POST['menuData']) exit();
     // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
     if (isset($_COOKIE['dKEY'])) {
       if (!$auth->verfUser($_COOKIE['dKEY'])) {
