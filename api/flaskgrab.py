@@ -43,7 +43,7 @@ class jdsDownloader():
         nsp = self.namespace
 
         while not obj.isFinished():
-            print("[*]")
+            print("[*] \t")
             try:
                 self.socket.emit('event', {
                     'namespace': self.namespace,
@@ -87,7 +87,7 @@ class jdsDownloader():
                 else:
                     print("[-] WEB REQUEST FAILED")
                 obj.stop()
-            print("[*]")
+            print("[*] \t")
 
             time.sleep(0.2)
 
@@ -116,7 +116,9 @@ class jdsDownloader():
                 'sha1_hash': obj.get_data_hash('sha1'),
                 'sha256_hash': obj.get_data_hash('sha256'),
                 'download_path': obj.get_dest(),
-                'download_time_length': obj.get_dl_time(human=True)
+                'download_time_length': obj.get_dl_time(human=True),
+                'file_real_size': obj.get_final_filesize(human=True),
+                'file_byte_size': obj.get_final_filesize(human=False)
             }
             req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
             if req:
@@ -133,6 +135,17 @@ class jdsDownloader():
         path = obj.get_dest()
         self.socket.disconnect(); # disconnect WebSocket
         print("[*] =================================================================================>")
+
+        fileSize = obj.get_final_filesize(human=False)
+        chunk = (fileSize * 20)/100
+        realChunk = (chunk / 1024) + " KB";
+
+        print("Optimal chunk size: ", chunk)
+        print("Optimal chunk real size: ", realChunk)
+
+        print("FILE_PATH: ",path)
+        print("FILE_ROOT_DIR: ", DESTINATION)
+        # ZIP AND SPLIT INTO CHUNKS
 
 
 if __name__ == '__main__':

@@ -623,6 +623,19 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
     # ---------------------------------------------------------------------/\
   }
+
+  // networkSpeedTester
+  if (isset($_POST['speedTest'])) {
+    $direction = $std->db->escape_string($_POST['speedTest']);
+    $content = $std->db->escape_string($_POST['content']);
+    $chunk = "";
+    if ($direction == "down") {
+      for ($i=0; $i < $content; $i++) $chunk = $chunk . '' .$std->makeKey(1);
+      echo $chunk;
+    } else if ($direction == "up") {
+      echo true;
+    }
+  }
   //////////////////////////////////////////////////////////////////////////////
 } else if ($_SERVER['REQUEST_METHOD'] == "GET") {
   if (isset($_GET['groupCheck'])) {
