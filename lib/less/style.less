@@ -586,6 +586,52 @@ select {
                 	flex-flow: row;
                 	margin: 7px auto;
                 }
+                &._options_container {
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  z-index: 999;
+                  width: 100%;
+                  height: 100%;
+                  background-color: #0000005e;
+                  ._options {
+                  	background-color: var(--dark-gray);
+                  	border-radius: 10px;
+                    border-collapse: collapse;
+                    overflow: hidden;
+                    margin-bottom: 5px;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 99% !important;
+                    max-width: 700px;
+                    @media screen and (max-width: 800px) {
+                      font-size: 12px;
+                    }
+                    ._jdsi_row_opt_head {
+                    	color: white;
+                      ._jdsiroh_field {
+                        color: white;
+                        ._jdsiroh_close {
+                        	width: max-content;
+                        	text-align: right;
+                        	margin: 2px 2px auto auto;
+                        	color: red;
+                        	padding: 5px;
+                        	border-radius: 5px;
+                          &:hover {
+                          	cursor: pointer;
+                          	color: #fb3d3d;
+                          }
+                        }
+                      }
+                    }
+                    ._jdsi_row_opt_row {
+                    	background-color: var(--light-gray-v2);
+                    }
+                  }
+                }
                 ._jdsiri_row {
                 	margin: 0px 5px 0px auto;
                   .fill_width();

@@ -153,8 +153,8 @@
       document.querySelector('._bibfdcds_select').setAttribute('disabled', 'true');
       $('.chunkInput').css("display", "none");
     }
-    $('select[name="max_chunk"]').val('5');
-    $('.chunkInput').val('5');
+    $('select[name="max_chunk"]').val('10');
+    $('.chunkInput').val('10');
   });
   // -------------------------------------------------------------------------->
 
@@ -194,7 +194,7 @@
       success: (res) => {
         if (res) {
           swal({icon: "success", title: "Saved", text: "Chunk configuration has been updated for this file"});
-          console.log("Max chunk for request ID: "+svrID+" has been changed to "+maxChunk+" MB");
+          console.log("Max chunk for request ID: "+svrID+" has been changed to "+maxChunk+"%");
         }
       },
       load: 'up'

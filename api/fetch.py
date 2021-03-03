@@ -41,6 +41,10 @@ def main():
 
             # return make_response(jsonify({'thread_name': str(thread.name), 'started': True}), 200)
             return jsonify({'thread_name': str(thread.name), 'started': True})
+
+    else if 'chunkify' in request.args:
+        print('Chunkify file');
+        
     else:
         return jsonify({'response': 'Invalid parameter'})
 

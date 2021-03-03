@@ -145,6 +145,7 @@ class jointlib extends stdlib {
     INNER JOIN joint_group ON joint_group.joint_id = svr_download_request.joint_id
     INNER JOIN user ON user.user_id = svr_download_request.user_id
     WHERE svr_download_request.joint_id = '$jid'
+    ORDER BY request_datetime DESC
     ";
     $qry = mysqli_query($this->db, $sql);
     if (mysqli_num_rows($qry) == 0 || !$qry) return 0;

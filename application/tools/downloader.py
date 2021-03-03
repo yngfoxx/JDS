@@ -4,6 +4,10 @@ import requests
 import argparse
 from pySmartDL import SmartDL
 
+# http://itaybb.github.io/pySmartDL/examples.html
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
+# https://stackoverflow.com/questions/40691996/python-requests-http-range-not-working
+
 # CLIENT DOWNLOAD MANAGER
 # test URL: "https://www.bing.com/th?id=OIP.1L3zMoMScZvtQ9VLhf4MRgHaLH&w=200&h=300&c=8&o=5&pid=1.7"
 
@@ -12,7 +16,16 @@ parser.add_argument('-u', '--url', type=str, required=True, help='The URL of the
 parser.add_argument('-d', '--dest', type=str, required=True, help='The download destination')
 args = parser.parse_args()
 
-fileDLM = SmartDL(args.url, args.dest)
+headers_arg = {"Range" : "bytes=0-100"}
+headers_dlm_arg = {"headers" : {"Range" : "bytes=0-100"}}
+
+
+# test if the server accepts range header
+r = requests.get(args.url, headers=headers_arg)
+assert len(r.text) <= 101
+print(r)
+
+fileDLM = SmartDL(args.url, args.dest, request_args=headers_dlm_arg)
 fileDLM.start(blocking=False)
 
 data = {}

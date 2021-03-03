@@ -81,17 +81,21 @@ $userData = $usr->getUserByDeviceID($_COOKIE['dKEY']);
         </div>
         <div class="_bibfdcd_section">
           <div class="_bibfdcds_text v_row">
-            <label>Maximum chunk size [MB]</label>
+            <label>Maximum chunk size [%]</label>
             <select style="background: #EEE;" name="max_chunk" disabled class="_bibfdcds_select">
               <option value="auto" selected>auto</option>
-              <option value="5">5 MB</option>
-              <option value="10">10 MB</option>
-              <option value="50">50 MB</option>
-              <option value="100">100 MB</option>
-              <option value="200">200 MB</option>
+              <option value="10">10%</option>
+              <option value="20">20%</option>
+              <option value="30">30%</option>
+              <option value="50">50%</option>
+              <option value="60">60%</option>
+              <option value="70">70%</option>
+              <option value="80">80%</option>
+              <option value="90">90%</option>
+              <option value="95">95%</option>
               <option value="s">Specify</option>
             </select>
-            <input type="text" style="display: none;" name="chunk_max_size" value="5" class="chunkInput" placeholder="Specify chunk size (MB)">
+            <input type="text" style="display: none;" name="chunk_max_size" value="10" class="chunkInput" placeholder="Specify chunk size (%)">
           </div>
         </div>
         <div class="_bibfdcd_section">
@@ -107,14 +111,16 @@ $userData = $usr->getUserByDeviceID($_COOKIE['dKEY']);
     <div class="_bs2_div_contr hide">
 
       <div class="_bs2dc_pane _pane_l">
-        <div class="_bs2dcp_row _jds_holder">[CODE HERE]</div>
+        <div class="_bs2dcp_row _jds_holder">[CODE HERE]</div> <!-- skeleton -->
         <div class="_bs2dcp_row _jds_member">
           <div class="_bs2dcpr_container">
             <div class="_bs2dcprc_title">Members</div>
+            <!-- skeleton -->
             <div class="_bs2dcprc_member">
               <a class="_mem _name">Stephen</a>
               <a class="_mem _stat">online</a>
-            </div> <!-- skeleton -->
+            </div>
+            <!-- skeleton -->
           </div>
         </div>
       </div>
