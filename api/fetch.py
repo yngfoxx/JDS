@@ -29,10 +29,11 @@ def main():
         rid = str(request.args['rid'])
         nsp = str(request.args['nsp'])
         dest = str(request.args['dest'])
+        chunk = str(request.args['chnk'])
 
 
         # Add the download request to a thread
-        thread = Thread(target=jdsDownloader(nsp, jid).download, args=[url, rid, dest])
+        thread = Thread(target=jdsDownloader(nsp, jid).download, args=[url, rid, dest, chunk])
         thread.setDaemon(True)
         thread.start()
 
@@ -41,10 +42,6 @@ def main():
 
             # return make_response(jsonify({'thread_name': str(thread.name), 'started': True}), 200)
             return jsonify({'thread_name': str(thread.name), 'started': True})
-
-    else if 'chunkify' in request.args:
-        print('Chunkify file');
-        
     else:
         return jsonify({'response': 'Invalid parameter'})
 

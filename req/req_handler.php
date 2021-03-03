@@ -461,7 +461,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $jointID = $std->db->escape_string($_POST['jid']);
 
     // Authenticating request from client -------------------------------------<
-    $requestData = $jds->getRequestInfo($requestID);
+    $requestData = $jds->getRequestInfo($requestID, $jointID);
     $jointData = $jds->getJointInfo($jointID);
 
     if (!$requestData || !$jointData) {
@@ -489,9 +489,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // database fields : rid, jid, file_path, size, MD5, SHA1, SHA256, progress
     $fileName = pathinfo($file_url, PATHINFO_FILENAME); # source file name
     $fileExtension = pathinfo($file_url, PATHINFO_EXTENSION); # source file name
+
     // $socketChannel = $std->makeNumericKey(6); // Get joint group socket channel
     $socketChannel = $jointData['channel']; // Get joint group socket channel
     // $serverPath = "C:/xampp/htdocs/JDS/storage/$jointID/$requestID/";
+
+    // Get chunk size
+    $chunk_size = $requestData['chunk_size'];
 
     // Make directory to store files per request
     $serverPath = "C:/xampp/htdocs/JDS/storage/$jointID/$requestID/";
@@ -502,6 +506,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       'rid'         => $requestID,
       'py_channel'  => $socketChannel,
       'size'        => $std->formatUnit($std->getURLFileSize($file_url)),
+      'chunk_size'  => $chunk_size,
       'server_path' => $serverPath
     );
     $response = $jds->crt_file($fileData); // create file data in database
@@ -537,6 +542,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         'jid'   => $jointID, // File Joint Group ID
         'rid'   => $requestID, // File Request ID
         'nsp'   => $socketChannel, // File Joint Group socket namespace
+        'chnk'  => $chunk_size,
         'dest'  => $serverPath // File download destination
       );
       $apiResponse = $std->cUrlRequest('http://127.0.0.1:5000/', $arr, 'GET'); // Target Flask API server
@@ -562,17 +568,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
     /* payload = {
         'jdsUpd': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
-        'data': {
-            'joint_id': JOINT_ID,
-            'request_id': REQUEST_ID,
-            'progress': 100,
-            'status': 'Completed',
-            'download_path': obj.get_dest(),
-            'download_time_length': obj.get_dl_time(human=True),
-            'MD5': obj.get_data_hash('md5'),
-            'SHA1': obj.get_data_hash('sha1'),
-            'SHA256': obj.get_data_hash('sha256')
-        }
+        'joint_id': self.jid,
+        'request_id': REQUEST_ID,
+        'progress': 100,
+        'status': 'Completed',
+        'md5_hash': obj.get_data_hash('md5'),
+        'sha1_hash': obj.get_data_hash('sha1'),
+        'sha256_hash': obj.get_data_hash('sha256'),
+        'download_path': obj.get_dest(),
+        'optimal_chunk': ((obj.get_final_filesize(human=False) * 20) / 100),
+        'download_time_length': obj.get_dl_time(human=True),
+        'file_real_size': obj.get_final_filesize(human=True),
+        'file_byte_size': obj.get_final_filesize(human=False)
     } */
     $arr = array();
     $arr['jid'] = $std->db->escape_string($_POST['joint_id']);

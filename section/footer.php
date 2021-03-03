@@ -186,6 +186,7 @@
     let checkBoxInput = document.querySelector('input[name="auto_config"]');
     let svrID = form.getAttribute('data-svr-id');
     let maxChunk = (checkBoxInput.checked == true) ? $('.chunkInput').val() : 'auto';
+        maxChunk = (maxChunk > 50) ? 50 : maxChunk; // chunk size can not be greater than 50%
     // modify chunk size
     ajx({
       type: 'POST',

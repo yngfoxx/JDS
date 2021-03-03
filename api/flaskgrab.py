@@ -1,9 +1,14 @@
 # SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)
 import sys
 import time
+
 import requests
 import socketio
+
 from pySmartDL import SmartDL
+
+# from zipfile_infolist import print_info
+import zipfile
 
 
 class jdsDownloader():
@@ -34,7 +39,7 @@ class jdsDownloader():
             print("[socket is now disconnected]")
 
 
-    def download(self, URL, REQUEST_ID, DESTINATION):
+    def download(self, URL, REQUEST_ID, DESTINATION, CHUNK):
         print("[*] =================================================================================>")
         self.connecsocket() # Connect web socket
 
@@ -116,6 +121,7 @@ class jdsDownloader():
                 'sha1_hash': obj.get_data_hash('sha1'),
                 'sha256_hash': obj.get_data_hash('sha256'),
                 'download_path': obj.get_dest(),
+                'optimal_chunk': ((obj.get_final_filesize(human=False) * 20) / 100),
                 'download_time_length': obj.get_dl_time(human=True),
                 'file_real_size': obj.get_final_filesize(human=True),
                 'file_byte_size': obj.get_final_filesize(human=False)
@@ -132,31 +138,51 @@ class jdsDownloader():
             for e in obj.get_errors():
                 print(str(e))
 
-        path = obj.get_dest()
-        self.socket.disconnect(); # disconnect WebSocket
-        print("[*] =================================================================================>")
+        path = obj.get_dest();
+
+        # ===================================================================== #
+        # |            ZIP AND SPLIT CHUNK USING PYTHON LIBRARIES             | #
+        # ===================================================================== #
 
         fileSize = obj.get_final_filesize(human=False)
-        chunk = (fileSize * 20)/100
-        realChunk = (chunk / 1024) + " KB";
+        optimal_chunk = (fileSize * 20.0) / 100.0
+        real_optimal_chunk = optimal_chunk / 1024.0;
 
-        print("Optimal chunk size: ", chunk)
-        print("Optimal chunk real size: ", realChunk)
+        print("Optimal chunk size: ", optimal_chunk)
+        print("Optimal chunk real size: ", real_optimal_chunk, " KB")
 
         print("FILE_PATH: ",path)
         print("FILE_ROOT_DIR: ", DESTINATION)
-        # ZIP AND SPLIT INTO CHUNKS
+
+        fileZIP = zipfile.ZipFile('test.zip', mode='w')
+        try:
+            print('[+] Compressing');
+            fileZIP.write(path)
+        finally:
+            print('[+] Compression completed');
+            fileZIP.close()
+
+        # print_info('zipfile_write.zip')
+
+        # ===================================================================== #
+
+        self.socket.disconnect(); # disconnect WebSocket
+        print("[*] =================================================================================>")
+
+
 
 
 if __name__ == '__main__':
     # TERMINAL ALTERNATIVE ->
-    # python flaskgrab.py "https://i.pinimg.com/originals/bf/82/f6/bf82f6956a32819af48c2572243e8286.jpg" 13RWS2 12 1234531 "C:\JDS\storage"
+    # python flaskgrab.py "https://i.pinimg.com/originals/bf/82/f6/bf82f6956a32819af48c2572243e8286.jpg" 13RWS2 12 1234531 "C:/JDS/storage/13RWS2/12/" 20
+    # python flaskgrab.py "https://i.pinimg.com/originals/bf/82/f6/bf82f6956a32819af48c2572243e8286.jpg" 13RWS2 12 1234531 "C:/xampp/htdocs/JDS/storage/13RWS2/12/" 20
     URL = sys.argv[1]
     JOINT_ID = sys.argv[2]
     REQUEST_ID = sys.argv[3]
     NAMESPACE = sys.argv[4]
     DESTINATION = sys.argv[5]
+    CHUNK = sys.argv[6]
 
-    downloader = jdsDownloader(JOINT_ID)
-    downloader.download(URL, REQUEST_ID, DESTINATION)
+    downloader = jdsDownloader(NAMESPACE, JOINT_ID)
+    downloader.download(URL, REQUEST_ID, DESTINATION, CHUNK)
 # SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)

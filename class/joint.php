@@ -197,9 +197,10 @@ class jointlib extends stdlib {
   }
 
 
-  public function getRequestInfo($rid)
+  public function getRequestInfo($rid, $jid)
   {
     $rid = $this->db->escape_string($rid);
+    $jid = $this->db->escape_string($jid);
     $sql = "
     SELECT
       svr_download_request.request_id AS 'rid',
@@ -213,6 +214,7 @@ class jointlib extends stdlib {
     INNER JOIN joint_group ON joint_group.joint_id = svr_download_request.joint_id
     INNER JOIN user ON user.user_id = svr_download_request.user_id
     WHERE svr_download_request.request_id = '$rid'
+    AND joint_group.joint_id = '$jid'
     ";
     $qry = mysqli_query($this->db, $sql);
     if (mysqli_num_rows($qry) == 1) return mysqli_fetch_assoc($qry);
