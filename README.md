@@ -3,10 +3,10 @@ Joint Downloading System (JDS) is an online content downloader that eases file d
 
 ## How to setup JDS locally
 #### Requirements
-* XAMPP
-* PyCharm (optional: you will need to install all the modules manually)
-* Python
+* XAMPP Apache server
+* Python 3.7^
 * npm
+* pip
 
 #### Installation
 1. Copy all files to *c:/xampp/htdocs/JDS*
