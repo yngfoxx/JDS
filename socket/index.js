@@ -128,9 +128,6 @@ user_nsp.on('connection', (socket) => {
 
 
 
-
-
-
 // PYTHON API SOCKET NAMESPACE/CHANNELS =====================================================================================================================================\/
 const python_server_nsp = io.of(/^\/py_\d+$/);
 let pyClients = [];
@@ -157,8 +154,7 @@ python_server_nsp.on('connection', (socket) => {
     if (socketGC != 'general') {
       // let arr = {gc: pyClients[pyClients.indexOf(uData)].room, uid: pyClients[pyClients.indexOf(uData)].uuid, status: 'disconnected'};
       // python_server_nsp.to(pyClients[pyClients.indexOf(uData)].room).emit('msg', {response: 'user_status', data: arr}); // send status of all users in the channel
-
-      if (socketGC != 'general') pyClients.splice(pyClients.indexOf(uData), 1); // remove user from client list
+      pyClients.splice(pyClients.indexOf(uData), 1); // remove user from client list
     } else {
       console.log("Socket is in general room");
     }
@@ -176,7 +172,7 @@ python_server_nsp.on('connection', (socket) => {
     data.channel = python_channel.name;
     python_server_nsp.to(data.namespace).emit('msg', data); // send message direct to the namespace
     admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: data}); // send message direct to the admin namespace
-    if (data.file_data.progress) console.log(data.file_data.progress);
+    // if (data.file_data) console.log(data.file_data);
   });
 
 

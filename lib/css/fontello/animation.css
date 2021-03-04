@@ -8,6 +8,7 @@
   animation: spin 2s infinite linear;
   display: inline-block;
 }
+
 @-moz-keyframes spin {
   0% {
     -moz-transform: rotate(0deg);
@@ -82,4 +83,38 @@
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg);
   }
+}
+
+
+.animate-grow {
+  -moz-animation: grow 2s infinite linear;
+  -o-animation: grow 2s infinite linear;
+  -webkit-animation: grow 2s infinite linear;
+  animation: grow 2s infinite linear;
+  display: inline-block;
+}
+@-moz-keyframes grow {
+  0% { transform: scale(.7); }
+  50% { transform: scale(1); }
+  100% { transform: scale(.7); }
+}
+@-webkit-keyframes grow {
+  0% { transform: scale(.7); }
+  50% { transform: scale(1); }
+  100% { transform: scale(.7); }
+}
+@-o-keyframes grow {
+  0% { transform: scale(.7); }
+  50% { transform: scale(1); }
+  100% { transform: scale(.7); }
+}
+@-ms-keyframes grow {
+  0% { transform: scale(.7); }
+  50% { transform: scale(1); }
+  100% { transform: scale(.7); }
+}
+@keyframes grow {
+  0% { transform: scale(.7); }
+  50% { transform: scale(1); }
+  100% { transform: scale(.7); }
 }

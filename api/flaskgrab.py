@@ -15,8 +15,9 @@ class jdsDownloader():
     def __init__(self, channel, joint_id):
         super().__init__()
         self.channel = channel
-        self.namespace = "/py_"+channel
+        self.namespace = str("/py_"+channel)
         self.jid = joint_id
+        self.rid = 0
 
 
     def connecsocket(self):
@@ -46,6 +47,7 @@ class jdsDownloader():
         obj = SmartDL(URL, DESTINATION)
         obj.start(blocking=False)
         nsp = self.namespace
+        self.rid = REQUEST_ID
 
         while not obj.isFinished():
             print("[*] \t")
@@ -94,7 +96,7 @@ class jdsDownloader():
                 obj.stop()
             print("[*] \t")
 
-            time.sleep(0.2)
+            time.sleep(0.4)
 
         if obj.isSuccessful():
             print("[*]")
@@ -139,8 +141,19 @@ class jdsDownloader():
                 print(str(e))
 
         path = obj.get_dest();
-        self.socket.disconnect(); # disconnect WebSocket
 
+        # COMPRESS FILE
+        try:
+            self.compress(path, DESTINATION, obj.get_final_filesize(human=False))
+        finally:
+            print('[+] Compression is done');
+            self.socket.sleep(0.4)
+            self.socket.disconnect(); # disconnect WebSocket
+
+        print("[*] =================================================================================>")
+
+
+    def compress(self, path, dest, fileSize):
         # ===================================================================== #
         # |            ZIP AND SPLIT CHUNK USING PYTHON LIBRARIES             | #
         # ===================================================================== #
@@ -150,7 +163,6 @@ class jdsDownloader():
         # https://www.geeksforgeeks.org/working-zip-files-python/
         # https://stackoverflow.com/questions/26063311/importerror-no-module-named-zipfile
 
-        fileSize = obj.get_final_filesize(human=False)
         optimal_chunk = (fileSize * 20.0) / 100.0
         real_optimal_chunk = optimal_chunk / 1024.0;
 
@@ -158,12 +170,12 @@ class jdsDownloader():
         print("[!] Optimal chunk real size: ", real_optimal_chunk, "KB")
 
         print("[!] FILE_PATH: ",path)
-        print("[!] FILE_ROOT_DIR: ", DESTINATION)
+        print("[!] FILE_ROOT_DIR: ", dest)
 
         # C:/xampp/htdocs/JDS/storage/13RWS2/12/arch_13RWS2_12.zip
-        # DESTINATION+'arch_'+JOINT_ID+'_'+REQUEST_ID+'.zip'
-        file_name = 'Arch_'+self.jid+'_'+REQUEST_ID+'.zip'
-        file_zip_path = DESTINATION + file_name
+        # dest+'arch_'+JOINT_ID+'_'+REQUEST_ID+'.zip'
+        file_name = 'Arch_'+self.jid+'_'+self.rid+'.zip'
+        file_zip_path = dest + file_name
 
         # fileZIP = zipfile.ZipFile('test.zip', mode='w')
         fileZIP = zipfile.ZipFile(file_zip_path, mode='w')
@@ -173,49 +185,43 @@ class jdsDownloader():
             print('[+] Compressing file');
             fileZIP.write(path)
 
-            self.connecsocket() # Connect web socket
             self.socket.emit('event', {
                 'namespace': self.namespace,
                 'joint_id': self.jid,
-                'request_id': REQUEST_ID,
-                'status': 'compressing'
+                'request_id': self.rid,
+                'file_data': {'status': 'compressing'}
             }, self.namespace)
+
             payload = {
                 'jdsArch': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
                 'joint_id': self.jid,
-                'request_id': REQUEST_ID,
+                'request_id': self.rid,
                 'status': 'compressing'
             }
             req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
-            self.socket.disconnect(); # disconnect WebSocket
-            
+
         finally:
             print('[+] Compression completed');
             fileZIP.close()
 
-            self.connecsocket() # Connect web socket
             self.socket.emit('event', {
                 'namespace': self.namespace,
                 'joint_id': self.jid,
-                'request_id': REQUEST_ID,
+                'request_id': self.rid,
                 'archive': file_name,
-                'status': 'splitting'
+                'file_data': {'status': 'splitting'}
             }, self.namespace)
+
             # INITIALIZE ARCHIVE SPLITTING STAGE ------------------------------\/
             payload = {
                 'jdsArch': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
                 'joint_id': self.jid,
-                'request_id': REQUEST_ID,
+                'request_id': self.rid,
                 'archive': file_name,
                 'status': 'splitting'
             }
             req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
-            self.socket.disconnect(); # disconnect WebSocket
-
         # ===================================================================== #
-
-        print("[*] =================================================================================>")
-
 
 
 
