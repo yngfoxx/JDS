@@ -1,3 +1,7 @@
+:root {
+  --sonar-color-1: #fff;
+  --sonar-color-2: green;
+}
 /*
    Animation example, for spinners
 */
@@ -117,4 +121,30 @@
   0% { transform: scale(.7); }
   50% { transform: scale(1); }
   100% { transform: scale(.7); }
+}
+
+
+
+
+.animate-sonar {
+  -moz-animation: sonar 2s infinite linear;
+  -o-animation: sonar 2s infinite linear;
+  -webkit-animation: sonar 2s infinite linear;
+  animation: sonar 2s infinite linear;
+  display: inline-block;
+  background-clip: text;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes sonar {
+  0% { background:    -webkit-linear-gradient(var(--sonar-color-1) 0%, var(--sonar-color-2) 10%,  var(--sonar-color-1) 100%); }
+  5% { background:    -webkit-linear-gradient(var(--sonar-color-1) 0%, var(--sonar-color-2) 15%,  var(--sonar-color-1) 100%); }
+  10% { background:   -webkit-linear-gradient(var(--sonar-color-1) 0%, var(--sonar-color-2) 20%, var(--sonar-color-1) 100%); }
+  20% { background:   -webkit-linear-gradient(var(--sonar-color-1) 0%, var(--sonar-color-2) 30%, var(--sonar-color-1) 100%); }
+  40% { background:   -webkit-linear-gradient(var(--sonar-color-1) 0%, var(--sonar-color-2) 50%, var(--sonar-color-1) 100%); }
+  60% { background:   -webkit-linear-gradient(var(--sonar-color-1) 0%, var(--sonar-color-2) 70%, var(--sonar-color-1) 100%); }
+  80% { background:   -webkit-linear-gradient(var(--sonar-color-1) 0%, var(--sonar-color-2) 90%, var(--sonar-color-1) 100%); }
+  90% { background:   -webkit-linear-gradient(var(--sonar-color-2) 0%, var(--sonar-color-1) 50%, var(--sonar-color-2) 100%); }
+  100% { background:  -webkit-linear-gradient(var(--sonar-color-1) 0%, var(--sonar-color-2) 10%,  var(--sonar-color-1) 100%); }
 }
