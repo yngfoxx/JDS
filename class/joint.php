@@ -238,7 +238,7 @@ class jointlib extends stdlib {
   }
 
 
-  public function updateDownloadData($arr)
+  public function updateFileData($arr)
   {
     $jid = $arr['jid'];
     $rid = $arr['rid'];
@@ -261,6 +261,19 @@ class jointlib extends stdlib {
       $qry = mysqli_query($this->db, $sql);
       return (($qry) ? true : $this->db->error);
     }
+  }
+
+
+  public function updateDownloadData($arr)
+  {
+    $jid = $arr['jid'];
+    $rid = $arr['rid'];
+    $status_txt = $arr['stat'];
+    $status = ($status_txt == 'compressing') ? 3 : ( ($status_txt == 'splitting') ? 4 : ( ($status_txt == 'chunkified') ? 5 : null ) );
+    if ($status == null) return false;
+    $sql = "UPDATE svr_download_request SET init = '$status' WHERE joint_id = '$jid' AND request_id = '$rid'";
+    $qry = mysqli_query($this->db, $sql);
+    return (($qry) ? true : $this->db->error);
   }
 }
 ?>

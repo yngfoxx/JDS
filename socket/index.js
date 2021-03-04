@@ -12,7 +12,6 @@ const io = require('socket.io')(server, {
   cookie: false
 });
 
-
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -179,6 +178,7 @@ python_server_nsp.on('connection', (socket) => {
     admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: data}); // send message direct to the admin namespace
     if (data.file_data.progress) console.log(data.file_data.progress);
   });
+
 
   socket.on('join', function(userData) {
     socket.join(userData.gc); // add only users to rooms

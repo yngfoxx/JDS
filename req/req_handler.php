@@ -559,28 +559,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   }
 
 
-  # Update MySQL from python flask API
+
+  # Update MySQL from python flask API ---------------------------------------->
   if (isset($_POST['jdsUpd'])) {
     if ($_POST['jdsUpd'] != 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs') {
       $result = array('server_error' => "Unexpected origin of request", 'code' => '500'); // invalid request origin
       echo json_encode($result);
       exit();
     }
-    /* payload = {
-        'jdsUpd': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
-        'joint_id': self.jid,
-        'request_id': REQUEST_ID,
-        'progress': 100,
-        'status': 'Completed',
-        'md5_hash': obj.get_data_hash('md5'),
-        'sha1_hash': obj.get_data_hash('sha1'),
-        'sha256_hash': obj.get_data_hash('sha256'),
-        'download_path': obj.get_dest(),
-        'optimal_chunk': ((obj.get_final_filesize(human=False) * 20) / 100),
-        'download_time_length': obj.get_dl_time(human=True),
-        'file_real_size': obj.get_final_filesize(human=True),
-        'file_byte_size': obj.get_final_filesize(human=False)
-    } */
+
     $arr = array();
     $arr['jid'] = $std->db->escape_string($_POST['joint_id']);
     $arr['rid'] = $std->db->escape_string($_POST['request_id']);
@@ -590,12 +577,33 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $arr['sha1_hash'] = (isset($_POST['sha1_hash'])) ? $std->db->escape_string($_POST['sha1_hash']) : '';
     $arr['sha256_hash'] = (isset($_POST['sha256_hash'])) ? $std->db->escape_string($_POST['sha256_hash']) : '';
 
+    // Update MySQL with new data
+    $response = $jds->updateFileData($arr);
+    echo $response;
+  }
+  // -------------------------------------------------------------------------->
+
+
+
+  # Update MySQL from python flask API ---------------------------------------->
+  if (isset($_POST['jdsArch'])) {
+    if ($_POST['jdsArch'] != 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs') {
+      $result = array('server_error' => "Unexpected origin of request", 'code' => '500'); // invalid request origin
+      echo json_encode($result);
+      exit();
+    }
+
+    $arr['jid'] = $std->db->escape_string($_POST['joint_id']);
+    $arr['rid'] = $std->db->escape_string($_POST['request_id']);
+    $arr['zip'] = $std->db->escape_string($_POST['archive']);
+    $arr['stat'] = $std->db->escape_string($_POST['status']);
+
     $response = $jds->updateDownloadData($arr);
     echo $response;
-
-
-    // Update MySQL with new data
   }
+  // -------------------------------------------------------------------------->
+
+
 
   if (isset($_POST['crtDownload'])) {
     // Add requested file to server download request
@@ -630,6 +638,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
     # ---------------------------------------------------------------------/\
   }
+
 
   // networkSpeedTester
   if (isset($_POST['speedTest'])) {

@@ -139,34 +139,81 @@ class jdsDownloader():
                 print(str(e))
 
         path = obj.get_dest();
+        self.socket.disconnect(); # disconnect WebSocket
 
         # ===================================================================== #
         # |            ZIP AND SPLIT CHUNK USING PYTHON LIBRARIES             | #
         # ===================================================================== #
 
+        # https://askubuntu.com/questions/1106903/split-zip-into-smaller-zip-files
+        # https://pymotw.com/2/zipfile/
+        # https://www.geeksforgeeks.org/working-zip-files-python/
+        # https://stackoverflow.com/questions/26063311/importerror-no-module-named-zipfile
+
         fileSize = obj.get_final_filesize(human=False)
         optimal_chunk = (fileSize * 20.0) / 100.0
         real_optimal_chunk = optimal_chunk / 1024.0;
 
-        print("Optimal chunk size: ", optimal_chunk)
-        print("Optimal chunk real size: ", real_optimal_chunk, " KB")
+        print("[!] Optimal chunk size: ", optimal_chunk)
+        print("[!] Optimal chunk real size: ", real_optimal_chunk, "KB")
 
-        print("FILE_PATH: ",path)
-        print("FILE_ROOT_DIR: ", DESTINATION)
+        print("[!] FILE_PATH: ",path)
+        print("[!] FILE_ROOT_DIR: ", DESTINATION)
 
-        fileZIP = zipfile.ZipFile('test.zip', mode='w')
+        # C:/xampp/htdocs/JDS/storage/13RWS2/12/arch_13RWS2_12.zip
+        # DESTINATION+'arch_'+JOINT_ID+'_'+REQUEST_ID+'.zip'
+        file_name = 'Arch_'+self.jid+'_'+REQUEST_ID+'.zip'
+        file_zip_path = DESTINATION + file_name
+
+        # fileZIP = zipfile.ZipFile('test.zip', mode='w')
+        fileZIP = zipfile.ZipFile(file_zip_path, mode='w')
+
+        # INITIALIZE COMPRESSION STAGE ----------------------------------------\/
         try:
-            print('[+] Compressing');
+            print('[+] Compressing file');
             fileZIP.write(path)
+
+            self.connecsocket() # Connect web socket
+            self.socket.emit('event', {
+                'namespace': self.namespace,
+                'joint_id': self.jid,
+                'request_id': REQUEST_ID,
+                'status': 'compressing'
+            }, self.namespace)
+            payload = {
+                'jdsArch': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
+                'joint_id': self.jid,
+                'request_id': REQUEST_ID,
+                'status': 'compressing'
+            }
+            req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
+            self.socket.disconnect(); # disconnect WebSocket
+            
         finally:
             print('[+] Compression completed');
             fileZIP.close()
 
-        # print_info('zipfile_write.zip')
+            self.connecsocket() # Connect web socket
+            self.socket.emit('event', {
+                'namespace': self.namespace,
+                'joint_id': self.jid,
+                'request_id': REQUEST_ID,
+                'archive': file_name,
+                'status': 'splitting'
+            }, self.namespace)
+            # INITIALIZE ARCHIVE SPLITTING STAGE ------------------------------\/
+            payload = {
+                'jdsArch': 'QtWuiJ7JrlcWbIV8GzYS8243Jb7pZKPs',
+                'joint_id': self.jid,
+                'request_id': REQUEST_ID,
+                'archive': file_name,
+                'status': 'splitting'
+            }
+            req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
+            self.socket.disconnect(); # disconnect WebSocket
 
         # ===================================================================== #
 
-        self.socket.disconnect(); # disconnect WebSocket
         print("[*] =================================================================================>")
 
 
