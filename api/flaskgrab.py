@@ -1,4 +1,5 @@
 # SCRIPT BY OSUNRINDE STEPHEN ADEBAYO (SID 20010266)
+import os
 import sys
 import time
 
@@ -202,6 +203,13 @@ class jdsDownloader():
 
         finally:
             print('[+] Compression completed');
+
+            if os.path.exists(path):
+                os.remove(path)
+                print('[+] Cleaned up unused file: ', path);
+            else:
+                print('[-] Could not find file: ',path);
+
             fileZIP.close()
 
             self.socket.emit('event', {
