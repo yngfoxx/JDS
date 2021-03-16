@@ -22,7 +22,9 @@ Joint Downloading System (JDS) is an online content downloader that eases file d
 #### 4. Run the following in CMD to run the Desktop client:
     $ cd c:/xampp/htdocs/JDS/application/
     $ venv/Scripts/activate
-    $ python app.py* or run with debugger *python app.py --remote-debugging-port=1231
+    $ python app.py
+    or run with debugger:
+    $ python app.py --remote-debugging-port=1231
 
 
 #### 5. Run the following in CMD to run the JDS socket server locally:
