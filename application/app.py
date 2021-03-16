@@ -129,7 +129,6 @@ def exit_():
 
 
 def main():
-
     clientApp = JDS_CLIENT("http://localhost/JDS") # CLIENT APPLICATION
     # clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
 
@@ -140,6 +139,8 @@ def main():
     print("APP INITIALIZED")
 
     sys.exit(exit_())
+
+
 
 if __name__ == '__main__':
     main()

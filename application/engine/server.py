@@ -34,6 +34,15 @@ class LocalServer(SimpleHTTPRequestHandler):
                 f.close()
                 return
 
+            elif self.path.endswith(".css"):
+                f = open(curdir + sep + self.path, "rb")
+                self.send_response(200)
+                self.send_header("Content-type", "text/css")
+                self.end_headers()
+                self.wfile.write(f.read())
+                f.close()
+                return
+
             elif self.path.endswith(".js"):
                 f = open(curdir + sep + self.path, "rb")
                 self.send_response(200)
