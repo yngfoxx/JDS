@@ -37,3 +37,4 @@ Joint Downloading System (JDS) is an online content downloader that eases file d
 * 5000 - JDS flask downloader API
 * 8000 - Desktop LAN client application
 * 5678 - Desktop WEBSOCKET client application
+* 1231 - Desktop client application debugger (Inspect element)
