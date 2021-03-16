@@ -53,6 +53,7 @@ class LocalServer(SimpleHTTPRequestHandler):
                 return
 
         except IOError:
+            print("[!] 404 - file not found")
             self.send_error(404, "File Not Found: %s" % self.path)
 
 
@@ -66,12 +67,12 @@ def main():
         pass
 
     webServer.server_close()
-    print("Server stopped automatically.")
+    print("[!] Server stopped automatically.")
 
 
 def stop():
     webServer.server_close()
-    print("Server stopped manually.")
+    print("[!] Server stopped manually.")
     sys.exit()
 
 if __name__ == "__main__":

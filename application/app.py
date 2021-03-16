@@ -1,20 +1,34 @@
 import sys
 import os
 import time
-
 import threading
-from threading import Thread
-
-from PyQt5 import QtGui, QtCore, QtNetwork
-from PyQt5.QtCore import QUrl
-from PyQt5.QtWidgets import QMainWindow,QHBoxLayout,QWidget,QApplication
-from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWebChannel import QWebChannel
 
 from engine import server
+from engine import socket
+
+from threading import Thread
+
+from PyQt5.QtCore import QUrl
+from PyQt5.QtWebChannel import QWebChannel
+from PyQt5 import QtGui, QtCore, QtNetwork
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QApplication
+
+
 
 threads = []
 app = QApplication(sys.argv)
+
+
+async def hello(websocket, path):
+    name = await websocket.recv()
+    print(f"< {name}")
+
+    greeting = f"Hello {name}!"
+
+    await websocket.send(greeting)
+    print(f"> {greeting}")
+
 
 class JDS_CLIENT(QMainWindow):
     def __init__(self, url):
@@ -106,12 +120,24 @@ class Threader (threading.Thread):
 
 
     def run(self):
-        print("Starting " + self.name)
-        server.main()
-        print("Exiting " + self.name)
+        print("[+] Starting " + self.name)
+
+        if (self.name == "LOCAL_HTTP_SERVER"):
+            server.main()
+
+        elif (self.name == "SOCKET_SERVER"):
+            # SOCKET SERVER SECTION ------------------------------------------->
+            # https://websockets.readthedocs.io/en/stable/intro.html
+            print("[+] Creating socket server on port: 5678")
+            socket.initialize();
+            # ----------------------------------------------------------------->
+
+        print("[*] Exiting " + self.name)
+
 
     def stop(self):
-        server.stop()
+        if (self.name == "LOCAL_HTTP_SERVER"):
+            server.stop()
         self.join()
         print(self)
 
@@ -122,21 +148,29 @@ def exit_():
     for t in threads:
         print(t)
         t.stop()
-
-    time.sleep(2)
     sys.exit()
 
 
 
 def main():
+    # USER INTERFACE ---------------------------------------------------------->
     clientApp = JDS_CLIENT("http://localhost/JDS") # CLIENT APPLICATION
-    # clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
+    clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
+    # ------------------------------------------------------------------------->
 
-    thread1 = Threader(1, "Thread-1", 1)
+
+    # THREAD SECTION ---------------------------------------------------------->
+    thread1 = Threader(1, "LOCAL_HTTP_SERVER", 1)
     thread1.start()
-
     threads.append(thread1)
-    print("APP INITIALIZED")
+    print("[+] Local server initialized")
+
+    thread2 = Threader(2, "SOCKET_SERVER", 2)
+    thread2.start()
+    threads.append(thread2)
+    print("[+] Socket server initialized")
+    # ------------------------------------------------------------------------->
+
 
     sys.exit(exit_())
 
