@@ -594,44 +594,54 @@ select {
                   width: 100%;
                   height: 100%;
                   background-color: #0000005e;
-                  ._options {
-                  	background-color: var(--dark-gray);
-                  	border-radius: 10px;
-                    border-collapse: collapse;
-                    overflow: hidden;
-                    margin-bottom: 5px;
+                  ._jdsiroc_content {
                     position: absolute;
-                    top: 50%;
+                    top: 20%;
                     left: 50%;
                     transform: translate(-50%, -50%);
                     width: 99% !important;
                     max-width: 700px;
-                    @media screen and (max-width: 800px) {
-                      font-size: 12px;
-                    }
-                    ._jdsi_row_opt_head {
-                    	color: white;
-                      ._jdsiroh_field {
-                        color: white;
-                        padding: 10px;
-                        ._jdsiroh_close {
-                        	width: max-content;
-                        	text-align: right;
-                        	margin: 2px 2px auto auto;
-                        	color: red;
-                        	padding: 5px;
-                        	border-radius: 5px;
-                          &:hover {
-                          	cursor: pointer;
-                          	color: #fb3d3d;
-                          }
+                    background-color: var(--light-gray);
+                    ._jdsi_opt_head {
+                      text-align: right;
+                      padding: 8px;
+                      ._jdsioh_close {
+                        width: max-content;
+                        text-align: right;
+                        margin: 2px 2px auto auto;
+                        color: #ff3a3a;
+                        padding: 5px;
+                        border-radius: 5px;
+                        &:hover {
+                          cursor: pointer;
+                          color: #fb3d3d;
                         }
                       }
                     }
-                    ._jdsi_row_opt_row {
-                    	background-color: var(--light-gray-v2);
-                      ._jdsiroh_field {
-                      	padding: 10px;
+                    ._options {
+                    	background-color: var(--dark-gray);
+                    	border-radius: 10px;
+                      border-collapse: collapse;
+                      overflow: hidden;
+                      margin-bottom: 5px;
+                      width: 97% !important;
+                      margin: 10px auto;
+                      max-width: 700px;
+                      @media screen and (max-width: 800px) {
+                        font-size: 12px;
+                      }
+                      ._jdsi_row_opt_head {
+                      	color: white;
+                        ._jdsiroh_field {
+                          color: white;
+                          padding: 10px;
+                        }
+                      }
+                      ._jdsi_row_opt_row {
+                      	background-color: var(--light-gray-v2);
+                        ._jdsiroh_field {
+                        	padding: 10px;
+                        }
                       }
                     }
                   }

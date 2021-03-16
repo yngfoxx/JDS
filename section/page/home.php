@@ -48,7 +48,7 @@ $userData = $usr->getUserByDeviceID($_COOKIE['dKEY']);
       </label>
       <input type="file" name="uprofile" id="uprofchange" class="hide"/>
     </div>
-    <div class="_tnvMnu_drpProf_uname">Username</div>
+    <div class="_tnvMnu_drpProf_uname"><?php echo $userData['username']; ?></div>
   </div>
 
   <div class="_tnvMnu_drpDwn" data-group-block="J0INT">

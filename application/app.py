@@ -1,18 +1,28 @@
 import sys
 import os
+import time
+
+import threading
+from threading import Thread
+
 from PyQt5 import QtGui, QtCore, QtNetwork
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QMainWindow,QHBoxLayout,QWidget,QApplication
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
 
+from engine import server
+
+threads = []
+app = QApplication(sys.argv)
 
 class JDS_CLIENT(QMainWindow):
-    def __init__(self):
+    def __init__(self, url):
         super().__init__()
-        self.initUI()
+        self.initUI(url)
 
-    def initUI(self):
+    def initUI(self, url):
+        self.webURL = url
         self.resize(1200, 800)
         self.setMinimumSize(800, 800)
         self.setWindowTitle("Joint Downloading System [Desktop client]")
@@ -28,13 +38,17 @@ class JDS_CLIENT(QMainWindow):
         scriptDir = os.path.dirname(os.path.realpath(__file__))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'logo-512x512.png'))
 
-        self.webEngineView = QWebEngineView()
+        self.webViewOnline = QWebEngineView()
+        self.webViewClient = QWebEngineView()
 
         self.loadWebPage()
+        self.loadClientPage()
 
+        # Main pane
         horizontalLayout = QHBoxLayout()
-        horizontalLayout.setContentsMargins(0, 0, 0, 0);
-        horizontalLayout.addWidget(self.webEngineView)
+        horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        horizontalLayout.addWidget(self.webViewOnline) # JDS online webview
+        horizontalLayout.addWidget(self.webViewClient) # Local Client file sharing
 
         widget = QWidget()
         widget.setLayout(horizontalLayout)
@@ -43,7 +57,12 @@ class JDS_CLIENT(QMainWindow):
         self.show()
 
     def loadWebPage(self):
-        self.webEngineView.load(QUrl("http://localhost/JDS"))
+        self.webViewOnline.load(QUrl(self.webURL))
+
+    def loadClientPage(self):
+        self.webViewClient.load(QUrl("http://localhost:8000/index.html"))
+        self.webViewClient.setFixedWidth(350)
+
 
 
 class JDS_DEBUGGER(QMainWindow):
@@ -59,12 +78,12 @@ class JDS_DEBUGGER(QMainWindow):
         scriptDir = os.path.dirname(os.path.realpath(__file__))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'logo-512x512.png'))
 
-        self.webEngineView = QWebEngineView()
+        self.webViewOnline = QWebEngineView()
 
         self.loadWebPage()
 
         horizontalLayout = QHBoxLayout()
-        horizontalLayout.addWidget(self.webEngineView)
+        horizontalLayout.addWidget(self.webViewOnline)
 
         widget = QWidget()
         widget.setLayout(horizontalLayout)
@@ -73,15 +92,54 @@ class JDS_DEBUGGER(QMainWindow):
         self.show()
 
     def loadWebPage(self):
-        self.webEngineView.load(QUrl("http://127.0.0.1:1231"))
+        self.webViewOnline.load(QUrl("http://127.0.0.1:1231"))
+
+
+
+class Threader (threading.Thread):
+    # https://www.tutorialspoint.com/python/python_multithreading.htm
+    def __init__(self, threadID, name, counter):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.counter = counter
+
+
+    def run(self):
+        print("Starting " + self.name)
+        server.main()
+        print("Exiting " + self.name)
+
+    def stop(self):
+        server.stop()
+        self.join()
+        print(self)
+
+
+
+def exit_():
+    app.exec_()
+    for t in threads:
+        print(t)
+        t.stop()
+
+    time.sleep(2)
+    sys.exit()
+
 
 
 def main():
-    app = QApplication(sys.argv)
-    clientApp = JDS_CLIENT() # CLIENT APPLICATION
+
+    clientApp = JDS_CLIENT("http://localhost/JDS") # CLIENT APPLICATION
     # clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
+
+    thread1 = Threader(1, "Thread-1", 1)
+    thread1.start()
+
+    threads.append(thread1)
     print("APP INITIALIZED")
-    sys.exit(app.exec_())
+
+    sys.exit(exit_())
 
 if __name__ == '__main__':
     main()
