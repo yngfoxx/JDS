@@ -20,16 +20,6 @@ threads = []
 app = QApplication(sys.argv)
 
 
-async def hello(websocket, path):
-    name = await websocket.recv()
-    print(f"< {name}")
-
-    greeting = f"Hello {name}!"
-
-    await websocket.send(greeting)
-    print(f"> {greeting}")
-
-
 class JDS_CLIENT(QMainWindow):
     def __init__(self, url):
         super().__init__()
@@ -128,8 +118,9 @@ class Threader (threading.Thread):
         elif (self.name == "SOCKET_SERVER"):
             # SOCKET SERVER SECTION ------------------------------------------->
             # https://websockets.readthedocs.io/en/stable/intro.html
-            print("[+] Creating socket server on port: 5678")
-            socket.initialize();
+            wSocket = socket.websocketserver(5678);
+            wSocket.initialize();
+            print("[+] Created socket server on port: 5678")
             # ----------------------------------------------------------------->
 
         print("[*] Exiting " + self.name)
