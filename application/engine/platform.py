@@ -14,7 +14,7 @@ class domainName(object):
         elif platform == "win32":
             # Windows
             self.domain = "localhost"
-            return self.domain
+            return str(self.domain)
 
 if __name__ == '__main__':
     domainOBJ = domainName()
