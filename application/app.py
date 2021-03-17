@@ -127,22 +127,17 @@ class Threader (threading.Thread):
         elif (self.name == "SOCKET_SERVER"):
             # SOCKET SERVER SECTION ------------------------------------------->
             # https://websockets.readthedocs.io/en/stable/intro.html
-            try:
-                wSocket.initialize();
-            except:
-                print("Error while starting websocket server!")
-
-            print("[+] Created socket server on port: 5678")
+            wSocket.start();
             # ----------------------------------------------------------------->
 
-        print("[*] Exiting " + self.name)
+        print("[*] Exiting thread: " + self.name)
 
 
-
+# Exit application ------------------------------------------------------------>
 def exit_():
     app.exec_()
     for t in threads:
-        print(t)
+        # print(t) # Show thread
         if (t.name == "LOCAL_HTTP_SERVER"):
             try:
                 server_lan.stop()
@@ -150,15 +145,11 @@ def exit_():
                 print("Error while closing LAN server!")
 
         elif (t.name == "SOCKET_SERVER"):
-            try:
-                wSocket.close()
-            except:
-                print("Error while closing web socket!")
-                # sys.exit()
+            wSocket.close()
 
         t.join()
     print("[+] Threads killed!")
-
+# ----------------------------------------------------------------------------->
 
 
 def main():
