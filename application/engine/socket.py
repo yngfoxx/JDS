@@ -11,7 +11,7 @@ from tornado.platform.asyncio import AnyThreadEventLoopPolicy
 asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())
 
 domainObject = domainName()
-hostdomain = domainObject.getDomain()
+hostdomain = str(domainObject.getDomain())
 
 class websocketserver():
     def __init__(self, port):

@@ -13,7 +13,7 @@ from engine.platform import domainName
 
 PORT = 8000
 domainObject = domainName()
-hostName = domainObject.getDomain()
+hostName = str(domainObject.getDomain())
 
 # 79 6f 75 6e 67 | 66 6f 78
 # 76766 - 65535 (MAX) = 11231
