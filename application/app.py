@@ -10,7 +10,7 @@ from engine.platform import domainName
 from threading import Thread
 
 from PyQt5.QtCore import QUrl
-from PyQt5.QtWebChannel import QWebChannel
+from PyQt5.QtWebChannel import *
 from PyQt5 import QtGui, QtCore, QtNetwork
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QApplication
