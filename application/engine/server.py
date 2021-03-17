@@ -57,23 +57,25 @@ class LocalServer(SimpleHTTPRequestHandler):
             self.send_error(404, "File Not Found: %s" % self.path)
 
 
-webServer = socketserver.TCPServer(("", PORT), LocalServer)
+class lanServer():
+    def __init__(self):
+        super().__init__()
 
-def main():
-    try:
-        # Continue running in background (if INITIALIZED through a thread)
-        webServer.serve_forever()
-    except KeyboardInterrupt:
-        pass
+    def start(self):
+        self.server = socketserver.TCPServer(("", PORT), LocalServer)
+        print("[+] LAN server started.")
+        self.server.serve_forever()
 
-    webServer.server_close()
-    print("[!] Server stopped automatically.")
+    def stop(self):
+        self.server.shutdown()
+        self.server.server_close()
+        print("[+] LAN server stopped.")
 
-
-def stop():
-    webServer.server_close()
-    print("[!] Server stopped manually.")
-    sys.exit()
 
 if __name__ == "__main__":
-    main()
+    try:
+        lanServer.start()
+    except keyboardinterrupt:
+        pass
+
+    sys.exit(lanServer.stop())

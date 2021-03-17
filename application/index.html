@@ -18,7 +18,7 @@
     <meta name="nosnippet">
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <link rel="stylesheet/less" type="text/css" href="/lib/less/style.less" />
-    <link rel="stylesheet" type="text/css" href="/lib/css/style.css" />
+    <!-- <link rel="stylesheet" type="text/css" href="/lib/css/style.css" /> -->
     <link rel="stylesheet" href="/lib/css/fontello/animation.css">
     <link rel="stylesheet" href="/lib/css/fontello/fontello.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/3.9.0/less.min.js" ></script>
@@ -52,6 +52,16 @@
     <script type="text/javascript" src="/lib/js/ajx.js"></script>
     <script type="text/javascript">
     var ws = new WebSocket("ws://127.0.0.1:5678/");
+        ws.onopen = function () {
+          // Request local area network hosts
+          alert("Connected!");
+          // https://websocket-client.readthedocs.io/en/latest/examples.html
+          ws.send( JSON.stringify({action: 'get_lan_hosts', interval: '30'}) );
+        }
+
+        ws.onerror = function () { alert("Error occured in websocket connection"); }
+        ws.onclose = function () { alert("Connection closed!"); }
+
         ws.onmessage = function (event) {
           console.log(event.data);
         };

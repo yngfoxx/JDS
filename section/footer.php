@@ -2,6 +2,23 @@
 <?php
 // USER HOME PAGE ------------------------------------------------------------->
  if (isset($_GET['home'])) { // HOME PAGE ?>
+
+  <script type="text/javascript">
+    // Connect to client application ------------------------------------------->
+    var ws_client_app = new WebSocket("ws://127.0.0.1:5678/");
+       ws_client_app.onopen = function () {
+         ws_client_app.send( JSON.stringify({action: 'client_connected', interval: '0'}) );
+       }
+
+       ws_client_app.onerror = function () { alert("Failed to connect to client application"); }
+       ws_client_app.onclose = function () { alert("Connection closed!"); }
+
+       ws_client_app.onmessage = function (event) {
+         console.log(event.data);
+       };
+    // ------------------------------------------------------------------------>
+  </script>
+
   <script type="text/javascript">
   // user entered URL or CODE ------------------------------------------------->
   $('._bibf').on('submit', function(e) {

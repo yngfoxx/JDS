@@ -18,7 +18,8 @@ from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QApplication
 
 threads = []
 app = QApplication(sys.argv)
-
+server_lan = server.lanServer()
+wSocket = socket.websocketserver(5678);
 
 class JDS_CLIENT(QMainWindow):
     def __init__(self, url):
@@ -113,24 +114,23 @@ class Threader (threading.Thread):
         print("[+] Starting " + self.name)
 
         if (self.name == "LOCAL_HTTP_SERVER"):
-            server.main()
+            try:
+                server_lan.start()
+            except:
+                print("Error while starting LAN server!")
 
         elif (self.name == "SOCKET_SERVER"):
             # SOCKET SERVER SECTION ------------------------------------------->
             # https://websockets.readthedocs.io/en/stable/intro.html
-            wSocket = socket.websocketserver(5678);
-            wSocket.initialize();
+            try:
+                wSocket.initialize();
+            except:
+                print("Error while starting websocket server!")
+
             print("[+] Created socket server on port: 5678")
             # ----------------------------------------------------------------->
 
         print("[*] Exiting " + self.name)
-
-
-    def stop(self):
-        if (self.name == "LOCAL_HTTP_SERVER"):
-            server.stop()
-        self.join()
-        print(self)
 
 
 
@@ -138,8 +138,21 @@ def exit_():
     app.exec_()
     for t in threads:
         print(t)
-        t.stop()
-    sys.exit()
+        if (t.name == "LOCAL_HTTP_SERVER"):
+            try:
+                server_lan.stop()
+            except:
+                print("Error while closing LAN server!")
+
+        elif (t.name == "SOCKET_SERVER"):
+            try:
+                wSocket.close()
+            except:
+                print("Error while closing web socket!")
+                # sys.exit()
+
+        t.join()
+    print("[+] Threads killed!")
 
 
 
