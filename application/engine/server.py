@@ -1,15 +1,20 @@
 # Python 3 server example ----------------------------------------------------->
 # https://pythonbasics.org/webserver/
 # ----------------------------------------------------------------------------->
-from os import curdir, sep
-import http.server
-from http.server import SimpleHTTPRequestHandler, HTTPServer
 import socketserver
 import time
 import sys
+import http.server
+from sys import platform
+from os import curdir, sep
+from http.server import SimpleHTTPRequestHandler, HTTPServer
+from engine.platform import domainName
 
-hostName = "127.0.0.1"
+
 PORT = 8000
+domainObject = domainName()
+hostName = domainObject.getDomain()
+
 # 79 6f 75 6e 67 | 66 6f 78
 # 76766 - 65535 (MAX) = 11231
 

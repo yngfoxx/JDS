@@ -5,6 +5,7 @@ import threading
 
 from engine import server
 from engine import socket
+from engine.platform import domainName
 
 from threading import Thread
 
@@ -20,6 +21,10 @@ threads = []
 app = QApplication(sys.argv)
 server_lan = server.lanServer()
 wSocket = socket.websocketserver(5678);
+
+domainObject = domainName()
+hostdomain = domainObject.getDomain()
+
 
 class JDS_CLIENT(QMainWindow):
     def __init__(self, url):
@@ -65,7 +70,7 @@ class JDS_CLIENT(QMainWindow):
         self.webViewOnline.load(QUrl(self.webURL))
 
     def loadClientPage(self):
-        self.webViewClient.load(QUrl("http://localhost:8000/index.html"))
+        self.webViewClient.load(QUrl("http://"+hostdomain+":8000/index.html"))
         self.webViewClient.setFixedWidth(350)
 
 
@@ -97,7 +102,7 @@ class JDS_DEBUGGER(QMainWindow):
         self.show()
 
     def loadWebPage(self):
-        self.webViewOnline.load(QUrl("http://127.0.0.1:1231"))
+        self.webViewOnline.load(QUrl("http://"+hostdomain+":1231"))
 
 
 
@@ -158,7 +163,7 @@ def exit_():
 
 def main():
     # USER INTERFACE ---------------------------------------------------------->
-    clientApp = JDS_CLIENT("http://localhost/JDS") # CLIENT APPLICATION
+    clientApp = JDS_CLIENT("http://"+hostdomain+"/JDS") # CLIENT APPLICATION
     clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
     # ------------------------------------------------------------------------->
 

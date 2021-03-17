@@ -4,10 +4,14 @@ import random
 import json
 import websockets
 
+from engine.platform import domainName
 from tornado.platform.asyncio import AnyThreadEventLoopPolicy
 
 # https://github.com/tornadoweb/tornado/issues/2531
 asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())
+
+domainObject = domainName()
+hostdomain = domainObject.getDomain()
 
 class websocketserver():
     def __init__(self, port):
@@ -39,7 +43,7 @@ class websocketserver():
             await asyncio.sleep(random.random() * 3)
 
     def initialize(self):
-        self.server = websockets.serve(self.main, "127.0.0.1", self.port)
+        self.server = websockets.serve(self.main, hostdomain, self.port)
 
         asyncio.get_event_loop().run_until_complete(self.server)
         asyncio.get_event_loop().run_forever()
