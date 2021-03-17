@@ -84,6 +84,7 @@ class websocketserver():
         self.loop = asyncio.get_event_loop()
 
         # The stop condition is set when receiving SIGTERM.
+        # https://docs.python.org/3/library/asyncio-future.html#asyncio.Future
         self.futurestop = self.loop.create_future()
         # loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
 
