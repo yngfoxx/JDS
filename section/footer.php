@@ -2,21 +2,53 @@
 <?php
 // USER HOME PAGE ------------------------------------------------------------->
  if (isset($_GET['home'])) { // HOME PAGE ?>
-
   <script type="text/javascript">
-    // Connect to client application ------------------------------------------->
-    var ws_client_app = new WebSocket("ws://127.0.0.1:5678/");
-       ws_client_app.onopen = function () {
-         ws_client_app.send( JSON.stringify({action: 'client_connected', interval: '0'}) );
-       }
+  <?php
+    include_once $_SERVER['DOCUMENT_ROOT'] . "/JDS/class/user.php";
+    include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/auth.php';
+    include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/joint.php';
 
-       ws_client_app.onerror = function () { alert("Failed to connect to client application"); }
-       ws_client_app.onclose = function () { alert("Connection closed!"); }
+    $usr = new user();
+    $auth = new auth();
+    $jds = new jointlib();
 
-       ws_client_app.onmessage = function (event) {
-         console.log(event.data);
-       };
-    // ------------------------------------------------------------------------>
+    if (isset($_COOKIE['dKEY'])) {
+      $user_data = $usr->getUserByDeviceID($_COOKIE['dKEY']);
+      $devID = $_COOKIE['dKEY'];
+      $userID = $user_data['id'];
+      $username = $user_data['username'];
+      $email = $user_data['email'];
+      $joints = json_encode($jds->getUserJointList($userID));
+      ?>
+
+      // Connect to client application ------------------------------------------->
+      var ws_client_app = new WebSocket("ws://127.0.0.1:5678/");
+        ws_client_app.onopen = function () {
+          ws_client_app.send(
+            JSON.stringify({
+              action: 'jds_client_connected',
+              interval: 'none',
+              payload: {
+                devID: "<?php echo $devID; ?>",
+                userID: "<?php echo $userID; ?>",
+                username: "<?php echo $username; ?>",
+                joints: <?php echo $joints; ?>,
+              }
+            })
+          );
+        }
+
+        ws_client_app.onerror = function () { alert("Failed to connect to client application"); }
+        ws_client_app.onclose = function () { alert("Connection closed!"); }
+
+        ws_client_app.onmessage = function (event) {
+          console.log(event.data);
+        };
+      // ------------------------------------------------------------------------>
+
+  <?php
+    }
+  ?>
   </script>
 
   <script type="text/javascript">

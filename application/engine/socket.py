@@ -22,6 +22,11 @@ class websocketserver():
     async def main(self, websocket, path):
         while self.stopped == False:
             # await websocket.send("connected")
+
+            # wsInput = await websocket.recv()
+            # wsRequest = json.loads(wsInput)
+            # print("[+] Recvd: "+wsRequest)
+
             try:
                 # Recieve input from web client ------------------------------->
                 wsInput = await websocket.recv()
@@ -31,10 +36,17 @@ class websocketserver():
                 action = wsRequest['action']
                 interval = wsRequest['interval']
 
-                print("[+] Action:"+action+"; Interval:"+interval)
+                print("[+] Action:"+action+"; Interval:"+interval);
 
-                # client_connected
-                # get_lan_hosts
+                # jds_client_connected
+                if action == 'jds_client_connected':
+                    payload = wsRequest['payload']
+                    print(payload)
+
+                # desktop_client_online
+                elif action == 'desktop_client_online':
+                    print('[+] Desktop socket is now connected')
+                    #
 
                 # ------------------------------------------------------------->
             except:
