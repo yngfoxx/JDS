@@ -95,10 +95,11 @@
 
       // Testing POST request
       (() => {
+        let parm = '{ "event": "sonar", "type": "lan" }';
         ajx({
           type: 'POST',
           url: '/',
-          data: {foo: 'bar'},
+          data: parm,
           success: (response) => { console.log(response); },
           complete: () => { console.log("Ajax done!"); },
           errorMethod: () => { console.error("Ajax error!"); },

@@ -4,7 +4,9 @@
 import socketserver
 import time
 import sys
+import json
 import http.server
+from io import BytesIO
 from sys import platform
 from os import curdir, sep
 from http.server import SimpleHTTPRequestHandler, HTTPServer
@@ -70,10 +72,14 @@ class LocalServer(SimpleHTTPRequestHandler):
     def do_POST(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
-        print("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n", str(self.path), str(self.headers), post_data.decode('utf-8'))
-
+        # print("POST request,\nPath:", str(self.path), "\nHeaders: {", str(self.headers),"\n}\nBody: {\n", post_data.decode('utf-8'),"\n}")
         self._set_response()
-        self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
+
+        post_data = json.loads(post_data.decode('utf-8'))
+        print(post_data)
+        # Handle request before returning response
+        if post_data['event'] == 'sonar':
+            self.wfile.write(b"POST request for LAN sonar recieved!")
 
 
 
@@ -89,7 +95,7 @@ class lanServer():
     def stop(self):
         self.server.shutdown()
         self.server.server_close()
-        print("[+] LAN server stopped.")
+        print("[+] LAN server stopped")
 
 
 if __name__ == "__main__":

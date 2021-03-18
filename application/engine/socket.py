@@ -66,7 +66,7 @@ class websocketserver():
                 await asyncio.sleep(random.random() * 3)
 
             except websockets.exceptions.ConnectionClosedOK:
-                print("[+] Connection closed")
+                print("[+] WebSocket connection closed")
 
             finally:
                 clients.remove(websocket)
@@ -94,11 +94,9 @@ class websocketserver():
 
 
     def close(self):
-        # Stop while loop in main()
-        self.stopped = True
-
-        # Stop future loop to terminate the program
-        self.futurestop.set_result(True)
+        self.stopped = True # Stop while loop in main()
+        self.futurestop.set_result(True) # Stop future loop to terminate the program
+        print("[+] WebSocket server stopped")
 
 
 if __name__ == '__main__':
