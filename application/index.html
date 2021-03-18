@@ -51,7 +51,7 @@
     <script type="text/javascript" src="/lib/js/script.js"></script>
     <script type="text/javascript" src="/lib/js/ajx.js"></script>
     <script type="text/javascript">
-    let client_data = { foo: 'bar' };
+    let client_data = null;
     let ws = new WebSocket("ws://127.0.0.1:5678/");
         ws.onopen = function () { // Request local area network hosts
           // https://websocket-client.readthedocs.io/en/latest/examples.html
@@ -70,17 +70,15 @@
           if (isJson(event.data)) {
             let eData = JSON.parse(event.data);
             if (eData.hasOwnProperty('channel')) {
-              console.log(event.data.channel);
               switch (eData.channel) {
                 case 'desktop_client':
                   if (eData.hasOwnProperty('payload')) {
                     if (isJson(eData.payload)) {
-                      let payload = JSON.parse(eData.payload);
-                      if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", payload);
-                      client_data = payload;
+                      client_data = JSON.parse(eData.payload);
+                      if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
                       // Start network scanner -------------------------------->
                       let networkMsg = document.getElementsByClassName('_aMsg')[0];
-                      networkMsg.innerText = "Scanning network";
+                      networkMsg.innerText = "Scanning for members on same network";
                       // ------------------------------------------------------>
                     }
                   }
@@ -94,18 +92,18 @@
         };
 
       // Testing POST request
-      (() => {
-        let parm = '{ "event": "sonar", "type": "lan" }';
-        ajx({
-          type: 'POST',
-          url: '/',
-          data: parm,
-          success: (response) => { console.log(response); },
-          complete: () => { console.log("Ajax done!"); },
-          errorMethod: () => { console.error("Ajax error!"); },
-          load: 'up'
-        });
-      })();
+      // (() => {
+      //   let parm = '{ "event": "sonar", "type": "lan" }';
+      //   ajx({
+      //     type: 'POST',
+      //     url: '/',
+      //     data: parm,
+      //     success: (response) => { console.log(response); },
+      //     complete: () => { console.log("Ajax done!"); },
+      //     errorMethod: () => { console.error("Ajax error!"); },
+      //     load: 'up'
+      //   });
+      // })();
     </script>
   </body>
 </html>

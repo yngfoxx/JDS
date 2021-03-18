@@ -81,6 +81,7 @@ class JDS_DEBUGGER(QMainWindow):
         self.initUI()
 
     def initUI(self):
+        self.resize(400, 800)
         # self.setFixedWidth(1400)
         # self.setFixedHeight(800)
         self.setWindowTitle("Joint Downloading System [Desktop client debugger]")

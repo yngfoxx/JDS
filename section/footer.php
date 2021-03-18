@@ -14,7 +14,7 @@
 
     if (isset($_COOKIE['dKEY'])) {
       $user_data = $usr->getUserByDeviceID($_COOKIE['dKEY']);
-      $devID = $_COOKIE['dKEY'];
+      $devID = base64_decode($_COOKIE['dKEY']);
       $userID = $user_data['id'];
       $username = $user_data['username'];
       $email = $user_data['email'];
@@ -26,13 +26,13 @@
         ws_client_app.onopen = function () {
           ws_client_app.send(
             JSON.stringify({
-              action: 'jds_client_connected',
-              interval: 'none',
-              payload: {
-                devID: "<?php echo $devID; ?>",
-                userID: "<?php echo $userID; ?>",
-                username: "<?php echo $username; ?>",
-                joints: <?php echo $joints; ?>,
+              "action": "jds_client_connected",
+              "interval": "none",
+              "payload": {
+                "devID": "<?php echo $devID; ?>",
+                "userID": "<?php echo $userID; ?>",
+                "username": "<?php echo $username; ?>",
+                "joints": <?php echo $joints; ?>,
               }
             })
           );

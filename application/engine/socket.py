@@ -38,7 +38,7 @@ class websocketserver():
                 action = wsRequest['action']
                 interval = wsRequest['interval']
 
-                print("[+] Action:"+action+"; Interval:"+interval);
+                print("[+] Action: "+action+"; Interval: "+interval);
 
                 # jds_client_connected
                 if action == 'jds_client_connected':
@@ -54,9 +54,10 @@ class websocketserver():
                     print('[+] Desktop socket is now connected')
                     JDS_PAYLOAD_FILE.seek(0)
                     pLoad = JDS_PAYLOAD_FILE.read().decode('utf-8')
+                    pLoad = pLoad.replace("\'", "\"")
                     CLIENT_PAYLOAD = {
-                        'channel': "desktop_client",
-                        'payload': pLoad
+                        "channel": "desktop_client",
+                        "payload": pLoad
                     }
                     CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
                     await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
