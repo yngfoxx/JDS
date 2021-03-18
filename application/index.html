@@ -51,7 +51,8 @@
     <script type="text/javascript" src="/lib/js/script.js"></script>
     <script type="text/javascript" src="/lib/js/ajx.js"></script>
     <script type="text/javascript">
-    var ws = new WebSocket("ws://127.0.0.1:5678/");
+    let client_data = { foo: 'bar' };
+    let ws = new WebSocket("ws://127.0.0.1:5678/");
         ws.onopen = function () { // Request local area network hosts
           // https://websocket-client.readthedocs.io/en/latest/examples.html
           ws.send( JSON.stringify({action: 'desktop_client_online', interval: 'none'}) );
@@ -66,16 +67,21 @@
 
         ws.onmessage = function (event) {
           // wait for event.data with current users info
-          console.log(event.data);
           if (isJson(event.data)) {
             let eData = JSON.parse(event.data);
             if (eData.hasOwnProperty('channel')) {
+              console.log(event.data.channel);
               switch (eData.channel) {
                 case 'desktop_client':
                   if (eData.hasOwnProperty('payload')) {
                     if (isJson(eData.payload)) {
                       let payload = JSON.parse(eData.payload);
-                      console.log(payload);
+                      if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", payload);
+                      client_data = payload;
+                      // Start network scanner -------------------------------->
+                      let networkMsg = document.getElementsByClassName('_aMsg')[0];
+                      networkMsg.innerText = "Scanning network";
+                      // ------------------------------------------------------>
                     }
                   }
                   break;
@@ -86,6 +92,19 @@
             }
           }
         };
+
+      // Testing POST request
+      (() => {
+        ajx({
+          type: 'POST',
+          url: '/',
+          data: {foo: 'bar'},
+          success: (response) => { console.log(response); },
+          complete: () => { console.log("Ajax done!"); },
+          errorMethod: () => { console.error("Ajax error!"); },
+          load: 'up'
+        });
+      })();
     </script>
   </body>
 </html>

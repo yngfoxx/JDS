@@ -19,6 +19,11 @@ hostName = str(domainObject.getDomain())
 # 76766 - 65535 (MAX) = 11231
 
 class LocalServer(SimpleHTTPRequestHandler):
+    def _set_response(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
     def do_GET(self):
         try:
             if self.path.endswith(".html"):
@@ -60,6 +65,16 @@ class LocalServer(SimpleHTTPRequestHandler):
         except IOError:
             print("[!] 404 - file not found")
             self.send_error(404, "File Not Found: %s" % self.path)
+
+
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
+        post_data = self.rfile.read(content_length) # <--- Gets the data itself
+        print("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n", str(self.path), str(self.headers), post_data.decode('utf-8'))
+
+        self._set_response()
+        self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
+
 
 
 class lanServer():

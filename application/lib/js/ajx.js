@@ -31,7 +31,8 @@ function ajx(obj) {
 
   let area = (!obj.hasOwnProperty('area')) ? "width" : obj.area;
 
-  ajaxProcess[JSON.stringify(loaderID)] = $.ajax({
+  // ajaxProcess[JSON.stringify(loaderID)] = $.ajax({
+  $.ajax({
     xhr: function()
     {
       let xhr = new window.XMLHttpRequest();

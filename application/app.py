@@ -122,7 +122,7 @@ class Threader (threading.Thread):
             try:
                 server_lan.start()
             except:
-                print("Error while starting LAN server!")
+                print("[!] Error while starting LAN server!")
 
         elif (self.name == "SOCKET_SERVER"):
             # SOCKET SERVER SECTION ------------------------------------------->
