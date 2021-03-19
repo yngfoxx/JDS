@@ -88,7 +88,9 @@
                       console.log("[+] Application connection established!");
 
                       let joint_list = [];
-                      (client_data.joints).forEach((item, i) => { joint_list[] = item.jid; });
+                      client_data.joints.forEach((item, i) => {
+                        joint_list.push(item.jid);
+                      });
                       console.log(joint_list);
                       // Start scanning and broadcasting list of users to this user
                       ws.send( JSON.stringify({action: 'fetch_network_users', interval: '30', list: joint_list, client_id: desktop_socket_unique_id}) );

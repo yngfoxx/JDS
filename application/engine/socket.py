@@ -63,6 +63,10 @@ class websocketserver():
                     await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
                     # send network data back to client
 
+                elif action == 'fetch_network_users':
+                    print('[+] WebSocket request: '+action)
+                    print(wsRequest['list'])
+                    # Use list of groups to find other users with similar groups
                 # ------------------------------------------------------------->
                 await asyncio.sleep(random.random() * 3)
 
