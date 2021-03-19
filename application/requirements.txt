@@ -2,6 +2,7 @@ bidict==0.21.2
 certifi==2020.12.5
 chardet==4.0.0
 idna==2.10
+networkscan==1.0.9
 PyQt5==5.15.2
 PyQt5-sip==12.8.1
 PyQtWebEngine==5.15.2

@@ -52,10 +52,11 @@
     <script type="text/javascript" src="/lib/js/ajx.js"></script>
     <script type="text/javascript">
     let client_data = null;
+    let desktop_socket_unique_id = genKey(6);
     let ws = new WebSocket("ws://127.0.0.1:5678/");
         ws.onopen = function () { // Request local area network hosts
           // https://websocket-client.readthedocs.io/en/latest/examples.html
-          ws.send( JSON.stringify({action: 'desktop_client_online', interval: 'none'}) );
+          ws.send( JSON.stringify({action: 'desktop_client_online', interval: 'none', client_id: desktop_socket_unique_id}) );
           let networkMsg = document.getElementsByClassName('_aMsg')[0];
           let downloadStat = document.getElementsByClassName('_aMsg')[1];
               networkMsg.innerText = "Waiting for JDS server...";
@@ -78,10 +79,27 @@
                       if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
                       // Start network scanner -------------------------------->
                       let networkMsg = document.getElementsByClassName('_aMsg')[0];
-                      networkMsg.innerText = "Scanning for members on same network";
+                      networkMsg.style.color = 'var(--light-gray-v2)';
+                      networkMsg.innerText = "Scanning for users, make sure the users are on the same local network";
+
+                      let downloadStat = document.getElementsByClassName('_aMsg')[1];
+                      downloadStat.innerText = "Waiting";
+                      downloadStat.style.color = 'var(--light-gray-v2)';
+                      console.log("[+] Application connection established!");
+
+                      let joint_list = [];
+                      (client_data.joints).forEach((item, i) => { joint_list[] = item.jid; });
+                      console.log(joint_list);
+                      // Start scanning and broadcasting list of users to this user
+                      ws.send( JSON.stringify({action: 'fetch_network_users', interval: '30', list: joint_list, client_id: desktop_socket_unique_id}) );
                       // ------------------------------------------------------>
                     }
                   }
+                  break;
+
+                case desktop_socket_unique_id:
+                  console.log("Unique message received!");
+                  console.log(eData);
                   break;
 
                 default:
