@@ -16,71 +16,163 @@ asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
-JDS_PAYLOAD_FILE = tempfile.TemporaryFile(prefix='jds_', suffix='_payload.json')
+# self.payload_file = tempfile.TemporaryFile(prefix='jds_', suffix='_payload.json')
 clients = set()
+connections = {}
 
 class websocketserver():
     def __init__(self, port):
         super().__init__()
         self.port = port
         self.stopped = False
+        self.payload_file = tempfile.TemporaryFile(prefix='jds_', suffix='_payload.json')
+
+    def clients_event(self):
+        return json.dumps({"type": "client", "count": len(clients)})
+
+
+    async def notify_clients(self):
+        if clients:  # asyncio.wait doesn't accept an empty list
+            message = self.clients_event()
+            await asyncio.wait([ws.send(message) for ws in clients])
+
+
+    # Register the websocket
+    async def register(self, websocket):
+        clients.add(websocket)
+        await self.notify_clients()
+
+
+    # Unregister the websocket
+    async def unregister(self, websocket):
+        clients.remove(websocket)
+        await self.notify_clients()
+
+
+    # Register the WebSocket with a socket ID
+    async def addSocket(self, websocket, socketID, socketType):
+        print("[+] New WebSocket connection: ", socketID)
+        connections[str(socketID)] = { "socket": websocket, "type": socketType }
+        for ws in connections:
+            print("[!] ", ws, " => ", connections[ws])
+            if (connections[ws]["socket"].closed == True):
+                print("[+] ", ws, " is closed, removing from connection list")
+                self.removeSocket(connections[ws], ws)
+
+
+    # Unregister the WebSocket with a socket ID
+    async def removeSocket(self, WebSocket, socketID):
+        connections.pop(str(socketID))
+        print("[+] A WebSocket connection closed")
+
 
     async def main(self, websocket, path):
         while self.stopped == False:
             # await websocket.send("connected")
-            clients.add(websocket)
+            # clients.add(websocket)
+            await self.register(websocket)
             try:
                 # Recieve input from web client ------------------------------->
-                wsInput = await websocket.recv()
+                try:
+                    wsInput = await websocket.recv()
+                except websockets.exceptions.ConnectionClosedOK:
+                    print("[+] WebSocket connection closed")
 
                 # Handle websocket recieved input
                 wsRequest = json.loads(wsInput)
                 action = wsRequest['action']
-                interval = wsRequest['interval']
+                print("[+] Action: "+action);
 
-                print("[+] Action: "+action+"; Interval: "+interval);
+                # interval = wsRequest['interval']
 
                 # jds_client_connected
                 if action == 'jds_client_connected':
-                    payload = str(wsRequest['payload'])
+                    await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
+
                     # save payload in temporary file -------------------------->
-                    JDS_PAYLOAD_FILE.write(str.encode(payload))
+                    payload = str(wsRequest['payload'])
+                    self.payload_file.write(str.encode(payload))
                     print("[+] Payload stored!")
-                    # await asyncio.wait([websocket.send("jds_client_connected_true") for websocket in clients])
+
+                    self.payload_file.seek(0)
+                    pLoad = self.payload_file.read().decode('utf-8')
+                    pLoad = pLoad.replace("\'", "\"")
+                    CLIENT_PAYLOAD = {
+                        "channel": "desktop_client_connected",
+                        "payload": pLoad
+                    }
+                    CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
+                    try:
+                        await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
+                    except:
+                        pass
                     # --------------------------------------------------------->
 
                 # desktop_client_online
                 elif action == 'desktop_client_online':
-                    print('[+] Desktop socket is now connected')
-                    JDS_PAYLOAD_FILE.seek(0)
-                    pLoad = JDS_PAYLOAD_FILE.read().decode('utf-8')
+                    await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
+
+                    print('[+] Desktop socket connected to socket server')
+                    self.payload_file.seek(0)
+                    pLoad = self.payload_file.read().decode('utf-8')
                     pLoad = pLoad.replace("\'", "\"")
                     CLIENT_PAYLOAD = {
-                        "channel": "desktop_client",
+                        "channel": "desktop_client_connected",
                         "payload": pLoad
                     }
                     CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
-                    await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
-                    # send network data back to client
+                    try:
+                        await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
+                        # await asyncio.wait(websocket.send(CLIENT_PAYLOAD_JSON))
+                    except:
+                        pass
+                    # send data back to client
 
                 elif action == 'fetch_network_users':
                     print('[+] WebSocket request: '+action)
                     print(wsRequest['list'])
                     # Use list of groups to find other users with similar groups
+
+                elif action == 'refresh_webview':
+                    print('[+] Refresh webview command sent!')
+                    for ws in connections:
+                        ws = connections[ws]['socket']
+                        if (ws != websocket):
+                            WEB_PAYLOAD = { "channel": "refresh" }
+                            WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                            await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+
+                elif action == 'jds_client_disconnected':
+                    await self.removeSocket(websocket, wsRequest['socketID'])
+                    print('[!] User logged out!')
+                    CLIENT_PAYLOAD = { "channel": "desktop_client_disconnected", "socket": wsRequest['socketID'] }
+                    CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
+
+                    try:
+                        await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
+                    except:
+                        pass
                 # ------------------------------------------------------------->
                 await asyncio.sleep(random.random() * 3)
 
-            except websockets.exceptions.ConnectionClosedOK:
-                print("[+] WebSocket connection closed")
+
+            # except websockets.exceptions.ConnectionClosedOK:
+            #     print("[+] WebSocket connection closed")
+            #
+            #
+            # except websockets.exceptions.ConnectionClosedError:
+            #     print("[+] WebSocket connection error: [Expected]")
+
 
             finally:
-                clients.remove(websocket)
-                # JDS_PAYLOAD_FILE.close()
+                self.payload_file.seek(0)
+                self.payload_file.truncate()
+                await self.unregister(websocket)
 
 
     async def initialize(self, stop):
-        # self.server = websockets.serve(self.main, hostdomain, self.port)
-        async with websockets.serve(self.main, hostdomain, self.port):
+        self.ws = websockets.serve(self.main, hostdomain, self.port)
+        async with self.ws:
             await stop
 
 
@@ -99,9 +191,13 @@ class websocketserver():
 
 
     def close(self):
-        self.stopped = True # Stop while loop in main()
-        self.futurestop.set_result(True) # Stop future loop to terminate the program
-        print("[+] WebSocket server stopped")
+        try:
+            self.stopped = True # Stop while loop in main()
+            self.futurestop.set_result(True) # Stop future loop to terminate the program
+            # self.payload_file.close()
+            print("[+] WebSocket server stopped")
+        except:
+            pass
 
 
 if __name__ == '__main__':

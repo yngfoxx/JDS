@@ -146,7 +146,10 @@ def exit_():
                 print("Error while closing LAN server!")
 
         elif (t.name == "SOCKET_SERVER"):
-            wSocket.close()
+            try:
+                wSocket.close()
+            except:
+                print("Error while closing WebSocket server!")
 
         t.join()
     print("[+] Threads killed!")

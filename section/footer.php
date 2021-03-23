@@ -3,6 +3,7 @@
 // USER HOME PAGE ------------------------------------------------------------->
  if (isset($_GET['home'])) { // HOME PAGE ?>
   <script type="text/javascript">
+  let socket_unique_id = genKey(6);
   <?php
     include_once $_SERVER['DOCUMENT_ROOT'] . "/JDS/class/user.php";
     include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/auth.php';
@@ -28,6 +29,8 @@
             JSON.stringify({
               "action": "jds_client_connected",
               "interval": "none",
+              "socketID": socket_unique_id,
+              "socketType": "web",
               "payload": {
                 "devID": "<?php echo $devID; ?>",
                 "userID": "<?php echo $userID; ?>",
@@ -42,7 +45,17 @@
         ws_client_app.onclose = function () { alert("Connection closed!"); }
 
         ws_client_app.onmessage = function (event) {
-          console.log(event.data);
+          let eData = JSON.parse(event.data);
+          if (eData.hasOwnProperty('channel')) {
+            switch (eData.channel) {
+              case 'refresh':
+                location.reload();
+                break;
+
+              default:
+                break;
+            }
+          }
         };
       // ------------------------------------------------------------------------>
 
@@ -317,6 +330,16 @@ $("#uprofchange").on('change', function(e) {
 
   // event listener for logout button
   $("a[title='Logout']").on('click', function(e) {
+    if (ws_client_app) {
+      ws_client_app.send(
+        JSON.stringify({
+          "action": "jds_client_disconnected",
+          "interval": "none",
+          "socketID": socket_unique_id,
+        })
+      );
+      ws_client_app.close()
+    }
     window.location.href = "./?logout";
   });
 </script>

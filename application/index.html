@@ -26,6 +26,10 @@
   </head>
   <body>
     <div class="_prc_container"></div>
+    <div class="_pre_loader">
+      <div class="_pl_text">JDS</div>
+      <div class="_pl_icon"></div>
+    </div>
     <div class="web_container">
       <!-- Network -->
       <div class="tnvbr">
@@ -56,7 +60,7 @@
     let ws = new WebSocket("ws://127.0.0.1:5678/");
         ws.onopen = function () { // Request local area network hosts
           // https://websocket-client.readthedocs.io/en/latest/examples.html
-          ws.send( JSON.stringify({action: 'desktop_client_online', interval: 'none', client_id: desktop_socket_unique_id}) );
+          ws.send( JSON.stringify({action: 'desktop_client_online', interval: 'none', socketID: desktop_socket_unique_id, socketType: 'desktop'}) );
           let networkMsg = document.getElementsByClassName('_aMsg')[0];
           let downloadStat = document.getElementsByClassName('_aMsg')[1];
               networkMsg.innerText = "Waiting for JDS server...";
@@ -68,24 +72,35 @@
 
         ws.onmessage = function (event) {
           // wait for event.data with current users info
+          // console.log(event.data);
           if (isJson(event.data)) {
             let eData = JSON.parse(event.data);
             if (eData.hasOwnProperty('channel')) {
               switch (eData.channel) {
-                case 'desktop_client':
+                case 'desktop_client_connected':
+                  console.log(eData);
                   if (eData.hasOwnProperty('payload')) {
+                    if (eData.payload == "") {
+                      console.log("[!] Payload is empty.");
+                      // get web payload
+                      ws.send( JSON.stringify({action: 'refresh_webview', interval: 'none'}) );
+                      return;
+                    }
                     if (isJson(eData.payload)) {
                       client_data = JSON.parse(eData.payload);
                       if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
                       // Start network scanner -------------------------------->
                       let networkMsg = document.getElementsByClassName('_aMsg')[0];
                       networkMsg.style.color = 'var(--light-gray-v2)';
-                      networkMsg.innerText = "Scanning for users, make sure the users are on the same local network";
+                      networkMsg.innerText = "Scanning for users, make sure users are on the same local network";
 
                       let downloadStat = document.getElementsByClassName('_aMsg')[1];
                       downloadStat.innerText = "Waiting";
                       downloadStat.style.color = 'var(--light-gray-v2)';
                       console.log("[+] Application connection established!");
+
+                      let loader = document.querySelector('._pre_loader');
+                          loader.classList.add('hide');
 
                       let joint_list = [];
                       client_data.joints.forEach((item, i) => {
@@ -93,10 +108,22 @@
                       });
                       console.log(joint_list);
                       // Start scanning and broadcasting list of users to this user
-                      ws.send( JSON.stringify({action: 'fetch_network_users', interval: '30', list: joint_list, client_id: desktop_socket_unique_id}) );
+                      ws.send( JSON.stringify({action: 'fetch_network_users', interval: '30', list: joint_list, socketID: desktop_socket_unique_id}) );
                       // ------------------------------------------------------>
                     }
                   }
+                  break;
+
+                case 'desktop_client_disconnected':
+                  console.log("Client logged out!");
+                  let loader = document.querySelector('._pre_loader');
+                      loader.classList.remove('hide');
+                  let networkMsg = document.getElementsByClassName('_aMsg')[0];
+                  let downloadStat = document.getElementsByClassName('_aMsg')[1];
+                      networkMsg.style.color = '#ee5f5f';
+                      networkMsg.innerText = "Waiting for JDS server...";
+                      downloadStat.style.color = '#ee5f5f';
+                      downloadStat.innerText = " Make sure you are logged in for services to operate normally!";
                   break;
 
                 case desktop_socket_unique_id:
