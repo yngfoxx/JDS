@@ -158,11 +158,22 @@ select {
     	border-radius: 6px;
       position: relative;
       ._aMsg {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
       	color: #ee5f5f;
+        position: absolute;
+        top: 40%;
+        left: 44%;
+        transform: translate(-50%, -50%);
+        &::after {
+          content: '';
+          ._pre_loader._pl_icon();
+        }
+        &::before {
+          content: attr(data-snippet);
+          position: absolute;
+          width: 150px;
+          left: -55px;
+          top: 50px;
+        }
       }
     }
   }

@@ -37,7 +37,7 @@
       </div>
       <div class="_bdyMain">
         <div class="_bdyContent">
-          <a class="_aMsg">No host found!</a>
+          <a class="_aMsg" data-snippet="Offline"></a>
         </div>
       </div>
 
@@ -47,7 +47,7 @@
       </div>
       <div class="_bdyMain">
         <div class="_bdyContent">
-          <a class="_aMsg">None in progress!</a>
+          <a class="_aMsg" data-snippet="Offline"></a>
         </div>
       </div>
     </div>
@@ -63,8 +63,8 @@
           ws.send( JSON.stringify({action: 'desktop_client_online', interval: 'none', socketID: desktop_socket_unique_id, socketType: 'desktop'}) );
           let networkMsg = document.getElementsByClassName('_aMsg')[0];
           let downloadStat = document.getElementsByClassName('_aMsg')[1];
-              networkMsg.innerText = "Waiting for JDS server...";
-              downloadStat.innerText = " Make sure you are logged in for services to operate normally!";
+          networkMsg.setAttribute('data-snippet', "Waiting for JDS server");
+          downloadStat.setAttribute('data-snippet', "Waiting");
         }
 
         ws.onerror = function () { alert("Error occured in websocket connection"); }
@@ -92,10 +92,10 @@
                       // Start network scanner -------------------------------->
                       let networkMsg = document.getElementsByClassName('_aMsg')[0];
                       networkMsg.style.color = 'var(--light-gray-v2)';
-                      networkMsg.innerText = "Scanning for users, make sure users are on the same local network";
+                      networkMsg.setAttribute('data-snippet', "Searching local network for users");
 
                       let downloadStat = document.getElementsByClassName('_aMsg')[1];
-                      downloadStat.innerText = "Waiting";
+                      downloadStat.setAttribute('data-snippet', "Waiting");
                       downloadStat.style.color = 'var(--light-gray-v2)';
                       console.log("[+] Application connection established!");
 
@@ -120,10 +120,12 @@
                       loader.classList.remove('hide');
                   let networkMsg = document.getElementsByClassName('_aMsg')[0];
                   let downloadStat = document.getElementsByClassName('_aMsg')[1];
+
                       networkMsg.style.color = '#ee5f5f';
-                      networkMsg.innerText = "Waiting for JDS server...";
+                      networkMsg.setAttribute('data-snippet', "Service is offline");
+
                       downloadStat.style.color = '#ee5f5f';
-                      downloadStat.innerText = " Make sure you are logged in for services to operate normally!";
+                      downloadStat.setAttribute('data-snippet', "Service is offline");
                   break;
 
                 case desktop_socket_unique_id:
