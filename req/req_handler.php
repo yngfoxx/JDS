@@ -434,14 +434,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   # initialize download request
   if (isset($_POST['jdsInit'])) {
     if (!$_POST['jdsInit']) exit();
-    // TODO: Initialize joint download
-    /*
+    // Initialize joint download
     #-> File authenticity check
-    #
     #-> Create socket channel ID
-    #
     #-> Store necessary file data
-    */
+
     // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
     if (isset($_COOKIE['dKEY'])) {
       if (!$auth->verfUser($_COOKIE['dKEY'])) {
@@ -604,7 +601,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // -------------------------------------------------------------------------->
 
 
-
+  # Create download request --------------------------------------------------->
   if (isset($_POST['crtDownload'])) {
     // Add requested file to server download request
     $jointID = $std->db->escape_string($_POST['jointID']);
@@ -638,9 +635,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
     # ---------------------------------------------------------------------/\
   }
+  // -------------------------------------------------------------------------->
 
 
-  // networkSpeedTester
+  // Network speed tester ----------------------------------------------------->
   if (isset($_POST['speedTest'])) {
     $direction = $std->db->escape_string($_POST['speedTest']);
     $content = $std->db->escape_string($_POST['content']);
@@ -652,7 +650,64 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       echo true;
     }
   }
+  // -------------------------------------------------------------------------->
+
+
+  // Local network scanner ---------------------------------------------------->
+  if (isset($_POST['netScan'])) {
+    if (!$_POST['netScan']) exit();
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+
+    // request variables
+    $net_address = $std->db->escape_string($_POST['addr']);
+    $jointGroups = $_POST['joint_list'];
+    $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
+
+    // Update Local IP Address saved in database
+    $setAddress = $auth->set_lan_addr($userID, $net_address);
+    if ($setAddress == true) {
+      $groups = array();
+      foreach ($jointGroups as $key => $value) {
+        $jointID = $std->db->escape_string($value);
+        $jointMembers = $jds->getJointMembers($jointID); # Group members
+        foreach ($jointMembers as $key => $user) {
+          if ($user['uid'] == $userID) continue; // Skip self
+          $userData = array(
+            'user_id' => $user['uid'],
+            'user_name' => $user['username'],
+            'user_role' => $user['role'],
+            'user_net_addr' => $auth->get_lan_addr($user['uid'])
+          );
+          $groups[$jointID][] = $userData;
+        }
+      }
+      echo json_encode($groups);
+    } else {
+      $result = array('server_error' => "Failed to update local network address", 'code' => '500'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+    // ------------------------------------------------------------------------>
+
+
+  }
   //////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 } else if ($_SERVER['REQUEST_METHOD'] == "GET") {
   if (isset($_GET['groupCheck'])) {
     if (empty($_GET['groupCheck'])) exit();

@@ -4,15 +4,18 @@ import signal
 import datetime
 import random
 import json
+import socket
 import websockets
 import sys
 import tempfile
 
 from engine.platform import domainName
-from tornado.platform.asyncio import AnyThreadEventLoopPolicy
+from engine.server import lanServer
 
 # https://github.com/tornadoweb/tornado/issues/2531
+from tornado.platform.asyncio import AnyThreadEventLoopPolicy
 asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())
+
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
@@ -94,8 +97,12 @@ class websocketserver():
                     self.payload_file.seek(0)
                     pLoad = self.payload_file.read().decode('utf-8')
                     pLoad = pLoad.replace("\'", "\"")
+
+                    local_ip = socket.gethostbyname(socket.gethostname())
+                    # ip_list = lanServer().get_ip_list()
                     CLIENT_PAYLOAD = {
                         "channel": "desktop_client_connected",
+                        "net_addr": local_ip,
                         "payload": pLoad
                     }
                     CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
@@ -113,8 +120,12 @@ class websocketserver():
                     self.payload_file.seek(0)
                     pLoad = self.payload_file.read().decode('utf-8')
                     pLoad = pLoad.replace("\'", "\"")
+
+                    local_ip = socket.gethostbyname(socket.gethostname())
+                    # ip_list = lanServer().get_ip_list()
                     CLIENT_PAYLOAD = {
                         "channel": "desktop_client_connected",
+                        "net_addr": local_ip,
                         "payload": pLoad
                     }
                     CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
@@ -128,13 +139,28 @@ class websocketserver():
                 elif action == 'fetch_network_users':
                     print('[+] WebSocket request: '+action)
                     print(wsRequest['list'])
-                    # Use list of groups to find other users with similar groups
+                    print('SOCKET_ID => ', wsRequest['socketID'])
+                    print('LOCAL_IP => ', wsRequest['netAddr'])
+                    # get  local ip of all users of the same Joint group
+                    for ws in connections:
+                        ws = connections[ws]['socket']
+                        # point to [web] socket
+                        if ws != websocket:
+                            WEB_PAYLOAD = {
+                                "channel": "net_scanner",
+                                "groups": wsRequest['list'],
+                                "net_addr": wsRequest['netAddr']
+                            }
+                            WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                            await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+
 
                 elif action == 'refresh_webview':
                     print('[+] Refresh webview command sent!')
                     for ws in connections:
                         ws = connections[ws]['socket']
-                        if (ws != websocket):
+                        # point to [web] socket
+                        if ws != websocket:
                             WEB_PAYLOAD = { "channel": "refresh" }
                             WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
                             await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
@@ -155,7 +181,7 @@ class websocketserver():
 
             # except websockets.exceptions.ConnectionClosedOK:
             #     print("[+] WebSocket connection closed")
-            #
+            #     continue
             #
             # except websockets.exceptions.ConnectionClosedError:
             #     print("[+] WebSocket connection error: [Expected]")
@@ -175,6 +201,7 @@ class websocketserver():
 
 
     def start(self):
+        self.stopped = False
         # The stop condition is set when receiving SIGTERM.
         # https://docs.python.org/3/library/asyncio-future.html#asyncio.Future
         self.loop = asyncio.get_event_loop()

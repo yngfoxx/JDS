@@ -9,8 +9,12 @@ import http.server
 from io import BytesIO
 from sys import platform
 from os import curdir, sep
+
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from engine.platform import domainName
+
+# https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+from netifaces import interfaces, ifaddresses, AF_INET
 
 
 PORT = 8000
@@ -106,11 +110,19 @@ class lanServer():
         self.server.server_close()
         print("[+] LAN server stopped")
 
+    def get_ip_list(self):
+        list = []
+        for ifName in interfaces():
+            addresses = [i['addr'] for i in ifaddresses(ifName).setdefault(AF_INET, [{'addr':'none'}] )]
+            # print( '%s: %s' % (ifName, ', '.join(addresses)) )
+            if addresses[0] != 'none' and addresses[0] != '127.0.0.1':
+                list.append(addresses[0])
+        return list
 
 if __name__ == "__main__":
     try:
         lanServer.start()
-    except keyboardinterrupt:
+    except Exception:
         pass
 
     sys.exit(lanServer.stop())

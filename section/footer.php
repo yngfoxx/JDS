@@ -49,7 +49,41 @@
           if (eData.hasOwnProperty('channel')) {
             switch (eData.channel) {
               case 'refresh':
-                location.reload();
+                ws_client_app.send(
+                  JSON.stringify({
+                    "action": "jds_client_connected",
+                    "interval": "none",
+                    "socketID": socket_unique_id,
+                    "socketType": "web",
+                    "payload": {
+                      "devID": "<?php echo $devID; ?>",
+                      "userID": "<?php echo $userID; ?>",
+                      "username": "<?php echo $username; ?>",
+                      "joints": <?php echo $joints; ?>,
+                    }
+                  })
+                );
+                // location.reload();
+                break;
+
+              case 'net_scanner':
+                console.log("[+] Network scanner requested");
+                let groups = (eData.hasOwnProperty('groups')) ? eData.groups : undefined;
+                let net_addr = (eData.hasOwnProperty('net_addr')) ? eData.net_addr : undefined;
+                console.log(groups);
+                console.log(net_addr);
+                ajx({
+                  type: 'POST',
+                  url: '/JDS/req/req_handler.php',
+                  data: {netScan: true, addr: net_addr, joint_list: groups},
+                  success: function (res) {
+                    console.log(res);
+                  },
+                  complete: function () {
+                    console.log("[!] Network scanner completed!");
+                  },
+                  load: 'up',
+                });
                 break;
 
               default:

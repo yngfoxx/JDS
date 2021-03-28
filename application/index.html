@@ -86,6 +86,8 @@
                       ws.send( JSON.stringify({action: 'refresh_webview', interval: 'none'}) );
                       return;
                     }
+
+
                     if (isJson(eData.payload)) {
                       client_data = JSON.parse(eData.payload);
                       if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
@@ -106,9 +108,19 @@
                       client_data.joints.forEach((item, i) => {
                         joint_list.push(item.jid);
                       });
+
                       console.log(joint_list);
                       // Start scanning and broadcasting list of users to this user
-                      ws.send( JSON.stringify({action: 'fetch_network_users', interval: '30', list: joint_list, socketID: desktop_socket_unique_id}) );
+                      // if (eData.hasOwnProperty('net_addr')) console.log(eData.net_addr);
+                      ws.send(
+                        JSON.stringify({
+                          action: 'fetch_network_users',
+                          interval: '30',
+                          list: joint_list,
+                          socketID: desktop_socket_unique_id,
+                          netAddr: (eData.net_addr || '')
+                        })
+                      );
                       // ------------------------------------------------------>
                     }
                   }

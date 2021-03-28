@@ -82,6 +82,7 @@ class auth extends stdlib
   // -------------------------------------------------------------------------->
 
 
+  // Verify user device by cookie --------------------------------------------->
   function verfUser($devID)
   {
     $dID = base64_decode($this->db->escape_string($devID));
@@ -94,5 +95,38 @@ class auth extends stdlib
     if (!$qry) return false;
     return true;
   }
+  // -------------------------------------------------------------------------->
+
+
+  // Set users local network ip address variable ------------------------------>
+  public function set_lan_addr($uID, $net_addr)
+  {
+    $uID = $this->db->escape_string($uID);
+    $nAddr = $this->db->escape_string($net_addr);
+    $sql = "
+      UPDATE authLogin SET local_net_addr = '$nAddr'
+      WHERE user_id = '$uID';
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    if (!$qry) return false;
+    return true;
+  }
+  // -------------------------------------------------------------------------->
+
+
+  // Get user local network ip address variable ------------------------------->
+  public function get_lan_addr($uID)
+  {
+    $uID = $this->db->escape_string($uID);
+    $sql = "
+      SELECT user.user_id AS 'id',
+        authLogin.local_net_addr as 'ipv4' FROM authlogin
+        INNER JOIN user ON user.user_id = authlogin.user_id
+      WHERE authLogin.user_id = '$uID';
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    return ((mysqli_num_rows($qry) == 1) ? mysqli_fetch_assoc($qry)['ipv4'] : 'none');
+  }
+  // -------------------------------------------------------------------------->
 }
  ?>
