@@ -77,7 +77,10 @@
                   url: '/JDS/req/req_handler.php',
                   data: {netScan: true, addr: net_addr, joint_list: groups},
                   success: function (res) {
-                    console.log(res);
+                    if (isJson(res)) {
+                      iplist = JSON.parse(res);
+                      console.log(iplist);
+                    }
                   },
                   complete: function () {
                     console.log("[!] Network scanner completed!");
