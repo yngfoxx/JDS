@@ -670,7 +670,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
 
     // request variables
-    $net_address = $std->db->escape_string($_POST['addr']);
+    $net_address = $std->db->escape_string(json_encode($_POST['addr']));
     $jointGroups = $_POST['joint_list'];
     $userID = $auth->getUserIdByDeviceID($_COOKIE['dKEY']);
 

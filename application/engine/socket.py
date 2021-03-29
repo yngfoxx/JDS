@@ -98,8 +98,8 @@ class websocketserver():
                     pLoad = self.payload_file.read().decode('utf-8')
                     pLoad = pLoad.replace("\'", "\"")
 
-                    local_ip = socket.gethostbyname(socket.gethostname())
-                    # ip_list = lanServer().get_ip_list()
+                    # local_ip = socket.gethostbyname(socket.gethostname())
+                    local_ip = lanServer().get_ip_list()
                     CLIENT_PAYLOAD = {
                         "channel": "desktop_client_connected",
                         "net_addr": local_ip,
@@ -121,8 +121,8 @@ class websocketserver():
                     pLoad = self.payload_file.read().decode('utf-8')
                     pLoad = pLoad.replace("\'", "\"")
 
-                    local_ip = socket.gethostbyname(socket.gethostname())
-                    # ip_list = lanServer().get_ip_list()
+                    # local_ip = socket.gethostbyname(socket.gethostname())
+                    local_ip = lanServer().get_ip_list()
                     CLIENT_PAYLOAD = {
                         "channel": "desktop_client_connected",
                         "net_addr": local_ip,
