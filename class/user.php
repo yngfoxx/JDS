@@ -15,9 +15,9 @@ class user extends stdlib
       SELECT user.user_id AS 'id',
         user.username AS 'username',
         user.email AS 'email'
-      FROM authLogin
+      FROM authlogin
       INNER JOIN user ON user.user_id = authlogin.user_id
-      WHERE authLogin.deviceKey = '$dID';
+      WHERE authlogin.deviceKey = '$dID';
     ";
     $qry = mysqli_query($this->db, $sql);
     if (mysqli_num_rows($qry) == 1) return mysqli_fetch_assoc($qry);

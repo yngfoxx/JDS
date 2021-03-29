@@ -10,6 +10,7 @@ from flaskgrab import jdsDownloader
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
+threads = []
 
 @app.errorhandler(404)
 def not_found(error):
@@ -31,13 +32,13 @@ def main():
         dest = str(request.args['dest'])
         chunk = str(request.args['chnk'])
 
-
         # Add the download request to a thread
         thread = Thread(target=jdsDownloader(nsp, jid).download, args=[url, rid, dest, chunk])
         thread.setDaemon(True)
         thread.start()
+        threads.append(thread)
 
-        for thread in threading.enumerate():
+        for thread in threads:
             print("Thread name => ",thread.name)
 
             # return make_response(jsonify({'thread_name': str(thread.name), 'started': True}), 200)

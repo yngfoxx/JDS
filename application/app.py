@@ -23,7 +23,8 @@ server_lan = server.lanServer()
 wSocket = socket.websocketserver(5678);
 
 domainObject = domainName()
-hostdomain = str(domainObject.getDomain())
+# hostdomain = str(domainObject.getDomain())
+hostdomain = "10.5.24.221"
 
 
 class JDS_CLIENT(QMainWindow):

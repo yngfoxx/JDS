@@ -55,11 +55,11 @@ class auth extends stdlib
   public function crtDeviceID($arr)
   {
     # Delete any existing device key
-    $sql = "DELETE FROM authLogin WHERE user_id = '".$arr['uid']."'";
+    $sql = "DELETE FROM authlogin WHERE user_id = '".$arr['uid']."'";
     $qry = mysqli_query($this->db, $sql);
 
     # Add new device key for automatic login
-    $sql = "INSERT INTO authLogin(user_id, deviceKey) VALUES('".$arr['uid']."', '".$arr['dk']."')";
+    $sql = "INSERT INTO authlogin(user_id, deviceKey) VALUES('".$arr['uid']."', '".$arr['dk']."')";
     $qry = mysqli_query($this->db, $sql);
 
     return $qry;
@@ -74,7 +74,7 @@ class auth extends stdlib
     $sql = "
       SELECT user.user_id AS 'id' FROM authlogin
 	     INNER JOIN user ON user.user_id = authlogin.user_id
-      WHERE authLogin.deviceKey = '$dID';
+      WHERE authlogin.deviceKey = '$dID';
     ";
     $qry = mysqli_query($this->db, $sql);
     return ((mysqli_num_rows($qry) == 1) ? mysqli_fetch_assoc($qry)['id'] : false);
@@ -87,9 +87,9 @@ class auth extends stdlib
   {
     $dID = base64_decode($this->db->escape_string($devID));
     $sql = "
-      SELECT user.user_id AS 'id', authLogin.deviceKey AS 'key' FROM authlogin
+      SELECT user.user_id AS 'id', authlogin.deviceKey AS 'key' FROM authlogin
 	     INNER JOIN user ON user.user_id = authlogin.user_id
-      WHERE authLogin.deviceKey = '$devID';
+      WHERE authlogin.deviceKey = '$devID';
     ";
     $qry = mysqli_query($this->db, $sql);
     if (!$qry) return false;
@@ -104,7 +104,7 @@ class auth extends stdlib
     $uID = $this->db->escape_string($uID);
     $nAddr = $this->db->escape_string($net_addr);
     $sql = "
-      UPDATE authLogin SET local_net_addr = '$nAddr'
+      UPDATE authlogin SET local_net_addr = '$nAddr'
       WHERE user_id = '$uID';
     ";
     $qry = mysqli_query($this->db, $sql);
@@ -120,9 +120,9 @@ class auth extends stdlib
     $uID = $this->db->escape_string($uID);
     $sql = "
       SELECT user.user_id AS 'id',
-        authLogin.local_net_addr as 'ipv4' FROM authlogin
+        authlogin.local_net_addr as 'ipv4' FROM authlogin
         INNER JOIN user ON user.user_id = authlogin.user_id
-      WHERE authLogin.user_id = '$uID';
+      WHERE authlogin.user_id = '$uID';
     ";
     $qry = mysqli_query($this->db, $sql);
     return ((mysqli_num_rows($qry) == 1) ? mysqli_fetch_assoc($qry)['ipv4'] : 'none');
