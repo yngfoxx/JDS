@@ -23,8 +23,8 @@ server_lan = server.lanServer()
 wSocket = socket.websocketserver(5678);
 
 domainObject = domainName()
-# hostdomain = str(domainObject.getDomain())
-hostdomain = "10.5.24.221"
+hostdomain = str(domainObject.getDomain())
+jds_server_domain = "10.5.24.221"
 
 
 class JDS_CLIENT(QMainWindow):
@@ -159,7 +159,7 @@ def exit_():
 
 def main():
     # USER INTERFACE ---------------------------------------------------------->
-    clientApp = JDS_CLIENT("http://"+hostdomain+"/JDS") # CLIENT APPLICATION
+    clientApp = JDS_CLIENT("http://"+jds_server_domain+"/JDS") # CLIENT APPLICATION
     clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
     # ------------------------------------------------------------------------->
 
