@@ -171,10 +171,10 @@ class websocketserver():
                                 payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
                                 try:
                                     req = requests.post(targetDomain, data=payload)
+                                    print(req.headers)
+                                    print(req.text)
                                 except Exception as e:
-                                    req.close()
-                                finally:
-                                    print(req.content)
+                                    print(e)
 
                         print("="*101)
 
