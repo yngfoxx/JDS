@@ -8,6 +8,7 @@ import socket
 import websockets
 import sys
 import tempfile
+import requests
 
 from engine.platform import domainName
 from engine.server import lanServer
@@ -158,7 +159,20 @@ class websocketserver():
                 elif action == 'scan_network_users':
                     # Use payload to scan given IP's on local network
                     print('[+] Scan users in same groups')
-                    print(wsRequest['payload'])
+                    # print(wsRequest['payload'])
+                    for req in wsRequest['payload']:
+                        print("[!]", req, "="*90)
+                        local_ip = lanServer().get_ip_list()
+
+                        for userData in wsRequest['payload'][req]:
+                            for addr in userData['user_net_addr']:
+                                print(addr)
+                                targetDomain = 'http://'+str(addr)+':8000'
+                                payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
+                                req = requests.post(targetDomain, data=payload)
+                                print(req.content)
+
+                        print("="*101)
 
 
                 elif action == 'refresh_webview':
@@ -170,6 +184,7 @@ class websocketserver():
                             WEB_PAYLOAD = { "channel": "refresh" }
                             WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
                             await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+
 
                 elif action == 'jds_client_disconnected':
                     await self.removeSocket(websocket, wsRequest['socketID'])

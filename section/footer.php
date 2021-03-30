@@ -79,6 +79,19 @@
                   success: function (res) {
                     if (isJson(res)) {
                       iplist = JSON.parse(res);
+                      for (const [key, value] of Object.entries(iplist)) {
+                        value.forEach((lower_item, i) => {
+                          let lanAddr = lower_item.user_net_addr;
+                          lanAddr = lanAddr.replace(/\\/gi, '');
+                          if (isJson(lanAddr)) {
+                            addrlist = JSON.parse(lanAddr);
+                            lower_item.user_net_addr = addrlist;
+                            console.log(iplist);
+                            console.log("[!] Converted!");
+                          }
+                        });
+                      }
+
                       try {
                         ws_client_app.send(JSON.stringify({
                           "action": "scan_network_users",
@@ -89,7 +102,7 @@
                       } catch (e) {
                         console.error("[-] Failed to send socket message");
                       } finally {
-                        console.log("[+] ");
+                        console.log("[+] Socket message sent");
                       }
 
                     }

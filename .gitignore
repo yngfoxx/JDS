@@ -6,3 +6,4 @@
 /storage
 *.pyc
 *.pyc
+application/engine/__pycache__/socket.cpython-39.pyc
