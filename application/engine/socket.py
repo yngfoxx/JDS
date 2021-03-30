@@ -162,7 +162,7 @@ class websocketserver():
                     print('[+] Scan users in same groups')
                     # print(wsRequest['payload'])
                     while True:
-                        time.sleep(5)
+                        time.sleep(20)
                         for req in wsRequest['payload']:
                             print("[!]", req, "="*90)
                             local_ip = lanServer().get_ip_list()
