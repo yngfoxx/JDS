@@ -85,10 +85,10 @@ class LocalServer(SimpleHTTPRequestHandler):
     def do_POST(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
-        # print("POST request,\nPath:", str(self.path), "\nHeaders: {", str(self.headers),"\n}\nBody: {\n", post_data.decode('utf-8'),"\n}")
+
+        print("POST request,\nPath:", str(self.path), "\nHeaders: {", str(self.headers),"\n}\nBody: {\n", post_data.decode('utf-8'),"\n}")
+
         self._set_response()
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
 
         post_data = json.loads(post_data.decode('utf-8'))
         print(post_data)
