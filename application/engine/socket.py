@@ -161,25 +161,27 @@ class websocketserver():
                     # Use payload to scan given IP's on local network
                     print('[+] Scan users in same groups')
                     # print(wsRequest['payload'])
-                    for req in wsRequest['payload']:
-                        print("[!]", req, "="*90)
-                        local_ip = lanServer().get_ip_list()
+                    while True:
+                        time.sleep(5)
+                        for req in wsRequest['payload']:
+                            print("[!]", req, "="*90)
+                            local_ip = lanServer().get_ip_list()
 
-                        for userData in wsRequest['payload'][req]:
-                            for addr in userData['user_net_addr']:
-                                targetDomain = 'http://'+str(addr)+':8000'
-                                print(targetDomain)
-                                payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
-                                time.sleep(1)
-                                try:
-                                    req = requests.post(targetDomain, data=payload)
-                                    print(req.headers)
-                                    # print(req.text)
-                                    req.close()
-                                except Exception as e:
-                                    print(e)
+                            for userData in wsRequest['payload'][req]:
+                                for addr in userData['user_net_addr']:
+                                    targetDomain = 'http://'+str(addr)+':8000'
+                                    print(targetDomain)
+                                    payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
+                                    time.sleep(1)
+                                    try:
+                                        req = requests.post(targetDomain, data=payload)
+                                        print(req.headers)
+                                        # print(req.text)
+                                        req.close()
+                                    except Exception as e:
+                                        print(e)
 
-                        print("="*101)
+                                        print("="*101)
 
 
                 elif action == 'refresh_webview':
