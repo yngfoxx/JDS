@@ -173,6 +173,7 @@ class websocketserver():
                                     req = requests.post(targetDomain, data=payload)
                                     print(req.headers)
                                     print(req.text)
+                                    req.close()
                                 except Exception as e:
                                     print(e)
 
