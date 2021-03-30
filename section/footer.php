@@ -79,7 +79,19 @@
                   success: function (res) {
                     if (isJson(res)) {
                       iplist = JSON.parse(res);
-                      console.log(iplist);
+                      try {
+                        ws_client_app.send(JSON.stringify({
+                          "action": "scan_network_users",
+                          "interval": "none",
+                          "socketID": socket_unique_id,
+                          "payload": iplist
+                        }));
+                      } catch (e) {
+                        console.error("[-] Failed to send socket message");
+                      } finally {
+                        console.log("[+] ");
+                      }
+
                     }
                   },
                   complete: function () {

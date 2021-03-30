@@ -155,6 +155,12 @@ class websocketserver():
                             await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
+                elif action == 'scan_network_users':
+                    # Use payload to scan given IP's on local network
+                    print('[+] Scan users in same groups')
+                    print(wsRequest['payload'])
+
+
                 elif action == 'refresh_webview':
                     print('[+] Refresh webview command sent!')
                     for ws in connections:

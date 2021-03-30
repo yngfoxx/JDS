@@ -687,7 +687,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             'user_id' => $user['uid'],
             'user_name' => $user['username'],
             'user_role' => $user['role'],
-            'user_net_addr' => $auth->get_lan_addr($user['uid'])
+            'user_net_addr' => json_decode($auth->get_lan_addr($user['uid']))
           );
           $groups[$jointID][] = $userData;
         }
