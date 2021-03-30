@@ -9,6 +9,7 @@ import websockets
 import sys
 import tempfile
 import requests
+import time
 
 from engine.platform import domainName
 from engine.server import lanServer
@@ -166,9 +167,10 @@ class websocketserver():
 
                         for userData in wsRequest['payload'][req]:
                             for addr in userData['user_net_addr']:
-                                print(addr)
                                 targetDomain = 'http://'+str(addr)+':8000'
+                                print(targetDomain)
                                 payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
+                                time.sleep(1)
                                 try:
                                     req = requests.post(targetDomain, data=payload)
                                     print(req.headers)
