@@ -4,6 +4,4 @@
 /app/.idea
 /application/venv
 /storage
-*.pyc
-application/engine/__pycache__/platform.cpython-39.pyc
-application/engine/__pycache__/socket.cpython-39.pyc
+/application/engine/__pycache__
