@@ -235,12 +235,15 @@ class websocketserver():
                 await asyncio.sleep(random.random() * 3)
 
 
-            # except websockets.exceptions.ConnectionClosedOK:
-            #     print("[+] WebSocket connection closed")
-            #     continue
-            #
-            # except websockets.exceptions.ConnectionClosedError:
-            #     print("[+] WebSocket connection error: [Expected]")
+            except websockets.exceptions.ConnectionClosedOK:
+                print("[+] WebSocket connection closed")
+                self.stopped = True
+                break
+
+            except websockets.exceptions.ConnectionClosedError:
+                print("[+] WebSocket connection error: [Expected]")
+                self.stopped = True
+                break
 
 
             finally:
