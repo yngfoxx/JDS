@@ -31,6 +31,7 @@ class websocketserver():
         self.port = port
         self.stopped = False
         self.payload_file = tempfile.TemporaryFile(prefix='jds_', suffix='_payload.json')
+        self.local_net_scanner = True
 
     def clients_event(self):
         return json.dumps({"type": "client", "count": len(clients)})
@@ -118,7 +119,7 @@ class websocketserver():
                 elif action == 'desktop_client_online':
                     await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
 
-                    print('[+] Desktop socket connected to socket server')
+                    print('[+] Desktop socket connected to local socket server')
                     self.payload_file.seek(0)
                     pLoad = self.payload_file.read().decode('utf-8')
                     pLoad = pLoad.replace("\'", "\"")
@@ -131,11 +132,11 @@ class websocketserver():
                         "payload": pLoad
                     }
                     CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
-                    try:
-                        await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
-                        # await asyncio.wait(websocket.send(CLIENT_PAYLOAD_JSON))
-                    except:
-                        pass
+                    # try:
+                    #     await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
+                    #     # await asyncio.wait(websocket.send(CLIENT_PAYLOAD_JSON))
+                    # except:
+                    #     pass
                     # send data back to client
 
                 elif action == 'fetch_network_users':
@@ -161,18 +162,27 @@ class websocketserver():
                     # Use payload to scan given IP's on local network
                     print('[+] Scan users in same groups')
                     # print(wsRequest['payload'])
-                    while True:
+                    attempts = 0
+                    self.local_net_scanner = True
+
+                    while self.local_net_scanner == True:
                         time.sleep(20)
+                        attempts += 1
+
                         for req in wsRequest['payload']:
                             print("[!]", req, "="*90)
                             local_ip = lanServer().get_ip_list()
 
                             for userData in wsRequest['payload'][req]:
                                 for addr in userData['user_net_addr']:
+                                    if addr == '':
+                                        print("[!] Empty address found!")
+                                        continue
+
                                     targetDomain = 'http://'+str(addr)+':8000'
                                     print(targetDomain)
                                     payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
-                                    time.sleep(1)
+                                    time.sleep(0.5)
                                     try:
                                         req = requests.post(targetDomain, data=payload)
                                         print(req.headers)
@@ -181,7 +191,23 @@ class websocketserver():
                                     except Exception as e:
                                         print(e)
 
-                                        print("="*101)
+                            print("="*101)
+
+                        # Increment net scan attempts
+                        if attempts >= 3:
+                            print("[*] Local network scanner completed!")
+                            self.local_net_scanner = False
+                            for ws in connections:
+                                ws = connections[ws]['socket']
+                                # point to [web] socket
+                                if ws != websocket:
+                                    WEB_PAYLOAD = {
+                                        "channel": "net_scanner_completed",
+                                        "payload": {"foo": "bar"}
+                                    }
+                                    WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                    await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+                            break
 
 
                 elif action == 'refresh_webview':
@@ -245,6 +271,7 @@ class websocketserver():
 
     def close(self):
         try:
+            self.local_net_scanner = False
             self.stopped = True # Stop while loop in main()
             self.futurestop.set_result(True) # Stop future loop to terminate the program
             # self.payload_file.close()

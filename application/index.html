@@ -140,6 +140,10 @@
                       downloadStat.setAttribute('data-snippet', "Service is offline");
                   break;
 
+                case 'net_scanner_completed':
+                  console.log("[*] Local network scanner completed!");
+                  break;
+
                 case desktop_socket_unique_id:
                   console.log("Unique message received!");
                   console.log(eData);

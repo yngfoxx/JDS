@@ -24,7 +24,7 @@ wSocket = socket.websocketserver(5678);
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
-jds_server_domain = "10.5.24.221"
+jds_server_domain = "081482140322.ngrok.io"
 
 
 class JDS_CLIENT(QMainWindow):

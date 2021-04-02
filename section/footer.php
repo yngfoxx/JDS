@@ -79,9 +79,14 @@
                   success: function (res) {
                     if (isJson(res)) {
                       iplist = JSON.parse(res);
+                      console.log(iplist);
                       for (const [key, value] of Object.entries(iplist)) {
                         value.forEach((lower_item, i) => {
                           let lanAddr = lower_item.user_net_addr;
+                          if (lower_item.user_net_addr == null) {
+                            lower_item.user_net_addr = '';
+                            return;
+                          }
                           lanAddr = lanAddr.replace(/\\/gi, '');
                           if (isJson(lanAddr)) {
                             addrlist = JSON.parse(lanAddr);
@@ -92,6 +97,7 @@
                         });
                       }
 
+                      if (iplist == null) { return; }
                       try {
                         ws_client_app.send(JSON.stringify({
                           "action": "scan_network_users",
@@ -392,7 +398,7 @@ $("#uprofchange").on('change', function(e) {
 
   // event listener for logout button
   $("a[title='Logout']").on('click', function(e) {
-    if (ws_client_app) {
+    if (ws_client_app != undefined && ws_client_app) {
       ws_client_app.send(
         JSON.stringify({
           "action": "jds_client_disconnected",
