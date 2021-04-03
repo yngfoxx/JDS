@@ -91,7 +91,8 @@ class LocalServer(SimpleHTTPRequestHandler):
         recvd_payload = self.rfile.read(content_length) # <--- Gets the data itself
 
         print('[POST] ', '*'*72)
-        print("[!] Headers: {\n", str(self.headers), "}")
+
+        # print("[!] Headers: {\n", str(self.headers), "}") # <--- print all headers
 
         # authentication ------------------------------------------------------>
         if content_type != 'application/json' and user_agent == 'JDS/0.0.1':
@@ -115,7 +116,7 @@ class LocalServer(SimpleHTTPRequestHandler):
         self.wfile.write(str.encode(json.dumps(rData)))
         # --------------------------------------------------------------------->
 
-        print('*'*80)
+        print('*'*80, '\n')
 
 
 class lanServer():

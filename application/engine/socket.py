@@ -195,7 +195,7 @@ class websocketserver():
                                     except Exception as e:
                                         print(e)
 
-                            print("="*101)
+                            print("="*101, '\n')
 
                         # Increment net scan attempts
                         if attempts >= 3:
