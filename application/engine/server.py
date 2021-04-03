@@ -98,16 +98,19 @@ class LocalServer(SimpleHTTPRequestHandler):
 class lanServer():
     def __init__(self):
         super().__init__()
+        
 
     def start(self):
         self.server = socketserver.TCPServer(("", PORT), LocalServer)
         print("[+] LAN server started.")
         self.server.serve_forever()
 
+
     def stop(self):
         self.server.shutdown()
         self.server.server_close()
         print("[+] LAN server stopped")
+
 
     def get_ip_list(self):
         list = []
@@ -117,6 +120,7 @@ class lanServer():
             if addresses[0] != 'none' and addresses[0] != '127.0.0.1':
                 list.append(addresses[0])
         return list
+
 
 if __name__ == "__main__":
     try:
