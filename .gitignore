@@ -4,4 +4,4 @@
 /app/.idea
 /application/venv
 /storage
-/application/engine/__pycache__
+/application/engine/__pycache__/
