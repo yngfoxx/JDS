@@ -85,8 +85,8 @@ class LocalServer(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the data
-        content_type = str(self.headers['Content-Type']) # <--- Gets the content-type of the data
-        user_agent = str(self.headers['User-Agent']) # <--- Gets the content-type of the data
+        content_type = str(self.headers['content-type']) # <--- Gets the content-type of the data
+        user_agent = str(self.headers['user-agent']) # <--- Gets the content-type of the data
 
         recvd_payload = self.rfile.read(content_length) # <--- Gets the data itself
 
