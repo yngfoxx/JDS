@@ -19,6 +19,10 @@ function ajx(obj) {
 
   let errMethod = (obj.errorMethod || undefined);
 
+  let header_accepts = (obj.accepts || undefined);
+
+  let contentType = (obj.contentType || undefined);
+
   let timeOut = (!obj.hasOwnProperty('timeOut')) ? ()=>{swal({ icon: "error", title: "Server timedout", text: "There seems to be a problem with the internet connection." });} : obj.timeOut;
 
   let timer = (obj.timer || 10000);
@@ -82,6 +86,7 @@ function ajx(obj) {
     type: type,
     url: url,
     data: data,
+    contentType: contentType,
     success: function(result) {
       if (isJson(result)) {
         let res = JSON.parse(result);

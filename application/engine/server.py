@@ -5,6 +5,7 @@ import socketserver
 import time
 import sys
 import json
+import cgi
 import http.server
 from io import BytesIO
 from sys import platform
@@ -83,22 +84,42 @@ class LocalServer(SimpleHTTPRequestHandler):
 
 
     def do_POST(self):
-        content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
-        post_data = self.rfile.read(content_length) # <--- Gets the data itself
+        content_length = int(self.headers['Content-Length']) # <--- Gets the data
+        content_type = str(self.headers['content-Type']) # <--- Gets the content-type of the data
+        recvd_payload = self.rfile.read(content_length) # <--- Gets the data itself
 
-        print("POST request,\nPath:", str(self.path), "\nHeaders: {", str(self.headers),"\n}\nBody: {\n", post_data.decode('utf-8'),"\n}")
+        print('[POST] ', '*'*72)
+        print("[!] Headers: {\n", str(self.headers), "}")
 
+        # authentication ------------------------------------------------------>
+        # if content_type != 'application/json':
+        #     self.send_response(400)
+        #     self.end_headers()
+        #     return
+
+        # print("POST request,\nPath:", str(self.path), "\nHeaders: {", str(self.headers),"\n}\nBody: {\n", recvd_payload.decode('utf-8'),"\n}")
+        # --------------------------------------------------------------------->
+
+
+        # property handling --------------------------------------------------->
+        rData = json.loads(recvd_payload.decode('utf-8'))
+        rData['received'] = 'ok'
+        # --------------------------------------------------------------------->
+
+
+        # Return message ------------------------------------------------------>
         self._set_response()
+        print(json.dumps(rData))
+        self.wfile.write(str.encode(json.dumps(rData)))
+        # --------------------------------------------------------------------->
 
-        post_data = post_data.decode('utf-8')
-        print(post_data)
-
+        print('*'*80)
 
 
 class lanServer():
     def __init__(self):
         super().__init__()
-        
+
 
     def start(self):
         self.server = socketserver.TCPServer(("", PORT), LocalServer)

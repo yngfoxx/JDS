@@ -182,11 +182,15 @@ class websocketserver():
                                     targetDomain = 'http://'+str(addr)+':8000'
                                     print(targetDomain)
                                     payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
+                                    cHeaders = {
+                                        'user-agent': 'JDS/0.0.1',
+                                        'content-type': 'application/json'
+                                    }
                                     time.sleep(0.5)
                                     try:
-                                        req = requests.post(targetDomain, data=payload)
-                                        print(req.headers)
-                                        # print(req.text)
+                                        req = requests.post(targetDomain, data=json.dumps(payload), headers=cHeaders)
+                                        # print(req.headers)
+                                        print(req.text)
                                         req.close()
                                     except Exception as e:
                                         print(e)
