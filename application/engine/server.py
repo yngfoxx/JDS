@@ -85,17 +85,19 @@ class LocalServer(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the data
-        content_type = str(self.headers['content-Type']) # <--- Gets the content-type of the data
+        content_type = str(self.headers['Content-Type']) # <--- Gets the content-type of the data
+        user_agent = str(self.headers['User-Agent']) # <--- Gets the content-type of the data
+
         recvd_payload = self.rfile.read(content_length) # <--- Gets the data itself
 
         print('[POST] ', '*'*72)
         print("[!] Headers: {\n", str(self.headers), "}")
 
         # authentication ------------------------------------------------------>
-        # if content_type != 'application/json':
-        #     self.send_response(400)
-        #     self.end_headers()
-        #     return
+        if content_type != 'application/json' and user_agent == 'JDS/0.0.1':
+            self.send_response(400)
+            self.end_headers()
+            return
 
         # print("POST request,\nPath:", str(self.path), "\nHeaders: {", str(self.headers),"\n}\nBody: {\n", recvd_payload.decode('utf-8'),"\n}")
         # --------------------------------------------------------------------->

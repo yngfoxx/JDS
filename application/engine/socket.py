@@ -183,8 +183,8 @@ class websocketserver():
                                     print(targetDomain)
                                     payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
                                     cHeaders = {
-                                        'user-agent': 'JDS/0.0.1',
-                                        'content-type': 'application/json'
+                                        'User-Agent': 'JDS/0.0.1',
+                                        'Content-Type': 'application/json'
                                     }
                                     time.sleep(0.5)
                                     try:
