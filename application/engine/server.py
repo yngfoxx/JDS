@@ -90,11 +90,8 @@ class LocalServer(SimpleHTTPRequestHandler):
 
         self._set_response()
 
-        post_data = json.loads(post_data.decode('utf-8'))
+        post_data = post_data.decode('utf-8')
         print(post_data)
-        # Handle request before returning response
-        if post_data['event'] == 'sonar':
-            self.wfile.write(b"POST request for LAN sonar recieved!")
 
 
 
