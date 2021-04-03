@@ -27,6 +27,7 @@ hostdomain = str(domainObject.getDomain())
 jds_server_domain = "5783ef30b0ae.ngrok.io"
 
 
+
 class JDS_CLIENT(QMainWindow):
     def __init__(self, url):
         super().__init__()
