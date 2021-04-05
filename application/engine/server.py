@@ -116,13 +116,19 @@ class LocalServer(SimpleHTTPRequestHandler):
                     'origin': rData['net_addr'],
                     'origin_joint': rData['joint']
                 }
-                
-                uconfigFile = open("u_config_path.txt", "r")
-                user_config_path = uconfigFile.read()
 
-                if user_config_path != '':
-                    print('[!] uconfig_path: ', user_config_path)
-                    print('[!] handshake: ', json.dumps(response))
+                try:
+                    # Get uconfig payload in u_config file
+                    uconfigFile = open("u_config.txt", 'r')
+                    uconfigData = uconfigFile.read()
+                    uconfigFile.close()
+
+                except Exception as e:
+                    print('[!] Ran into a problem while handling \"u_config.txt\"')
+
+                if uconfigData != '':
+                    print('[!] uconfig_content: ', uconfigData)
+                    print('[!] payload: ', json.dumps(response))
                     # response['handshake']
                 else:
                     print('[!] user_config_path is empty: ', user_config_path)
@@ -155,11 +161,11 @@ class lanServer():
         print("[+] LAN server stopped")
 
 
-    def set_uconfig_path(self, path):
-        self.uconfig = open('u_config_path.txt', 'w')
-        self.uconfig.write(path)
+    def set_uconfig(self, payload):
+        self.uconfig = open('u_config.txt', 'w')
+        self.uconfig.write(payload)
         self.uconfig.close()
-        print("[+] LAN recvd payload: ", path)
+        print("[+] LAN recvd payload: ", payload)
 
 
     def get_ip_list(self):

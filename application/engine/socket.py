@@ -31,7 +31,6 @@ class websocketserver():
         self.port = port
         self.stopped = False
         self.payload_file = tempfile.NamedTemporaryFile(prefix='jds_', suffix='_payload.json')
-        lanServer().set_uconfig_path(self.payload_file.name)
         self.local_net_scanner = True
 
 
@@ -102,6 +101,7 @@ class websocketserver():
                     self.payload_file.seek(0)
                     pLoad = self.payload_file.read().decode('utf-8')
                     pLoad = pLoad.replace("\'", "\"")
+                    lanServer().set_uconfig(pLoad)
 
                     # local_ip = socket.gethostbyname(socket.gethostname())
                     local_ip = lanServer().get_ip_list()
@@ -164,7 +164,6 @@ class websocketserver():
 
                 elif action == 'scan_network_users':
                     # Use payload to scan given IP's on local network
-                    print('[+] Scan users in same groups')
                     # print(wsRequest['payload'])
                     attempts = 0
                     self.local_net_scanner = True
@@ -172,6 +171,7 @@ class websocketserver():
                     while self.local_net_scanner == True:
                         time.sleep(20)
                         attempts += 1
+                        print('[+] SCANNING JOINT USERS ON NETWORK (', attempts, '/ 3 )\n')
 
                         for req in wsRequest['payload']:
                             print("[!] SENDING POST", req, "="*90)
@@ -184,7 +184,7 @@ class websocketserver():
                                         continue
 
                                     targetDomain = 'http://'+str(addr)+':8000'
-                                    print(targetDomain)
+                                    print('TARGET => ', targetDomain)
                                     payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
                                     cHeaders = {
                                         'user-agent': 'JDS/0.0.1',
@@ -193,8 +193,8 @@ class websocketserver():
                                     time.sleep(0.5)
                                     try:
                                         req = requests.post(targetDomain, data=json.dumps(payload), headers=cHeaders)
-                                        # print(req.headers)
-                                        print(req.text)
+                                        if req.status_code == 200:
+                                            print('RESPONSE => ', req.text)
                                         req.close()
                                     except Exception as e:
                                         print(e)
