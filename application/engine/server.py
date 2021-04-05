@@ -116,6 +116,10 @@ class LocalServer(SimpleHTTPRequestHandler):
                     'origin': rData['net_addr'],
                     'origin_joint': rData['joint']
                 }
+                
+                uconfigFile = open("u_config_path.txt", "r")
+                user_config_path = uconfigFile.read()
+
                 if user_config_path != '':
                     print('[!] uconfig_path: ', user_config_path)
                     print('[!] handshake: ', json.dumps(response))
@@ -154,6 +158,7 @@ class lanServer():
     def set_uconfig_path(self, path):
         self.uconfig = open('u_config_path.txt', 'w')
         self.uconfig.write(path)
+        self.uconfig.close()
         print("[+] LAN recvd payload: ", path)
 
 

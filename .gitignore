@@ -5,3 +5,4 @@
 /application/venv
 /storage
 /application/engine/__pycache__/
+/application/u_config_path.txt
