@@ -113,7 +113,7 @@ class LocalServer(SimpleHTTPRequestHandler):
             print(rData)
             if rData['event'] == 'sonar':
                 response = {
-                    'origin': rData['origin'], # belongs to request origin
+                    'origin_addr': rData['origin'], # belongs to request origin
                     'origin_joint': rData['joint'] # belongs to request origin
                 }
 
@@ -129,8 +129,8 @@ class LocalServer(SimpleHTTPRequestHandler):
 
                 if uconfigData != '':
                     print('[!] uconfig_content: ', uconfigData)
-                    response['uid'] = uconfigData['userID'] # belongs to host
-                    response['uname'] = uconfigData['username'] # belongs to host
+                    response['host_uid'] = uconfigData['userID'] # belongs to host
+                    response['host_uname'] = uconfigData['username'] # belongs to host
                     joints = json.loads(str(uconfigData['joints']).replace("\'", "\""))
                     for jnt in joints:
                         if jnt['jid'] == response['origin_joint']:
