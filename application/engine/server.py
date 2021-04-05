@@ -120,14 +120,16 @@ class LocalServer(SimpleHTTPRequestHandler):
                 try:
                     # Get uconfig payload in u_config file
                     uconfigFile = open("u_config.txt", 'r')
-                    uconfigData = uconfigFile.read()
+                    uconfigData = json.loads(uconfigFile.read())
                     uconfigFile.close()
-
                 except Exception as e:
                     print('[!] Ran into a problem while handling \"u_config.txt\"')
+                    self._set_response()
+                    self.wfile.write(str.encode('[!] Ran into a problem while handling \"u_config.txt\"'))
 
                 if uconfigData != '':
                     print('[!] uconfig_content: ', uconfigData)
+
                     print('[!] payload: ', json.dumps(response))
                     # response['handshake']
                 else:

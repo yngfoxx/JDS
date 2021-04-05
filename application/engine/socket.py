@@ -101,6 +101,8 @@ class websocketserver():
                     self.payload_file.seek(0)
                     pLoad = self.payload_file.read().decode('utf-8')
                     pLoad = pLoad.replace("\'", "\"")
+
+                    # Store uconfig in lan server -----------------------------
                     lanServer().set_uconfig(pLoad)
 
                     # local_ip = socket.gethostbyname(socket.gethostname())
@@ -108,8 +110,7 @@ class websocketserver():
                     CLIENT_PAYLOAD = {
                         "channel": "desktop_client_connected",
                         "net_addr": local_ip,
-                        "payload": pLoad,
-                        "uconfig": str(self.payload_file.name)
+                        "payload": pLoad
                     }
                     CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
                     try:
@@ -132,8 +133,7 @@ class websocketserver():
                     CLIENT_PAYLOAD = {
                         "channel": "desktop_client_connected",
                         "net_addr": local_ip,
-                        "payload": pLoad,
-                        "uconfig": str(self.payload_file.name)
+                        "payload": pLoad
                     }
                     CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
                     # try:
@@ -197,7 +197,8 @@ class websocketserver():
                                             print('RESPONSE => ', req.text)
                                         req.close()
                                     except Exception as e:
-                                        print(e)
+                                        # print(e)
+                                        print('[-] Request from ',targetDomain,'responded unexpectedly')
 
                             print("="*114, '\n')
 
