@@ -152,8 +152,8 @@ class lanServer():
 
 
     def set_uconfig_path(self, path):
-        self.uconfig_path = path
-        user_config_path = path
+        self.uconfig = open('u_config_path.txt', 'w')
+        self.uconfig.write(path)
         print("[+] LAN recvd payload: ", path)
 
 

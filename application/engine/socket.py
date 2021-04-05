@@ -31,10 +31,8 @@ class websocketserver():
         self.port = port
         self.stopped = False
         self.payload_file = tempfile.NamedTemporaryFile(prefix='jds_', suffix='_payload.json')
-        self.local_net_scanner = True
-        # save payload in lan connection ---------------------->
         lanServer().set_uconfig_path(self.payload_file.name)
-        # ----------------------------------------------------->
+        self.local_net_scanner = True
 
 
     def clients_event(self):
@@ -110,7 +108,8 @@ class websocketserver():
                     CLIENT_PAYLOAD = {
                         "channel": "desktop_client_connected",
                         "net_addr": local_ip,
-                        "payload": pLoad
+                        "payload": pLoad,
+                        "uconfig": str(self.payload_file.name)
                     }
                     CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
                     try:
@@ -133,7 +132,8 @@ class websocketserver():
                     CLIENT_PAYLOAD = {
                         "channel": "desktop_client_connected",
                         "net_addr": local_ip,
-                        "payload": pLoad
+                        "payload": pLoad,
+                        "uconfig": str(self.payload_file.name)
                     }
                     CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
                     # try:
