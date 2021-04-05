@@ -110,6 +110,7 @@ class LocalServer(SimpleHTTPRequestHandler):
         rData['received'] = 'ok'
         if 'event' in rData:
             print('[!] event is in rData')
+            print(rData)
             if rData['event'] == 'sonar':
                 response = {
                     'origin': rData['net_addr'],
@@ -153,7 +154,7 @@ class lanServer():
     def set_uconfig_path(self, path):
         self.uconfig_path = path
         user_config_path = path
-        print("[+] Payload stored in lan server!")
+        print("[+] LAN recvd payload: ", path)
 
 
     def get_ip_list(self):

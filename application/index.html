@@ -196,20 +196,20 @@
         };
 
       // Testing POST request
-      (() => {
-        let parm = '{ "event": "sonar", "type": "lan" }';
-        // let parm = { "event": "sonar", "type": "lan" };
-        ajx({
-          type: 'POST',
-          url: '/',
-          contentType: 'application/json',
-          data: parm,
-          success: (response) => { console.log(response); },
-          complete: () => { console.log("Ajax done!"); },
-          errorMethod: () => { console.error("Ajax error!"); },
-          load: 'up'
-        });
-      })();
+      // (() => {
+      //   let parm = '{ "event": "sonar", "type": "lan" }';
+      //   // let parm = { "event": "sonar", "type": "lan" };
+      //   ajx({
+      //     type: 'POST',
+      //     url: '/',
+      //     contentType: 'application/json',
+      //     data: parm,
+      //     success: (response) => { console.log(response); },
+      //     complete: () => { console.log("Ajax done!"); },
+      //     errorMethod: () => { console.error("Ajax error!"); },
+      //     load: 'up'
+      //   });
+      // })();
     </script>
   </body>
 </html>

@@ -32,6 +32,10 @@ class websocketserver():
         self.stopped = False
         self.payload_file = tempfile.NamedTemporaryFile(prefix='jds_', suffix='_payload.json')
         self.local_net_scanner = True
+        # save payload in lan connection ---------------------->
+        lanServer().set_uconfig_path(self.payload_file.name)
+        # ----------------------------------------------------->
+
 
     def clients_event(self):
         return json.dumps({"type": "client", "count": len(clients)})
@@ -96,10 +100,6 @@ class websocketserver():
                     payload = str(wsRequest['payload'])
                     self.payload_file.write(str.encode(payload))
                     print("[+] Payload stored in temp file!")
-
-                    # save payload in lan connection ---------------------->
-                    lanServer().set_uconfig_path(self.payload_file.name)
-                    # ----------------------------------------------------->
 
                     self.payload_file.seek(0)
                     pLoad = self.payload_file.read().decode('utf-8')
