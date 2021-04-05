@@ -173,19 +173,23 @@ class websocketserver():
                         attempts += 1
                         print('[+] SCANNING JOINT USERS ON NETWORK (', attempts, '/ 3 )\n')
 
-                        for req in wsRequest['payload']:
-                            print("[!] SENDING POST", req, "="*90)
+                        for jointGrp in wsRequest['payload']:
+                            print("[!] SENDING POST", jointGrp, "="*90)
                             local_ip = lanServer().get_ip_list()
 
-                            for userData in wsRequest['payload'][req]:
+                            for userData in wsRequest['payload'][jointGrp]:
                                 for addr in userData['user_net_addr']:
                                     if addr == '':
-                                        print("[!] Empty address found!")
+                                        print("[!] ERROR: empty address found!")
                                         continue
 
                                     targetDomain = 'http://'+str(addr)+':8000'
                                     print('TARGET => ', targetDomain)
-                                    payload = { 'event': 'sonar', 'joint': req, 'net_addr': local_ip }
+                                    payload = {
+                                        'event': 'sonar',
+                                        'joint': jointGrp,
+                                        'origin': local_ip
+                                    }
                                     cHeaders = {
                                         'user-agent': 'JDS/0.0.1',
                                         'content-type': 'application/json'
