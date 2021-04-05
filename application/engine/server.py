@@ -147,7 +147,7 @@ class lanServer():
         print("[+] LAN server stopped")
 
 
-    def set_uconfig_path(path):
+    def set_uconfig_path(self, path):
         self.uconfig_path = path
         user_config_path = path
         print("[+] Payload stored in lan server!")
