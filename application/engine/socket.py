@@ -177,6 +177,10 @@ class websocketserver():
                             print("[!] SENDING POST", jointGrp, "="*90)
                             local_ip = lanServer().get_ip_list()
 
+                            uconfigFile = open("u_config.txt", 'r')
+                            uconfigData = json.loads(uconfigFile.read())
+                            uconfigFile.close()
+
                             for userData in wsRequest['payload'][jointGrp]:
                                 for addr in userData['user_net_addr']:
                                     if addr == '':
@@ -185,16 +189,20 @@ class websocketserver():
 
                                     targetDomain = 'http://'+str(addr)+':8000'
                                     print('TARGET => ', targetDomain)
-                                    payload = {
-                                        'event': 'sonar',
-                                        'joint': jointGrp,
-                                        'origin': local_ip
-                                    }
-                                    cHeaders = {
-                                        'user-agent': 'JDS/0.0.1',
-                                        'content-type': 'application/json'
-                                    }
+
+                                    payload = { 'event': 'sonar', 'origin_joint': jointGrp, 'origin_addr': local_ip }
+                                    payload['origin_uid'] = uconfigData['userID'] # belongs to host
+                                    payload['origin_uname'] = uconfigData['username'] # belongs to host
+
+                                    origin_joints = json.loads(str(uconfigData['joints']).replace("\'", "\""))
+                                    for jnt in origin_joints:
+                                        if jnt['jid'] == payload['origin_joint']:
+                                            payload['joint_role'] = jnt['role']
+                                            break
+
+                                    cHeaders = { 'user-agent': 'JDS/0.0.1', 'content-type': 'application/json' }
                                     time.sleep(0.5)
+
                                     try:
                                         req = requests.post(targetDomain, data=json.dumps(payload), headers=cHeaders)
                                         if req.status_code == 200:

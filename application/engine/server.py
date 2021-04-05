@@ -113,8 +113,8 @@ class LocalServer(SimpleHTTPRequestHandler):
             print(rData)
             if rData['event'] == 'sonar':
                 response = {
-                    'origin_addr': rData['origin'], # belongs to request origin
-                    'origin_joint': rData['joint'] # belongs to request origin
+                    'origin_addr': rData['origin_addr'], # belongs to request origin
+                    'origin_joint': rData['origin_joint'] # belongs to request origin
                 }
 
                 try:
