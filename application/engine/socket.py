@@ -99,7 +99,6 @@ class websocketserver():
 
                     # save payload in lan connection ---------------------->
                     lanServer().set_uconfig_path(self.payload_file.name)
-                    print("[+] Payload sent to lan server!")
                     # ----------------------------------------------------->
 
                     self.payload_file.seek(0)

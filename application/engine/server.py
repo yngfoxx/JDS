@@ -109,6 +109,7 @@ class LocalServer(SimpleHTTPRequestHandler):
         rData = json.loads(recvd_payload.decode('utf-8'))
         rData['received'] = 'ok'
         if 'event' in rData:
+            print('[!] event is in rData')
             if rData['event'] == 'sonar':
                 response = {
                     'origin': rData['net_addr'],
@@ -118,6 +119,8 @@ class LocalServer(SimpleHTTPRequestHandler):
                     print('[!] uconfig_path: ', user_config_path)
                     print('[!] handshake: ', json.dumps(response))
                     # response['handshake']
+                else:
+                    print('[!] user_config_path is empty: ', user_config_path)
         # --------------------------------------------------------------------->
 
 
