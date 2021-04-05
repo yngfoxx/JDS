@@ -141,8 +141,26 @@ select {
   	background-color: var(--sec-col);
   	color: white;
   	border-radius: 6px;
+    display: flex;
     h3 {
-    	margin: auto;
+      margin: auto;
+      margin-left: 0;
+    }
+    .tnvbr_btns {
+      margin: auto;
+      margin-right: 0;
+      .tnvbrb-button {
+        background-color: var(--dark-gray);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 3px 13px;
+        transition: .3s;
+        &:hover {
+          cursor: pointer;
+          background-color: var(--light-gray-v2);
+        }
+      }
     }
   }
   ._bdyMain {

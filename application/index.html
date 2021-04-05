@@ -34,6 +34,9 @@
       <!-- Network -->
       <div class="tnvbr">
         <h3>Network</h3>
+        <div class="tnvbr_btns">
+          <a class="tnvbrb-button" data-btn="net_recon">Scan</a>
+        </div>
       </div>
       <div class="_bdyMain">
         <div class="_bdyContent">
@@ -56,6 +59,8 @@
     <script type="text/javascript" src="/lib/js/ajx.js"></script>
     <script type="text/javascript">
     let client_data = null;
+    let client_net_addr = null;
+    let recon_cool_down = false;
     let desktop_socket_unique_id = genKey(6);
     let ws = new WebSocket("ws://127.0.0.1:5678/");
         ws.onopen = function () { // Request local area network hosts
@@ -112,15 +117,49 @@
                       console.log(joint_list);
                       // Start scanning and broadcasting list of users to this user
                       // if (eData.hasOwnProperty('net_addr')) console.log(eData.net_addr);
+                      client_net_addr = (eData.net_addr || []);
                       ws.send(
                         JSON.stringify({
                           action: 'fetch_network_users',
                           interval: '30',
                           list: joint_list,
                           socketID: desktop_socket_unique_id,
-                          netAddr: (eData.net_addr || [])
+                          netAddr: client_net_addr
                         })
                       );
+
+                      // create button click event listener
+                      let scan_btn = document.querySelectorAll("[data-btn='net_recon']");
+                      scan_btn.forEach((item, i) => {
+                        item.addEventListener('click', () => {
+                          if (recon_cool_down == true) {
+                            alert("Scanner is cooling down!");
+                            return;
+                          }
+                          recon_cool_down = true;
+                          console.log("[!] Scanning network for users...");
+
+                          let networkMsg = document.getElementsByClassName('_aMsg')[0];
+                          networkMsg.style.color = 'var(--light-gray-v2)';
+                          networkMsg.setAttribute('data-snippet', "Searching local network for users");
+
+                          ws.send(
+                            JSON.stringify({
+                              action: 'fetch_network_users',
+                              interval: '30',
+                              list: joint_list,
+                              socketID: desktop_socket_unique_id,
+                              netAddr: client_net_addr
+                            })
+                          );
+
+                          // turn off cooldown after 10 seconds
+                          setTimeout(() => {
+                            recon_cool_down = false;
+                          }, 10000);
+
+                        });
+                      });
                       // ------------------------------------------------------>
                     }
                   }

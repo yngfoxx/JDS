@@ -21,6 +21,7 @@ from netifaces import interfaces, ifaddresses, AF_INET
 PORT = 8000
 domainObject = domainName()
 hostName = str(domainObject.getDomain())
+user_config_path = ''
 
 # 79 6f 75 6e 67 | 66 6f 78
 # 76766 - 65535 (MAX) = 11231
@@ -90,7 +91,7 @@ class LocalServer(SimpleHTTPRequestHandler):
 
         recvd_payload = self.rfile.read(content_length) # <--- Gets the data itself
 
-        print('[POST] ', '*'*72)
+        print('[POST RECEIVED] ', '*'*72)
 
         # print("[!] Headers: {\n", str(self.headers), "}") # <--- print all headers
 
@@ -107,16 +108,26 @@ class LocalServer(SimpleHTTPRequestHandler):
         # property handling --------------------------------------------------->
         rData = json.loads(recvd_payload.decode('utf-8'))
         rData['received'] = 'ok'
+        if 'event' in rData:
+            if rData['event'] == 'sonar':
+                response = {
+                    'origin': rData['net_addr'],
+                    'origin_joint': rData['joint']
+                }
+                if user_config_path != '':
+                    print('[!] uconfig_path: ', user_config_path)
+                    print('[!] handshake: ', json.dumps(response))
+                    # response['handshake']
         # --------------------------------------------------------------------->
 
 
         # Return message ------------------------------------------------------>
         self._set_response()
-        print(json.dumps(rData))
+        print('payload =>',json.dumps(rData))
         self.wfile.write(str.encode(json.dumps(rData)))
         # --------------------------------------------------------------------->
 
-        print('*'*80, '\n')
+        print('*'*89, '\n')
 
 
 class lanServer():
@@ -134,6 +145,12 @@ class lanServer():
         self.server.shutdown()
         self.server.server_close()
         print("[+] LAN server stopped")
+
+
+    def set_uconfig_path(path):
+        self.uconfig_path = path
+        user_config_path = path
+        print("[+] Payload stored in lan server!")
 
 
     def get_ip_list(self):

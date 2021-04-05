@@ -30,7 +30,7 @@ class websocketserver():
         super().__init__()
         self.port = port
         self.stopped = False
-        self.payload_file = tempfile.TemporaryFile(prefix='jds_', suffix='_payload.json')
+        self.payload_file = tempfile.NamedTemporaryFile(prefix='jds_', suffix='_payload.json')
         self.local_net_scanner = True
 
     def clients_event(self):
@@ -95,7 +95,12 @@ class websocketserver():
                     # save payload in temporary file -------------------------->
                     payload = str(wsRequest['payload'])
                     self.payload_file.write(str.encode(payload))
-                    print("[+] Payload stored!")
+                    print("[+] Payload stored in temp file!")
+
+                    # save payload in lan connection ---------------------->
+                    lanServer().set_uconfig_path(self.payload_file.name)
+                    print("[+] Payload sent to lan server!")
+                    # ----------------------------------------------------->
 
                     self.payload_file.seek(0)
                     pLoad = self.payload_file.read().decode('utf-8')
@@ -170,7 +175,7 @@ class websocketserver():
                         attempts += 1
 
                         for req in wsRequest['payload']:
-                            print("[!]", req, "="*90)
+                            print("[!] SENDING POST", req, "="*90)
                             local_ip = lanServer().get_ip_list()
 
                             for userData in wsRequest['payload'][req]:
@@ -195,7 +200,7 @@ class websocketserver():
                                     except Exception as e:
                                         print(e)
 
-                            print("="*101, '\n')
+                            print("="*114, '\n')
 
                         # Increment net scan attempts
                         if attempts >= 3:
