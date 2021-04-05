@@ -113,8 +113,8 @@ class LocalServer(SimpleHTTPRequestHandler):
             print(rData)
             if rData['event'] == 'sonar':
                 response = {
-                    'origin': rData['origin'],
-                    'origin_joint': rData['joint']
+                    'origin': rData['origin'], # belongs to request origin
+                    'origin_joint': rData['joint'] # belongs to request origin
                 }
 
                 try:
@@ -129,11 +129,15 @@ class LocalServer(SimpleHTTPRequestHandler):
 
                 if uconfigData != '':
                     print('[!] uconfig_content: ', uconfigData)
-                    response['uid'] = uconfigData['userID']
-                    response['uname'] = uconfigData['username']
-
-                    for jnt in uconfigData['joints']:
-                        print(uconfigData['joints'][jnt])
+                    response['uid'] = uconfigData['userID'] # belongs to host
+                    response['uname'] = uconfigData['username'] # belongs to host
+                    joints = json.loads(str(uconfigData['joints']).replace("\'", "\""))
+                    for jnt in joints:
+                        if jnt['jid'] == response['origin_joint']:
+                            response['host_joint'] = {
+                                'jid': jnt['jid'],
+                                'role': jnt['role']
+                            }
 
                     print('[!] payload: ', json.dumps(response))
                     # response['handshake']
@@ -144,8 +148,8 @@ class LocalServer(SimpleHTTPRequestHandler):
 
         # Return message ------------------------------------------------------>
         self._set_response()
-        print('payload =>',json.dumps(rData))
-        self.wfile.write(str.encode(json.dumps(rData)))
+        print('[+] POST response payload =>',json.dumps(response))
+        self.wfile.write(str.encode(json.dumps(response)))
         # --------------------------------------------------------------------->
 
         print('*'*89, '\n')
