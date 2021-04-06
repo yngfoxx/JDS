@@ -188,7 +188,7 @@ class websocketserver():
                                         continue
 
                                     targetDomain = 'http://'+str(addr)+':8000'
-                                    print('TARGET => ', targetDomain)
+                                    print('[!] TARGET => ', targetDomain)
 
                                     payload = { 'event': 'sonar', 'origin_joint': jointGrp, 'origin_addr': local_ip }
                                     payload['origin_uid'] = uconfigData['userID'] # belongs to host
@@ -203,14 +203,30 @@ class websocketserver():
                                     cHeaders = { 'user-agent': 'JDS/0.0.1', 'content-type': 'application/json' }
                                     time.sleep(0.5)
 
+                                    # Begin LAN handshake ----------------------------------------------------------->
+                                    response = None
                                     try:
                                         req = requests.post(targetDomain, data=json.dumps(payload), headers=cHeaders)
                                         if req.status_code == 200:
-                                            print('RESPONSE => ', req.text)
+                                            response = json.loads(req.text)
+                                            print('[!] RESPONSE => ', response)
                                         req.close()
                                     except Exception as e:
                                         # print(e)
                                         print('[-] Request from ',targetDomain,'responded unexpectedly')
+
+                                    if response != None:
+                                        for ws in connections:
+                                            ws = connections[ws]['socket']
+                                            # point to [web] socket
+                                            if ws != websocket:
+                                                WEB_PAYLOAD = {
+                                                    "channel": "net_user_discovered",
+                                                    "payload": response
+                                                }
+                                                WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+                                    # ------------------------------------------------------------------------------->
 
                             print("="*114, '\n')
 

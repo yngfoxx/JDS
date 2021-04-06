@@ -112,13 +112,18 @@ class LocalServer(SimpleHTTPRequestHandler):
             print('[!] event is in rData')
             print(rData)
             if rData['event'] == 'sonar':
+                # ---
+                # the only purpose of this handshake is to respond and
+                # authenticate requests
+                # ---
+
                 response = {
                     'origin_addr': rData['origin_addr'], # belongs to request origin
                     'origin_joint': rData['origin_joint'] # belongs to request origin
                 }
 
                 try:
-                    # Get uconfig payload in u_config file
+                    # Get user configuration payload/data in u_config.txt file
                     uconfigFile = open("u_config.txt", 'r')
                     uconfigData = json.loads(uconfigFile.read())
                     uconfigFile.close()
@@ -127,6 +132,7 @@ class LocalServer(SimpleHTTPRequestHandler):
                     self._set_response()
                     self.wfile.write(str.encode('[!] Ran into a problem while handling \"u_config.txt\"'))
 
+                # Filter the uconfig data for the important variables needed
                 if uconfigData != '':
                     print('[!] uconfig_content: ', uconfigData)
                     response['host_uid'] = uconfigData['userID'] # belongs to host
@@ -140,13 +146,10 @@ class LocalServer(SimpleHTTPRequestHandler):
                             }
 
                     print('[!] payload: ', json.dumps(response))
-                    # response['handshake']
                 else:
                     print('[!] user_config_path is empty: ', user_config_path)
-        # --------------------------------------------------------------------->
 
-
-        # Return message ------------------------------------------------------>
+        # Return the response ---
         self._set_response()
         print('[+] POST response payload =>',json.dumps(response))
         self.wfile.write(str.encode(json.dumps(response)))

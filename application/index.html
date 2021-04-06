@@ -185,6 +185,12 @@
 
                 case 'net_scanner_completed':
                   console.log("[*] Local network scanner completed!");
+                  // restart timer 20 seconds later
+                  break;
+
+                case 'net_user_discovered':
+                  console.log("[*] User of same group discovered!");
+                  console.log(eData.payload);
                   break;
 
                 case desktop_socket_unique_id:
