@@ -192,7 +192,7 @@
                 case 'net_user_discovered':
                   console.log("[*] User of same group discovered!");
                   console.log(eData.payload);
-                  let pload = eData.payload;
+                  let pLoad = eData.payload;
                   if (!pLoad.hasOwnProperty('host_joint')) break;
                   nlID = toString(pLoad['host_uid']) + '/' + toString(pLoad['host_net_addr'][0]);
                   if (!netList.hasOwnProperty(nlID)) {
