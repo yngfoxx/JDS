@@ -194,11 +194,12 @@
                   console.log(eData.payload);
                   let pLoad = eData.payload;
                   if (!pLoad.hasOwnProperty('host_joint')) break;
-                  nlID = toString(pLoad['host_uid']) + '/' + toString(pLoad['host_net_addr'][0]);
+                  // nlID = pLoad['host_uid'] + '/' + pLoad['host_net_addr'][0];
+                  nlID = 'UUID_'+pLoad['host_uid'];
                   if (!netList.hasOwnProperty(nlID)) {
                     netList[nlID] = {
                       'userID': pLoad['host_uid'],
-                      'userName': pLoad['host_username'],
+                      'userName': pLoad['host_uname'],
                       'joints': [{jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role']}],
                       'netAddr': pLoad['host_net_addr']
                     };
