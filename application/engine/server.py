@@ -137,6 +137,7 @@ class LocalServer(SimpleHTTPRequestHandler):
                     print('[!] uconfig_content: ', uconfigData)
                     response['host_uid'] = uconfigData['userID'] # belongs to host
                     response['host_uname'] = uconfigData['username'] # belongs to host
+                    response['host_net_addr'] = lanServer().get_ip_list()
                     joints = json.loads(str(uconfigData['joints']).replace("\'", "\""))
                     for jnt in joints:
                         if jnt['jid'] == response['origin_joint']:

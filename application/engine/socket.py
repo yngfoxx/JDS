@@ -277,10 +277,12 @@ class websocketserver():
             #     self.stopped = True
             #     break
             #
-            # except websockets.exceptions.ConnectionClosedError:
-            #     print("[+] WebSocket connection error: [Expected]")
-            #     self.stopped = True
-            #     break
+            except websockets.exceptions.ConnectionClosedError:
+                print("[+] WebSocket connection error: [Expected]")
+                self.stopped = True
+                # Restart socket server
+                self.start()
+                break
 
 
             finally:

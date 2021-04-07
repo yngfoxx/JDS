@@ -62,6 +62,7 @@
     let client_net_addr = null;
     let recon_cool_down = false;
     let desktop_socket_unique_id = genKey(6);
+    let netList = {};
     let ws = new WebSocket("ws://127.0.0.1:5678/");
         ws.onopen = function () { // Request local area network hosts
           // https://websocket-client.readthedocs.io/en/latest/examples.html
@@ -191,6 +192,23 @@
                 case 'net_user_discovered':
                   console.log("[*] User of same group discovered!");
                   console.log(eData.payload);
+                  let pload = eData.payload;
+                  if (!pLoad.hasOwnProperty('host_joint')) break;
+                  nlID = toString(pLoad['host_uid']) + '/' + toString(pLoad['host_net_addr'][0]);
+                  if (!netList.hasOwnProperty(nlID)) {
+                    netList[nlID] = {
+                      'userID': pLoad['host_uid'],
+                      'userName': pLoad['host_username'],
+                      'joints': [{jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role']}],
+                      'netAddr': pLoad['host_net_addr']
+                    };
+                  } else if (netList.hasOwnProperty(nlID)) {
+                    if (getKeyByValue(netList[nlID]['joints'], pLoad['host_joint']['jid']) != 'jid') {
+                      netList[nlID]['joints'].push(pLoad['host_joint']);
+                    }
+                  }
+                  // Log the network list to console
+                  console.log(netList);
                   break;
 
                 case desktop_socket_unique_id:
@@ -220,6 +238,14 @@
       //     load: 'up'
       //   });
       // })();
+
     </script>
+    <!-- <div class="net_usr_div"> -->
+      <!-- <div class="nud_prof"></div> -->
+      <!-- <div class="nud_info"> -->
+        <!-- <div class="nudi_name">Stephen</div> -->
+        <!-- <div class="nudi_joint">8XJC6N</div> -->
+      <!-- </div> -->
+    <!-- </div> -->
   </body>
 </html>
