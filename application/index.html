@@ -193,23 +193,24 @@
                   console.log("[*] User of same group discovered!");
                   console.log(eData.payload);
                   let pLoad = eData.payload;
-                  if (!pLoad.hasOwnProperty('host_joint')) break;
+                  if (!pLoad.hasOwnProperty('host_joint')) return;
                   // nlID = pLoad['host_uid'] + '/' + pLoad['host_net_addr'][0];
                   nlID = 'UUID_'+pLoad['host_uid'];
-                  if (!netList.hasOwnProperty(nlID)) {
+                  if (!netList[nlID]) {
                     netList[nlID] = {
                       'userID': pLoad['host_uid'],
                       'userName': pLoad['host_uname'],
                       'joints': [{jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role']}],
                       'netAddr': pLoad['host_net_addr']
                     };
-                  } else if (netList.hasOwnProperty(nlID)) {
+                    // Log the network list to console
+                    console.log(netList);
+                  } else if (netList[nlID]) {
+                    console.log('User is already in network list');
                     if (getKeyByValue(netList[nlID]['joints'], pLoad['host_joint']['jid']) != 'jid') {
                       netList[nlID]['joints'].push(pLoad['host_joint']);
                     }
                   }
-                  // Log the network list to console
-                  console.log(netList);
                   break;
 
                 case desktop_socket_unique_id:
