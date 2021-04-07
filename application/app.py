@@ -24,7 +24,7 @@ wSocket = socket.websocketserver(5678);
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
-jds_server_domain = "4023a3cdd80f.ngrok.io"
+jds_server_domain = "325f14aac31e.ngrok.io"
 
 
 
