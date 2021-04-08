@@ -281,6 +281,7 @@ class websocketserver():
                 print("[+] WebSocket connection error: [Expected]")
                 self.stopped = True
                 # Restart socket server
+                self.close()
                 self.start()
                 break
 

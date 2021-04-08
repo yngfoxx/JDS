@@ -191,25 +191,30 @@
 
                 case 'net_user_discovered':
                   console.log("[*] User of same group discovered!");
-                  console.log(eData.payload);
+                  // console.log(eData.payload);
                   let pLoad = eData.payload;
                   if (!pLoad.hasOwnProperty('host_joint')) return;
                   // nlID = pLoad['host_uid'] + '/' + pLoad['host_net_addr'][0];
                   nlID = 'UUID_'+pLoad['host_uid'];
                   if (!netList[nlID]) {
+                    console.log('[!] User is not in network list');
                     netList[nlID] = {
                       'userID': pLoad['host_uid'],
                       'userName': pLoad['host_uname'],
                       'joints': [{jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role']}],
                       'netAddr': pLoad['host_net_addr']
                     };
-                    // Log the network list to console
-                    console.log(netList);
+                    console.log(netList); // Log the network list to console
+
                   } else if (netList[nlID]) {
-                    console.log('User is already in network list');
-                    if (getKeyByValue(netList[nlID]['joints'], pLoad['host_joint']['jid']) != 'jid') {
-                      netList[nlID]['joints'].push(pLoad['host_joint']);
-                    }
+                    console.log('[!] User is already in network list');
+                    let resBool = false;
+                    netList[nlID]['joints'].forEach((item, i) => {
+                      console.log(item);
+                    });
+
+                    // console.log('[!] Updated joint list of discovered user.');
+                    // console.log(netList);
                   }
                   break;
 

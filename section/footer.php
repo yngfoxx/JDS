@@ -79,6 +79,7 @@
                   success: function (res) {
                     if (isJson(res)) {
                       iplist = JSON.parse(res);
+                      console.log('[!] IP list ------------------------------');
                       console.log(iplist);
                       for (const [key, value] of Object.entries(iplist)) {
                         value.forEach((lower_item, i) => {
@@ -92,7 +93,7 @@
                             addrlist = JSON.parse(lanAddr);
                             lower_item.user_net_addr = addrlist;
                             console.log(iplist);
-                            console.log("[!] Converted!");
+                            console.log("[!] Filtered and Converted!");
                           }
                         });
                       }
@@ -110,7 +111,7 @@
                       } finally {
                         console.log("[+] Socket message sent");
                       }
-
+                      console.log('------------------------------------------');
                     }
                   },
                   complete: function () {
