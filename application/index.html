@@ -211,10 +211,15 @@
                     let resBool = false;
                     netList[nlID]['joints'].forEach((item, i) => {
                       console.log(item);
+                      console.log(pLoad['host_joint']['jid']);
+                      if (item != pLoad['host_joint']['jid']) resBool = true;
                     });
 
-                    // console.log('[!] Updated joint list of discovered user.');
-                    // console.log(netList);
+                    if (resBool == true) {
+                      netList[nlID]['joints'].push(pLoad['host_joint']);
+                      console.log('[!] Updated joint list of discovered user.');
+                      console.log(netList);
+                    }
                   }
                   break;
 
