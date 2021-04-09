@@ -208,11 +208,17 @@
 
                   } else if (netList[nlID]) {
                     console.log('[!] User is already in network list');
+
+                    // Update only list of joints if new joint group found
                     let resBool = false;
+
                     netList[nlID]['joints'].forEach((item, i) => {
                       console.log(item);
                       console.log(pLoad['host_joint']['jid']);
+
                       if (item != pLoad['host_joint']['jid']) resBool = true;
+                      if (item == pLoad['host_joint']['jid']) resBool = false;
+
                     });
 
                     if (resBool == true) {

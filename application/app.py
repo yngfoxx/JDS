@@ -35,7 +35,7 @@ class JDS_CLIENT(QMainWindow):
 
     def initUI(self, url):
         self.webURL = url
-        self.resize(1600, 800)
+        self.resize(1300, 800)
         self.setMinimumSize(800, 800)
         self.setWindowTitle("Joint Downloading System [Desktop client]")
         # self.setWindowFlags(QtCore.Qt.FramelessWindowHint) # make window frameless
