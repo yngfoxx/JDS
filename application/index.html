@@ -190,13 +190,14 @@
                   break;
 
                 case 'net_user_discovered':
-                  console.log("[*] User of same group discovered!");
+                  console.log("----------------------------------");
+                  console.log("[+] User of same group discovered!");
                   // console.log(eData.payload);
                   let pLoad = eData.payload;
                   if (!pLoad.hasOwnProperty('host_joint')) return;
                   // nlID = pLoad['host_uid'] + '/' + pLoad['host_net_addr'][0];
                   nlID = 'UUID_'+pLoad['host_uid'];
-                  if (!netList[nlID]) {
+                  if (!netList.hasOwnProperty(nlID)) {
                     console.log('[!] User is not in network list');
                     netList[nlID] = {
                       'userID': pLoad['host_uid'],
@@ -206,27 +207,17 @@
                     };
                     console.log(netList); // Log the network list to console
 
-                  } else if (netList[nlID]) {
-                    console.log('[!] User is already in network list');
-
+                  } else if (netList.hasOwnProperty(nlID)) {
                     // Update only list of joints if new joint group found
-                    let resBool = false;
-
-                    netList[nlID]['joints'].forEach((item, i) => {
-                      console.log(item);
-                      console.log(pLoad['host_joint']['jid']);
-
-                      if (item != pLoad['host_joint']['jid']) resBool = true;
-                      if (item == pLoad['host_joint']['jid']) resBool = false;
-
+                    console.log('[!] User is already in network list');
+                    let arr = netList[nlID]['joints'];
+                    let arrIndex = arr.findIndex(function (joint) {
+                      return joint['jid'] == pLoad['host_joint']['jid'];
                     });
-
-                    if (resBool == true) {
-                      netList[nlID]['joints'].push(pLoad['host_joint']);
-                      console.log('[!] Updated joint list of discovered user.');
-                      console.log(netList);
-                    }
+                    if (arrIndex < 0) netList[nlID]['joints'].push({jid: pLoad['host_joint'].jid, role: pLoad['host_joint'].role });
+                    console.log(netList);
                   }
+                  console.log("----------------------------------");
                   break;
 
                 case desktop_socket_unique_id:
