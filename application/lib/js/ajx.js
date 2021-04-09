@@ -118,5 +118,12 @@ function ajx(obj) {
 }
 // ---------------------------------------------------------------------------->
 
+// Generate discovered user network profile field ----------------------------->
+function generate_net_prof(arr) {
+  console.log("[+] Generate network profile");
+  console.log(arr);
+}
+// ---------------------------------------------------------------------------->
+
 
 // https://github.com/joevennix/lan-js

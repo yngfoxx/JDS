@@ -214,7 +214,10 @@
                     let arrIndex = arr.findIndex(function (joint) {
                       return joint['jid'] == pLoad['host_joint']['jid'];
                     });
-                    if (arrIndex < 0) netList[nlID]['joints'].push({jid: pLoad['host_joint'].jid, role: pLoad['host_joint'].role });
+                    if (arrIndex < 0) {
+                      netList[nlID]['joints'].push({jid: pLoad['host_joint'].jid, role: pLoad['host_joint'].role });
+                      generate_net_prof(netList[nlID]);
+                    }
                     console.log(netList);
                   }
                   console.log("----------------------------------");
