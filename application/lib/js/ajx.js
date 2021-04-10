@@ -122,8 +122,33 @@ function ajx(obj) {
 function generate_net_prof(arr) {
   console.log("[+] Generate network profile");
   console.log(arr);
+
+  let parent = document.querySelector("div[data-element-id='netlist']");
+  clearDOM(parent);
+
+  let nud = document.createElement('DIV');
+      nud.setAttribute('class', 'net_usr_div');
+      let nudp = document.createElement('DIV');
+          nudp.setAttribute('class', 'nud_prof')
+      nud.append(nudp);
+      let nudi = document.createElement('class', 'nud_info');
+          let nudin = document.createElement('class', 'nudi_name');
+              nudin.innerText = arr.userName;
+          nudi.append(nudin);
+          let nudij = document.createElement('class', 'nudi_joint');
+              nudij.innerText = arr.joints[0].jid;
+          nudi.append(nudij);
+      nud.append(nudi);
+        parent.append(nud);
 }
 // ---------------------------------------------------------------------------->
 
 
+// <!-- <div class="net_usr_div"> -->
+//   <!-- <div class="nud_prof"></div> -->
+//   <!-- <div class="nud_info"> -->
+//     <!-- <div class="nudi_name">Stephen</div> -->
+//     <!-- <div class="nudi_joint">8XJC6N</div> -->
+//   <!-- </div> -->
+// <!-- </div> -->
 // https://github.com/joevennix/lan-js

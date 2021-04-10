@@ -91,6 +91,20 @@ function rand(min, max) {
 
 
 /*-------------------------------------------------------------
+    DOM manipulation functions
+---------------------------------------------------------------*/
+function clearDOM(element) {
+  while (element.firstChild) { element.removeChild(element.lastChild); }
+}
+
+function replaceInnerDOM(element, newDOM) {
+  while (element.firstChild) { element.removeChild(element.lastChild); }
+  element.innerHTML = newDOM;
+}
+
+
+
+/*-------------------------------------------------------------
     Get key of object by value
 ---------------------------------------------------------------*/
 function getKeyByValue(object, value) {
