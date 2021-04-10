@@ -24,7 +24,7 @@ wSocket = socket.websocketserver(5678);
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
-jds_server_domain = "dbc48a7dea0e.ngrok.io"
+jds_server_domain = "e63780e05fc3.ngrok.io"
 
 
 
@@ -160,7 +160,7 @@ def exit_():
 
 def main():
     # USER INTERFACE ---------------------------------------------------------->
-    clientApp = JDS_CLIENT("http://"+jds_server_domain+"/JDS") # CLIENT APPLICATION
+    clientApp = JDS_CLIENT("https://"+jds_server_domain+"/JDS") # CLIENT APPLICATION
     clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
     # ------------------------------------------------------------------------->
 
