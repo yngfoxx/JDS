@@ -132,10 +132,12 @@ function generate_net_prof(arr) {
           nudp.setAttribute('class', 'nud_prof')
       nud.append(nudp);
       let nudi = document.createElement('class', 'nud_info');
-          let nudin = document.createElement('class', 'nudi_name');
+          let nudin = document.createElement('DIV');
+              nudin.setAttribute('class', 'nudi_name');
               nudin.innerText = arr.userName;
           nudi.append(nudin);
-          let nudij = document.createElement('class', 'nudi_joint');
+          let nudij = document.createElement('DIV');
+              nudij.setAttribute('class', 'nudi_joint');
               nudij.innerText = arr.joints[0].jid;
           nudi.append(nudij);
       nud.append(nudi);
