@@ -125,7 +125,7 @@ function generate_net_prof(netlist) {
   for (const list in netlist) {
     // console.log(`${arr}: ${netlist[list]}`);
     let arr = netlist[list];
-    console.log(arr);
+    // console.log(arr);
     let parent = document.querySelector("div[data-element-id='netlist']");
     // clearDOM(parent);
 
@@ -152,6 +152,7 @@ function generate_net_prof(netlist) {
         nud.append(nudi);
     parent.append(nud);
   }
+  console.log("[+] LAN profile generator completed!");
 }
 // ---------------------------------------------------------------------------->
 
