@@ -187,6 +187,10 @@
                 case 'net_scanner_completed':
                   console.log("[*] Local network scanner completed!");
                   // restart timer 20 seconds later
+                  if (netList) {
+                    clearDOM(document.querySelector("div[data-element-id='netlist']"));
+                    generate_net_prof(netList);
+                  }
                   break;
 
                 case 'net_user_discovered':
@@ -205,8 +209,8 @@
                       'joints': [{jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role']}],
                       'netAddr': pLoad['host_net_addr']
                     };
-                    generate_net_prof(netList[nlID]);
-                    console.log(netList); // Log the network list to console
+                    // generate_net_prof(netList[nlID]);
+                    // console.log(netList); // Log the network list to console
 
                   } else if (netList.hasOwnProperty(nlID)) {
                     // Update only list of joints if new joint group found
@@ -217,7 +221,7 @@
                     });
                     if (arrIndex < 0) {
                       netList[nlID]['joints'].push({jid: pLoad['host_joint'].jid, role: pLoad['host_joint'].role });
-                      generate_net_prof(netList[nlID]);
+                      // generate_net_prof(netList[nlID]);
                     }
                     console.log(netList);
                   }

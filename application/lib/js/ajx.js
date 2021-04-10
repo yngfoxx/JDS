@@ -119,29 +119,39 @@ function ajx(obj) {
 // ---------------------------------------------------------------------------->
 
 // Generate discovered user network profile field ----------------------------->
-function generate_net_prof(arr) {
+function generate_net_prof(netlist) {
   console.log("[+] Generate network profile");
-  console.log(arr);
 
-  let parent = document.querySelector("div[data-element-id='netlist']");
-  clearDOM(parent);
+  for (const list in netlist) {
+    // console.log(`${arr}: ${netlist[list]}`);
+    let arr = netlist[list];
+    console.log(arr);
+    let parent = document.querySelector("div[data-element-id='netlist']");
+    // clearDOM(parent);
 
-  let nud = document.createElement('DIV');
-      nud.setAttribute('class', 'net_usr_div');
-      let nudp = document.createElement('DIV');
-          nudp.setAttribute('class', 'nud_prof')
-      nud.append(nudp);
-      let nudi = document.createElement('class', 'nud_info');
-          let nudin = document.createElement('DIV');
-              nudin.setAttribute('class', 'nudi_name');
-              nudin.innerText = arr.userName;
-          nudi.append(nudin);
-          let nudij = document.createElement('DIV');
-              nudij.setAttribute('class', 'nudi_joint');
-              nudij.innerText = arr.joints[0].jid;
-          nudi.append(nudij);
-      nud.append(nudi);
-        parent.append(nud);
+    let nud = document.createElement('DIV');
+        nud.setAttribute('class', 'net_usr_div');
+        let nudp = document.createElement('DIV');
+            nudp.classList.add('nud_prof')
+        nud.append(nudp);
+        let nudi = document.createElement('DIV');
+            nudi.classList.add('nud_info');
+            let nudin = document.createElement('DIV');
+                nudin.classList.add('nudi_name');
+                nudin.innerText = arr.userName;
+            nudi.append(nudin);
+            let nudij = document.createElement('DIV');
+                nudij.classList.add('nudi_joint');
+                arr['joints'].forEach((item, i) => {
+                  let nudijc = document.createElement('DIV');
+                      nudijc.classList.add('nudij_code');
+                      nudijc.innerText = item.jid;
+                  nudij.append(nudijc);
+                });
+            nudi.append(nudij);
+        nud.append(nudi);
+    parent.append(nud);
+  }
 }
 // ---------------------------------------------------------------------------->
 
@@ -150,7 +160,9 @@ function generate_net_prof(arr) {
 //   <!-- <div class="nud_prof"></div> -->
 //   <!-- <div class="nud_info"> -->
 //     <!-- <div class="nudi_name">Stephen</div> -->
-//     <!-- <div class="nudi_joint">8XJC6N</div> -->
+//     <!-- <div class="nudi_joint"> -->
+//       <!-- <div class="nudij_code">8XJC6N</div> -->
+//     <!-- </div>
 //   <!-- </div> -->
 // <!-- </div> -->
 // https://github.com/joevennix/lan-js
