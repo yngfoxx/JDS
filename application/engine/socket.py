@@ -275,6 +275,7 @@ class websocketserver():
             except websockets.exceptions.ConnectionClosedOK:
                 print("[+] WebSocket connection closed")
                 self.stopped = True
+                self.start()
                 continue
 
             except websockets.exceptions.ConnectionClosedError:
