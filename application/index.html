@@ -205,6 +205,7 @@
                       'joints': [{jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role']}],
                       'netAddr': pLoad['host_net_addr']
                     };
+                    generate_net_prof(netList[nlID]);
                     console.log(netList); // Log the network list to console
 
                   } else if (netList.hasOwnProperty(nlID)) {
