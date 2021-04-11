@@ -104,7 +104,7 @@ class JDS_CLIENT(QMainWindow):
         # Exit ---
         exit_action = QAction('Exit', self)
         exit_action.setShortcut('Ctrl+Q')
-        exit_action.triggered.connect(app.quit)
+        exit_action.triggered.connect(lambda:  app.quit())
         fileMenu.addAction(exit_action)
         # --------
 
