@@ -154,133 +154,133 @@ class websocketserver():
                         #     pass
                         # send data back to client
 
-                elif action == 'fetch_network_users':
-                    print('[+] WebSocket request: '+action)
-                    print(wsRequest['list'])
-                    print('SOCKET_ID => ', wsRequest['socketID'])
-                    print('LOCAL_IP => ', wsRequest['netAddr'])
-                    # get  local ip of all users of the same Joint group
-                    for ws in connections:
-                        ws = connections[ws]['socket']
-                        # point to [web] socket
-                        if ws != websocket:
-                            WEB_PAYLOAD = {
-                                "channel": "net_scanner",
-                                "groups": wsRequest['list'],
-                                "net_addr": wsRequest['netAddr']
-                            }
-                            WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
-                            await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+                    elif action == 'fetch_network_users':
+                        print('[+] WebSocket request: '+action)
+                        print(wsRequest['list'])
+                        print('SOCKET_ID => ', wsRequest['socketID'])
+                        print('LOCAL_IP => ', wsRequest['netAddr'])
+                        # get  local ip of all users of the same Joint group
+                        for ws in connections:
+                            ws = connections[ws]['socket']
+                            # point to [web] socket
+                            if ws != websocket:
+                                WEB_PAYLOAD = {
+                                    "channel": "net_scanner",
+                                    "groups": wsRequest['list'],
+                                    "net_addr": wsRequest['netAddr']
+                                }
+                                WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
-                elif action == 'scan_network_users':
-                    # Use payload to scan given IP's on local network
-                    # print(wsRequest['payload'])
-                    attempts = 0
-                    self.local_net_scanner = True
+                    elif action == 'scan_network_users':
+                        # Use payload to scan given IP's on local network
+                        # print(wsRequest['payload'])
+                        attempts = 0
+                        self.local_net_scanner = True
 
-                    while self.local_net_scanner == True:
-                        time.sleep(20)
-                        attempts += 1
-                        print('[+] SCANNING JOINT USERS ON NETWORK (', attempts, '/ 3 )\n')
+                        while self.local_net_scanner == True:
+                            time.sleep(20)
+                            attempts += 1
+                            print('[+] SCANNING JOINT USERS ON NETWORK (', attempts, '/ 3 )\n')
 
-                        for jointGrp in wsRequest['payload']:
-                            print("[!] SENDING POST", jointGrp, "="*90)
-                            local_ip = lanServer().get_ip_list()
+                            for jointGrp in wsRequest['payload']:
+                                print("[!] SENDING POST", jointGrp, "="*90)
+                                local_ip = lanServer().get_ip_list()
 
-                            uconfigFile = open("u_config.txt", 'r')
-                            uconfigData = json.loads(uconfigFile.read())
-                            uconfigFile.close()
+                                uconfigFile = open("u_config.txt", 'r')
+                                uconfigData = json.loads(uconfigFile.read())
+                                uconfigFile.close()
 
-                            for userData in wsRequest['payload'][jointGrp]:
-                                for addr in userData['user_net_addr']:
-                                    if addr == '':
-                                        print("[!] ERROR: empty address found!")
-                                        continue
+                                for userData in wsRequest['payload'][jointGrp]:
+                                    for addr in userData['user_net_addr']:
+                                        if addr == '':
+                                            print("[!] ERROR: empty address found!")
+                                            continue
 
-                                    targetDomain = 'http://'+str(addr)+':8000'
-                                    print('[!] TARGET => ', targetDomain)
+                                        targetDomain = 'http://'+str(addr)+':8000'
+                                        print('[!] TARGET => ', targetDomain)
 
-                                    payload = { 'event': 'sonar', 'origin_joint': jointGrp, 'origin_addr': local_ip }
-                                    payload['origin_uid'] = uconfigData['userID'] # belongs to host
-                                    payload['origin_uname'] = uconfigData['username'] # belongs to host
+                                        payload = { 'event': 'sonar', 'origin_joint': jointGrp, 'origin_addr': local_ip }
+                                        payload['origin_uid'] = uconfigData['userID'] # belongs to host
+                                        payload['origin_uname'] = uconfigData['username'] # belongs to host
 
-                                    origin_joints = json.loads(str(uconfigData['joints']).replace("\'", "\""))
-                                    for jnt in origin_joints:
-                                        if jnt['jid'] == payload['origin_joint']:
-                                            payload['joint_role'] = jnt['role']
-                                            break
+                                        origin_joints = json.loads(str(uconfigData['joints']).replace("\'", "\""))
+                                        for jnt in origin_joints:
+                                            if jnt['jid'] == payload['origin_joint']:
+                                                payload['joint_role'] = jnt['role']
+                                                break
 
-                                    cHeaders = { 'user-agent': 'JDS/0.0.1', 'content-type': 'application/json' }
-                                    time.sleep(0.5)
+                                        cHeaders = { 'user-agent': 'JDS/0.0.1', 'content-type': 'application/json' }
+                                        time.sleep(0.5)
 
-                                    # Begin LAN handshake ----------------------------------------------------------->
-                                    response = None
-                                    try:
-                                        req = requests.post(targetDomain, data=json.dumps(payload), headers=cHeaders)
-                                        if req.status_code == 200:
-                                            response = json.loads(req.text)
-                                            print('[!] RESPONSE => ', response)
-                                        req.close()
-                                    except Exception as e:
-                                        # print(e)
-                                        print('[-] Request from ',targetDomain,'responded unexpectedly')
+                                        # Begin LAN handshake ----------------------------------------------------------->
+                                        response = None
+                                        try:
+                                            req = requests.post(targetDomain, data=json.dumps(payload), headers=cHeaders)
+                                            if req.status_code == 200:
+                                                response = json.loads(req.text)
+                                                print('[!] RESPONSE => ', response)
+                                            req.close()
+                                        except Exception as e:
+                                            # print(e)
+                                            print('[-] Request from ',targetDomain,'responded unexpectedly')
 
-                                    if response != None:
-                                        for ws in connections:
-                                            ws = connections[ws]['socket']
-                                            # point to [web] socket
-                                            if ws != websocket:
-                                                WEB_PAYLOAD = {
-                                                    "channel": "net_user_discovered",
-                                                    "payload": response
-                                                }
-                                                WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
-                                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
-                                    # ------------------------------------------------------------------------------->
+                                        if response != None:
+                                            for ws in connections:
+                                                ws = connections[ws]['socket']
+                                                # point to [web] socket
+                                                if ws != websocket:
+                                                    WEB_PAYLOAD = {
+                                                        "channel": "net_user_discovered",
+                                                        "payload": response
+                                                    }
+                                                    WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                                    await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+                                        # ------------------------------------------------------------------------------->
 
-                            print("="*114, '\n')
+                                print("="*114, '\n')
 
-                        # Increment net scan attempts
-                        if attempts >= 3:
-                            print("[*] Local network scanner completed!")
-                            self.local_net_scanner = False
-                            for ws in connections:
-                                ws = connections[ws]['socket']
-                                # point to [web] socket
-                                if ws != websocket:
-                                    WEB_PAYLOAD = {
-                                        "channel": "net_scanner_completed",
-                                        "payload": {"foo": "bar"}
-                                    }
-                                    WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
-                                    await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
-                            break
-
-
-                elif action == 'refresh_webview':
-                    print('[+] Refresh webview command sent!')
-                    for ws in connections:
-                        ws = connections[ws]['socket']
-                        # point to [web] socket
-                        if ws != websocket:
-                            WEB_PAYLOAD = { "channel": "refresh" }
-                            WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
-                            await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+                            # Increment net scan attempts
+                            if attempts >= 3:
+                                print("[*] Local network scanner completed!")
+                                self.local_net_scanner = False
+                                for ws in connections:
+                                    ws = connections[ws]['socket']
+                                    # point to [web] socket
+                                    if ws != websocket:
+                                        WEB_PAYLOAD = {
+                                            "channel": "net_scanner_completed",
+                                            "payload": {"foo": "bar"}
+                                        }
+                                        WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                        await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+                                break
 
 
-                elif action == 'jds_client_disconnected':
-                    await self.removeSocket(websocket, wsRequest['socketID'])
-                    print('[!] User logged out!')
-                    CLIENT_PAYLOAD = { "channel": "desktop_client_disconnected", "socket": wsRequest['socketID'] }
-                    CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
+                    elif action == 'refresh_webview':
+                        print('[+] Refresh webview command sent!')
+                        for ws in connections:
+                            ws = connections[ws]['socket']
+                            # point to [web] socket
+                            if ws != websocket:
+                                WEB_PAYLOAD = { "channel": "refresh" }
+                                WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
-                    try:
-                        await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
-                    except:
-                        pass
-                # ------------------------------------------------------------->
-                await asyncio.sleep(random.random() * 3)
+
+                    elif action == 'jds_client_disconnected':
+                        await self.removeSocket(websocket, wsRequest['socketID'])
+                        print('[!] User logged out!')
+                        CLIENT_PAYLOAD = { "channel": "desktop_client_disconnected", "socket": wsRequest['socketID'] }
+                        CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
+
+                        try:
+                            await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
+                        except:
+                            pass
+                    # ------------------------------------------------------------->
+                    await asyncio.sleep(random.random() * 3)
 
 
             except websockets.exceptions.ConnectionClosedOK:
