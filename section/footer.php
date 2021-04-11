@@ -121,9 +121,6 @@
                 });
                 break;
 
-              case 'fetch_download_info':
-                swal({icon: "success", title: "Download manager", text: eData.client_payload});
-                break;
               default:
                 break;
             }
