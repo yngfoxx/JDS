@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWebChannel import *
 from PyQt5 import QtGui, QtCore, QtNetwork
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QApplication, QSystemTrayIcon, QMenu
+from PyQt5.QtWidgets import *
 
 
 
@@ -28,25 +28,90 @@ jds_server_domain = "50941b8c69cd.ngrok.io"
 
 
 
+# class JDS_CLIENT(QWidget):
 class JDS_CLIENT(QMainWindow):
     def __init__(self, url):
         super().__init__()
         self.initUI(url)
 
     def initUI(self, url):
+        # Webview ------------------------------------------------------------->
         self.webURL = url
+        self.webViewOnline = QWebEngineView()
+        self.webViewClient = QWebEngineView()
+
+        self.loadWebPage()
+        self.loadClientPage()
+        # --------------------------------------------------------------------->
+
+
+        # Main pane ----------------------------------------------------------->
+        horizontalBox = QHBoxLayout()
+        horizontalBox.setContentsMargins(0, 0, 0, 0)
+
+        splitter = QSplitter(Qt.Horizontal)
+        splitter.addWidget(self.webViewOnline) # JDS online webview
+        splitter.addWidget(self.webViewClient) # Local Client file sharing
+
+        horizontalBox.addWidget(splitter)
+
+        # horizontalBox.addWidget(self.webViewOnline) # JDS online webview
+        # horizontalBox.addWidget(self.webViewClient) # Local Client file sharing
+
+        # widget = QWidget()
+        # widget.setLayout(horizontalBox)
+
+        # self.setLayout(horizontalBox)
+
+        parentWidget = QWidget()
+        parentWidget.setLayout(horizontalBox)
+        self.setCentralWidget(parentWidget)
+
+        QApplication.setStyle(QStyleFactory.create('Cleanlooks'))
+
         self.resize(1300, 800)
         self.setMinimumSize(800, 800)
         self.setWindowTitle("Joint Downloading System [Desktop client]")
         # self.setWindowFlags(QtCore.Qt.FramelessWindowHint) # make window frameless
         self.setStyleSheet("""
-            QMainWindow {
-                background: '#2d2d2d';
+            QWidget {
+                background-color: '#2d2d2d';
                 padding: 0px;
                 margin: 0;
             }
             """)
+        # --------------------------------------------------------------------->
 
+
+        # Menu bar ------------------------------------------------------------>
+        self.menuBar = self.menuBar()
+        self.menuBar.setStyleSheet("""
+            QWidget {
+                background-color: '#fff';
+            }
+            """)
+
+        fileMenu = self.menuBar.addMenu('File')
+        helpMenu = self.menuBar.addMenu('Help')
+
+        # Debugger ---
+        debug_action = QAction('Open debugger', self)
+        debug_action.setShortcut('Ctrl+alt+d')
+        debug_action.triggered.connect(lambda: JDS_DEBUGGER())
+        helpMenu.addAction(debug_action)
+        # ------------
+
+        # Exit ---
+        exit_action = QAction('Exit', self)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.triggered.connect(app.quit)
+        fileMenu.addAction(exit_action)
+        # --------
+
+        # --------------------------------------------------------------------->
+
+
+        # Task bar ------------------------------------------------------------>
         # self.setQuitOnLastWindowClosed(False)
         self.trayIcon = QSystemTrayIcon(QtGui.QIcon("logo-512x512.png"), parent=app)
         self.trayIcon.setToolTip('JDS Client download manager is running in background.')
@@ -54,37 +119,25 @@ class JDS_CLIENT(QMainWindow):
 
         self.trayMenu = QMenu()
         self.exitAction = self.trayMenu.addAction('Exit')
-        self.exitAction.triggered.connect(app.quit)
+        self.exitAction.triggered.connect(lambda: app.quit())
 
         self.trayIcon.setContextMenu(self.trayMenu)
+        # --------------------------------------------------------------------->
 
+
+        # Window -------------------------------------------------------------->
         scriptDir = os.path.dirname(os.path.realpath(__file__))
         self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + '/images/logo/logo-512x512.png'))
-
-        self.webViewOnline = QWebEngineView()
-        self.webViewClient = QWebEngineView()
-
-        self.loadWebPage()
-        self.loadClientPage()
-
-        # Main pane
-        horizontalLayout = QHBoxLayout()
-        horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        horizontalLayout.addWidget(self.webViewOnline) # JDS online webview
-        horizontalLayout.addWidget(self.webViewClient) # Local Client file sharing
-
-        widget = QWidget()
-        widget.setLayout(horizontalLayout)
-
-        self.setCentralWidget(widget)
         self.show()
+        # --------------------------------------------------------------------->
 
     def loadWebPage(self):
         self.webViewOnline.load(QUrl(self.webURL))
 
     def loadClientPage(self):
         self.webViewClient.load(QUrl("http://"+hostdomain+":8000/index.html"))
-        self.webViewClient.setFixedWidth(350)
+        self.webViewClient.setMinimumWidth(250)
+        self.webViewClient.setMaximumWidth(450)
 
 
 
@@ -106,11 +159,11 @@ class JDS_DEBUGGER(QMainWindow):
 
         self.loadWebPage()
 
-        horizontalLayout = QHBoxLayout()
-        horizontalLayout.addWidget(self.webViewOnline)
+        horizontalBox = QHBoxLayout()
+        horizontalBox.addWidget(self.webViewOnline)
 
         widget = QWidget()
-        widget.setLayout(horizontalLayout)
+        widget.setLayout(horizontalBox)
 
         self.setCentralWidget(widget)
         self.show()
@@ -170,10 +223,11 @@ def exit_():
 # ----------------------------------------------------------------------------->
 
 
+
 def main():
     # USER INTERFACE ---------------------------------------------------------->
     clientApp = JDS_CLIENT("https://"+jds_server_domain+"/JDS") # CLIENT APPLICATION
-    clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
+    # clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
     # ------------------------------------------------------------------------->
 
 

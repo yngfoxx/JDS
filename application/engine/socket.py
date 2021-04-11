@@ -80,7 +80,18 @@ class websocketserver():
             await self.register(websocket)
             try:
                 # Recieve input from web client ------------------------------->
-                wsInput = await websocket.recv()
+                try:
+                    wsInput = await websocket.recv()
+                except websockets.exceptions.ConnectionClosedOK:
+                    print("[+] WebSocket connection closed")
+                    self.stopped = True
+                    self.start()
+                    continue
+
+                except websockets.exceptions.ConnectionClosedError:
+                    print("[+] WebSocket connection error: [Expected]")
+                    self.stopped = True
+                    continue
 
                 # Handle websocket recieved input
                 wsRequest = json.loads(wsInput)
