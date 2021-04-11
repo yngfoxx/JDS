@@ -188,8 +188,8 @@ class Threader (threading.Thread):
         if (self.name == "LOCAL_HTTP_SERVER"):
             try:
                 server_lan.start()
-            except:
-                print("[!] Error while starting LAN server!")
+            except Exception as err:
+                print("[!] Error while starting LAN server: ", err)
 
         elif (self.name == "SOCKET_SERVER"):
             # SOCKET SERVER SECTION ------------------------------------------->
