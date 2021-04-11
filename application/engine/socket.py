@@ -32,6 +32,7 @@ class websocketserver():
         self.stopped = False
         self.payload_file = tempfile.NamedTemporaryFile(prefix='jds_', suffix='_payload.json')
         self.local_net_scanner = True
+        self.init = True
 
 
     def clients_event(self):
@@ -95,64 +96,62 @@ class websocketserver():
 
                 # Handle websocket recieved input
                 wsRequest = json.loads(wsInput)
-                action = wsRequest['action']
-                print("[+] Action: "+action);
+                if 'action' in wsRequest:
+                    action = wsRequest['action']
+                    print("[+] Action: "+action);
+                    # jds_client_connected
+                    if action == 'jds_client_connected':
+                        await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
 
-                # interval = wsRequest['interval']
+                        # save payload in temporary file -------------------------->
+                        payload = str(wsRequest['payload'])
+                        self.payload_file.write(str.encode(payload))
+                        print("[+] Payload stored in temp file!")
 
-                # jds_client_connected
-                if action == 'jds_client_connected':
-                    await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
+                        self.payload_file.seek(0)
+                        pLoad = self.payload_file.read().decode('utf-8')
+                        pLoad = pLoad.replace("\'", "\"")
 
-                    # save payload in temporary file -------------------------->
-                    payload = str(wsRequest['payload'])
-                    self.payload_file.write(str.encode(payload))
-                    print("[+] Payload stored in temp file!")
+                        # Store uconfig in lan server -----------------------------
+                        lanServer().set_uconfig(pLoad)
 
-                    self.payload_file.seek(0)
-                    pLoad = self.payload_file.read().decode('utf-8')
-                    pLoad = pLoad.replace("\'", "\"")
+                        # local_ip = socket.gethostbyname(socket.gethostname())
+                        local_ip = lanServer().get_ip_list()
+                        CLIENT_PAYLOAD = {
+                            "channel": "desktop_client_connected",
+                            "net_addr": local_ip,
+                            "payload": pLoad
+                        }
+                        CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
+                        try:
+                            await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
+                        except:
+                            pass
+                        # --------------------------------------------------------->
 
-                    # Store uconfig in lan server -----------------------------
-                    lanServer().set_uconfig(pLoad)
+                    # desktop_client_online
+                    elif action == 'desktop_client_online':
+                        await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
 
-                    # local_ip = socket.gethostbyname(socket.gethostname())
-                    local_ip = lanServer().get_ip_list()
-                    CLIENT_PAYLOAD = {
-                        "channel": "desktop_client_connected",
-                        "net_addr": local_ip,
-                        "payload": pLoad
-                    }
-                    CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
-                    try:
-                        await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
-                    except:
-                        pass
-                    # --------------------------------------------------------->
+                        print('[+] Desktop socket connected to local socket server')
+                        self.payload_file.seek(0)
+                        pLoad = self.payload_file.read().decode('utf-8')
+                        pLoad = pLoad.replace("\'", "\"")
 
-                # desktop_client_online
-                elif action == 'desktop_client_online':
-                    await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
-
-                    print('[+] Desktop socket connected to local socket server')
-                    self.payload_file.seek(0)
-                    pLoad = self.payload_file.read().decode('utf-8')
-                    pLoad = pLoad.replace("\'", "\"")
-
-                    # local_ip = socket.gethostbyname(socket.gethostname())
-                    local_ip = lanServer().get_ip_list()
-                    CLIENT_PAYLOAD = {
-                        "channel": "desktop_client_connected",
-                        "net_addr": local_ip,
-                        "payload": pLoad
-                    }
-                    CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
-                    # try:
-                    #     await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
-                    #     # await asyncio.wait(websocket.send(CLIENT_PAYLOAD_JSON))
-                    # except:
-                    #     pass
-                    # send data back to client
+                        # local_ip = socket.gethostbyname(socket.gethostname())
+                        local_ip = lanServer().get_ip_list()
+                        CLIENT_PAYLOAD = {
+                            "channel": "desktop_client_connected",
+                            "net_addr": local_ip,
+                            "payload": pLoad
+                        }
+                        CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
+                        # try:
+                        #     await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
+                        #     # await asyncio.wait(websocket.send(CLIENT_PAYLOAD_JSON))
+                        # except:
+                        #     pass
+                        # send data back to client
 
                 elif action == 'fetch_network_users':
                     print('[+] WebSocket request: '+action)
@@ -286,12 +285,15 @@ class websocketserver():
             except websockets.exceptions.ConnectionClosedOK:
                 print("[+] WebSocket connection closed")
                 self.stopped = True
-                self.start()
+                if self.init == True:
+                    self.start()
                 continue
 
             except websockets.exceptions.ConnectionClosedError:
                 print("[+] WebSocket connection error: [Expected]")
                 self.stopped = True
+                if self.init == True:
+                    self.start()
                 continue
 
 
@@ -323,6 +325,7 @@ class websocketserver():
 
     def close(self):
         try:
+            self.init = False
             self.local_net_scanner = False
             self.stopped = True # Stop while loop in main()
             self.futurestop.set_result(True) # Stop future loop to terminate the program
