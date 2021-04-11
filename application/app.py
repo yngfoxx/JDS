@@ -3,26 +3,22 @@ import os
 import time
 import threading
 
+from threading import Thread
 from engine import server
 from engine import socket
 from engine.platform import domainName
 
-from threading import Thread
-
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import *
 from PyQt5.QtWebChannel import *
 from PyQt5 import QtGui, QtCore, QtNetwork
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QApplication
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QApplication, QSystemTrayIcon, QMenu
 
 
+
+app = QApplication(sys.argv)
 
 threads = []
-app = QApplication(sys.argv)
-app.setQuitOnLastWindowClosed(False)
-trayIcon = SystemTrayIcon(QtGui.QIcon("logo-512x512.png"))
-trayIcon.show()
-
 server_lan = server.lanServer()
 wSocket = socket.websocketserver(5678);
 
@@ -51,8 +47,19 @@ class JDS_CLIENT(QMainWindow):
             }
             """)
 
+        # self.setQuitOnLastWindowClosed(False)
+        self.trayIcon = QSystemTrayIcon(QtGui.QIcon("logo-512x512.png"), parent=app)
+        self.trayIcon.setToolTip('JDS Client download manager is running in background.')
+        self.trayIcon.show()
+
+        self.trayMenu = QMenu()
+        self.exitAction = self.trayMenu.addAction('Exit')
+        self.exitAction.triggered.connect(app.quit)
+
+        self.trayIcon.setContextMenu(self.trayMenu)
+
         scriptDir = os.path.dirname(os.path.realpath(__file__))
-        self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'logo-512x512.png'))
+        self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + '/images/logo/logo-512x512.png'))
 
         self.webViewOnline = QWebEngineView()
         self.webViewClient = QWebEngineView()
@@ -143,6 +150,7 @@ class Threader (threading.Thread):
 # Exit application ------------------------------------------------------------>
 def exit_():
     app.exec_()
+    # app.quit
     for t in threads:
         # print(t) # Show thread
         if (t.name == "LOCAL_HTTP_SERVER"):
