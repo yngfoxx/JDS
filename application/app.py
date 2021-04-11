@@ -19,6 +19,10 @@ from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QApplication
 
 threads = []
 app = QApplication(sys.argv)
+app.setQuitOnLastWindowClosed(False)
+trayIcon = SystemTrayIcon(QtGui.QIcon("logo-512x512.png"))
+trayIcon.show()
+
 server_lan = server.lanServer()
 wSocket = socket.websocketserver(5678);
 

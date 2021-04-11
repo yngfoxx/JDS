@@ -44,9 +44,9 @@
         </div>
       </div>
 
-      <!-- Local download stat -->
+      <!-- Local download manager -->
       <div class="tnvbr">
-        <h3>Download stat</h3>
+        <h3>Download manager</h3>
       </div>
       <div class="_bdyMain">
         <div class="_bdyContent">
@@ -83,18 +83,20 @@
             let eData = JSON.parse(event.data);
             if (eData.hasOwnProperty('channel')) {
               switch (eData.channel) {
+                /*
+                  Execute when websocket connection between
+                  desktop app and web app are successfully connected
+                */
                 case 'desktop_client_connected':
                   console.log(eData);
                   if (eData.hasOwnProperty('payload')) {
-                    if (eData.payload == "") {
+                    if (eData.payload == "") { // get web payload
                       console.log("[!] Payload is empty.");
-                      // get web payload
                       ws.send( JSON.stringify({action: 'refresh_webview', interval: 'none'}) );
                       return;
                     }
 
-
-                    if (isJson(eData.payload)) {
+                    if (isJson(eData.payload)) { // Check if payload is an object
                       client_data = JSON.parse(eData.payload);
                       if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
                       // Start network scanner -------------------------------->
@@ -110,20 +112,36 @@
                       let loader = document.querySelector('._pre_loader');
                           loader.classList.add('hide');
 
-                      let joint_list = [];
+
+                      let joint_list = []; // populate joint_list
                       client_data.joints.forEach((item, i) => {
                         joint_list.push(item.jid);
                       });
-
                       console.log(joint_list);
-                      // Start scanning and broadcasting list of users to this user
-                      // if (eData.hasOwnProperty('net_addr')) console.log(eData.net_addr);
+
+                      /*
+                        Find Joint group users on local network by there
+                        local IP address
+                      */
                       client_net_addr = (eData.net_addr || []);
                       ws.send(
                         JSON.stringify({
                           action: 'fetch_network_users',
                           interval: '30',
                           list: joint_list,
+                          socketID: desktop_socket_unique_id,
+                          netAddr: client_net_addr
+                        })
+                      );
+
+                      /*
+                        Request Download information payload
+                        initialize new background process for downloading
+                      */
+                      ws.send(
+                        JSON.stringify({
+                          channel: 'fetch_download_info',
+                          client_payload: client_data,
                           socketID: desktop_socket_unique_id,
                           netAddr: client_net_addr
                         })
@@ -155,10 +173,7 @@
                           );
 
                           // turn off cooldown after 10 seconds
-                          setTimeout(() => {
-                            recon_cool_down = false;
-                          }, 10000);
-
+                          setTimeout(() => { recon_cool_down = false; }, 10000);
                         });
                       });
                       // ------------------------------------------------------>
