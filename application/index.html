@@ -99,6 +99,18 @@
                     if (isJson(eData.payload)) { // Check if payload is an object
                       client_data = JSON.parse(eData.payload);
                       if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
+                      /*
+                        Request Download information payload
+                        initialize new background process for downloading
+                      */
+                      ws.send(
+                        JSON.stringify({
+                          action: 'fetch_download_info',
+                          payload: client_data,
+                          sid: desktop_socket_unique_id,
+                        })
+                      );
+                      
                       // Start network scanner -------------------------------->
                       let networkMsg = document.getElementsByClassName('_aMsg')[0];
                       networkMsg.style.color = 'var(--light-gray-v2)';
@@ -124,6 +136,11 @@
                         local IP address
                       */
                       client_net_addr = (eData.net_addr || []);
+
+
+                      /*
+                        Request groups members on same local network
+                      */
                       ws.send(
                         JSON.stringify({
                           action: 'fetch_network_users',
@@ -134,18 +151,6 @@
                         })
                       );
 
-                      /*
-                        Request Download information payload
-                        initialize new background process for downloading
-                      */
-                      // ws.send(
-                      //   JSON.stringify({
-                      //     channel: 'fetch_download_info',
-                      //     client_payload: client_data,
-                      //     socketID: desktop_socket_unique_id,
-                      //     netAddr: client_net_addr
-                      //   })
-                      // );
 
                       // create button click event listener
                       let scan_btn = document.querySelectorAll("[data-btn='net_recon']");

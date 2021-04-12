@@ -168,6 +168,11 @@ class websocketserver():
                                 await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
+                    elif action == 'fetch_download_info':
+                        print('[+] Fetching download info')
+                        print(wsRequest['payload'])
+
+
                     elif action == 'scan_network_users':
                         # Use payload to scan given IP's on local network
                         # print(wsRequest['payload'])
@@ -275,7 +280,7 @@ class websocketserver():
                         except:
                             pass
                     # ------------------------------------------------------------->
-                    
+
                     await asyncio.sleep(random.random() * 3)
 
 
