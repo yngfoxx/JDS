@@ -157,6 +157,27 @@ function generate_net_prof(netlist) {
 // ---------------------------------------------------------------------------->
 
 
+
+function networkpanel_overlay(newMsg) {
+  let networkMsg = document.createElement('A');
+      networkMsg.classList.add('_aMsg');
+      networkMsg.style.color = 'var(--light-gray-v2)';
+      networkMsg.setAttribute('data-snippet', newMsg);
+  let parent = document.querySelector('div[data-node-id="local_recon"]').children[0];
+      replaceInnerDOM(parent, networkMsg);
+}
+
+
+
+function localdmpanel_overlay(newMsg) {
+  let networkMsg = document.createElement('A');
+      networkMsg.classList.add('_aMsg');
+      networkMsg.style.color = 'var(--light-gray-v2)';
+      networkMsg.setAttribute('data-snippet', newMsg);
+  let parent = document.querySelector('div[data-node-id="local_dm"]');
+      replaceInnerDOM(parent, networkMsg);
+}
+
 // <!-- <div class="net_usr_div"> -->
 //   <!-- <div class="nud_prof"></div> -->
 //   <!-- <div class="nud_info"> -->
