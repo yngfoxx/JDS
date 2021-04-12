@@ -28,6 +28,38 @@ jds_server_domain = "a9a5eb218c92.ngrok.io"
 
 
 
+class JDS_DEBUGGER(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.resize(400, 800)
+        # self.setFixedWidth(1400)
+        # self.setFixedHeight(800)
+        self.setWindowTitle("Joint Downloading System [Desktop client debugger]")
+
+        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'logo-512x512.png'))
+
+        self.webViewOnline = QWebEngineView()
+
+        self.loadWebPage()
+
+        horizontalBox = QHBoxLayout()
+        horizontalBox.addWidget(self.webViewOnline)
+
+        widget = QWidget()
+        widget.setLayout(horizontalBox)
+
+        self.setCentralWidget(widget)
+        self.show()
+
+    def loadWebPage(self):
+        self.webViewOnline.load(QUrl("http://"+hostdomain+":1231"))
+
+
+
 # class JDS_CLIENT(QWidget):
 class JDS_CLIENT(QMainWindow):
     def __init__(self, url):
@@ -141,38 +173,6 @@ class JDS_CLIENT(QMainWindow):
 
 
 
-class JDS_DEBUGGER(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.initUI()
-
-    def initUI(self):
-        self.resize(400, 800)
-        # self.setFixedWidth(1400)
-        # self.setFixedHeight(800)
-        self.setWindowTitle("Joint Downloading System [Desktop client debugger]")
-
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
-        self.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'logo-512x512.png'))
-
-        self.webViewOnline = QWebEngineView()
-
-        self.loadWebPage()
-
-        horizontalBox = QHBoxLayout()
-        horizontalBox.addWidget(self.webViewOnline)
-
-        widget = QWidget()
-        widget.setLayout(horizontalBox)
-
-        self.setCentralWidget(widget)
-        self.show()
-
-    def loadWebPage(self):
-        self.webViewOnline.load(QUrl("http://"+hostdomain+":1231"))
-
-
-
 class Threader (threading.Thread):
     # https://www.tutorialspoint.com/python/python_multithreading.htm
     def __init__(self, threadID, name, counter):
@@ -186,15 +186,22 @@ class Threader (threading.Thread):
         print("[+] Starting " + self.name)
 
         if (self.name == "LOCAL_HTTP_SERVER"):
+            # HTTP SERVER SECTION --------------------------------------------->
             try:
                 server_lan.start()
             except Exception as err:
                 print("[!] Error while starting LAN server: ", err)
+            # ----------------------------------------------------------------->
 
         elif (self.name == "SOCKET_SERVER"):
             # SOCKET SERVER SECTION ------------------------------------------->
             # https://websockets.readthedocs.io/en/stable/intro.html
             wSocket.start();
+            # ----------------------------------------------------------------->
+
+        elif (self.name == "DEBUGGER"):
+            # DEBUGGER SECTION ------------------------------------------------>
+            clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
             # ----------------------------------------------------------------->
 
         print("[*] Exiting thread: " + self.name)
@@ -237,10 +244,17 @@ def main():
     threads.append(thread1)
     print("[+] Local server initialized")
 
+
     thread2 = Threader(2, "SOCKET_SERVER", 2)
     thread2.start()
     threads.append(thread2)
     print("[+] Socket server initialized")
+
+
+    # thread3 = Threader(3, "DEBUGGER", 3)
+    # thread3.start()
+    # threads.append(thread3)
+    # print("[+] Debugger initialized")
     # ------------------------------------------------------------------------->
 
 
