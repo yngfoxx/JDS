@@ -145,7 +145,6 @@ function startdecrypt(decrypted, encrypted) {
     decrypted.textContent = "";
 
     var shuffleInterval = setInterval(function(){
-
       // Generate random strings. You can modify the generator function range
       // (Math.random()*(to-from+1)+from);
       var shuffledText = '';
