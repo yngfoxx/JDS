@@ -147,13 +147,8 @@ class websocketserver():
                             "payload": pLoad
                         }
                         CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
-                        # try:
-                        #     await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
-                        #     # await asyncio.wait(websocket.send(CLIENT_PAYLOAD_JSON))
-                        # except:
-                        #     pass
-                        # send data back to client
 
+                    # fetch_network_users
                     elif action == 'fetch_network_users':
                         print('[+] WebSocket request: '+action)
                         print(wsRequest['list'])
@@ -280,6 +275,7 @@ class websocketserver():
                         except:
                             pass
                     # ------------------------------------------------------------->
+                    
                     await asyncio.sleep(random.random() * 3)
 
 
