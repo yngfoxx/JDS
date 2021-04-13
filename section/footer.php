@@ -21,140 +21,145 @@
       $email = $user_data['email'];
       $joints = json_encode($jds->getUserJointList($userID));
       ?>
+      function ws_client_connect() {
+        // Connect to client application ------------------------------------------->
+        var ws_client_app = new WebSocket("ws://127.0.0.1:5678/");
+          ws_client_app.onopen = function () {
+            ws_client_app.send(
+              JSON.stringify({
+                "action": "jds_client_connected",
+                "interval": "none",
+                "socketID": socket_unique_id,
+                "socketType": "web",
+                "payload": {
+                  "devID": "<?php echo $devID; ?>",
+                  "userID": "<?php echo $userID; ?>",
+                  "username": "<?php echo $username; ?>",
+                  "joints": <?php echo $joints; ?>,
+                }
+              })
+            );
+          }
 
-      // Connect to client application ------------------------------------------->
-      var ws_client_app = new WebSocket("ws://127.0.0.1:5678/");
-        ws_client_app.onopen = function () {
-          ws_client_app.send(
-            JSON.stringify({
-              "action": "jds_client_connected",
-              "interval": "none",
-              "socketID": socket_unique_id,
-              "socketType": "web",
-              "payload": {
-                "devID": "<?php echo $devID; ?>",
-                "userID": "<?php echo $userID; ?>",
-                "username": "<?php echo $username; ?>",
-                "joints": <?php echo $joints; ?>,
-              }
-            })
-          );
-        }
+          ws_client_app.onerror = function () { alert("Failed to connect to client application"); }
+          // ws_client_app.onclose = function () { alert("Connection closed!"); }
+          ws_client_app.onclose = function () {
+            console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+            setTimeout(function() { ws_client_connect(); }, 1000);
+          }
 
-        ws_client_app.onerror = function () { alert("Failed to connect to client application"); }
-        ws_client_app.onclose = function () { alert("Connection closed!"); }
-
-        ws_client_app.onmessage = function (event) {
-          let eData = JSON.parse(event.data);
-          if (eData.hasOwnProperty('channel')) {
-            switch (eData.channel) {
-              case 'refresh':
-                ws_client_app.send(
-                  JSON.stringify({
-                    "action": "jds_client_connected",
-                    "interval": "none",
-                    "socketID": socket_unique_id,
-                    "socketType": "web",
-                    "payload": {
-                      "devID": "<?php echo $devID; ?>",
-                      "userID": "<?php echo $userID; ?>",
-                      "username": "<?php echo $username; ?>",
-                      "joints": <?php echo $joints; ?>,
-                    }
-                  })
-                );
-                // location.reload();
-                break;
-
-              case 'net_scanner':
-                console.log("[+] Network scanner requested");
-                let groups = (eData.hasOwnProperty('groups')) ? eData.groups : undefined;
-                let net_addr = (eData.hasOwnProperty('net_addr')) ? eData.net_addr : undefined;
-                
-                console.log("[!] Active user's joint groups");
-                console.log(groups);
-
-                console.log("[!] Active user's local network address");
-                console.log(net_addr);
-
-                ajx({
-                  type: 'POST',
-                  url: '/JDS/req/req_handler.php',
-                  data: {netScan: true, addr: net_addr, joint_list: groups},
-                  success: function (res) {
-                    if (isJson(res)) {
-                      iplist = JSON.parse(res);
-                      console.log('[!] IP list ------------------------------');
-                      console.log(iplist);
-                      if (iplist.length == 0 || iplist == 0) {
-                        console.log('[!] There are no other users in the joint group');
-                        return;
+          ws_client_app.onmessage = function (event) {
+            let eData = JSON.parse(event.data);
+            if (eData.hasOwnProperty('channel')) {
+              switch (eData.channel) {
+                case 'refresh':
+                  ws_client_app.send(
+                    JSON.stringify({
+                      "action": "jds_client_connected",
+                      "interval": "none",
+                      "socketID": socket_unique_id,
+                      "socketType": "web",
+                      "payload": {
+                        "devID": "<?php echo $devID; ?>",
+                        "userID": "<?php echo $userID; ?>",
+                        "username": "<?php echo $username; ?>",
+                        "joints": <?php echo $joints; ?>,
                       }
-                      for (const [key, value] of Object.entries(iplist)) {
-                        value.forEach((lower_item, i) => {
-                          let lanAddr = lower_item.user_net_addr;
-                          if (lower_item.user_net_addr == null) {
-                            lower_item.user_net_addr = '';
-                            return;
-                          }
-                          lanAddr = lanAddr.replace(/\\/gi, '');
-                          if (isJson(lanAddr)) {
-                            addrlist = JSON.parse(lanAddr);
-                            lower_item.user_net_addr = addrlist;
-                            console.log(iplist);
-                            console.log("[!] Filtered and Converted!");
-                          }
-                        });
-                      }
+                    })
+                  );
+                  // location.reload();
+                  break;
 
-                      if (iplist == null) { return; }
-                      try {
-                        ws_client_app.send(JSON.stringify({
-                          "action": "scan_network_users",
-                          "interval": "none",
-                          "socketID": socket_unique_id,
-                          "payload": iplist
-                        }));
-                      } catch (e) {
-                        console.error("[-] Failed to send socket message");
-                      } finally {
-                        console.log("[+] Socket message sent");
-                      }
-                      console.log('------------------------------------------');
-                    }
-                  },
-                  complete: function () {
-                    console.log("[!] Network scanner completed!");
-                  },
-                  load: 'up',
-                });
-                break;
+                case 'net_scanner':
+                  console.log("[+] Network scanner requested");
+                  let groups = (eData.hasOwnProperty('groups')) ? eData.groups : undefined;
+                  let net_addr = (eData.hasOwnProperty('net_addr')) ? eData.net_addr : undefined;
 
-              case 'fetch_download_info':
-                if (eData.hasOwnProperty('payload')) {
-                  eData.payload['client_ldm'] = true;
+                  console.log("[!] Active user's joint groups");
+                  console.log(groups);
+
+                  console.log("[!] Active user's local network address");
+                  console.log(net_addr);
+
                   ajx({
                     type: 'POST',
                     url: '/JDS/req/req_handler.php',
-                    data: eData.payload,
-                    success: (res) => {
-                      console.log(res);
+                    data: {netScan: true, addr: net_addr, joint_list: groups},
+                    success: function (res) {
+                      if (isJson(res)) {
+                        iplist = JSON.parse(res);
+                        console.log('[!] IP list ------------------------------');
+                        console.log(iplist);
+                        if (iplist.length == 0 || iplist == 0) {
+                          console.log('[!] There are no other users in the joint group');
+                          return;
+                        }
+                        for (const [key, value] of Object.entries(iplist)) {
+                          value.forEach((lower_item, i) => {
+                            let lanAddr = lower_item.user_net_addr;
+                            if (lower_item.user_net_addr == null) {
+                              lower_item.user_net_addr = '';
+                              return;
+                            }
+                            lanAddr = lanAddr.replace(/\\/gi, '');
+                            if (isJson(lanAddr)) {
+                              addrlist = JSON.parse(lanAddr);
+                              lower_item.user_net_addr = addrlist;
+                              console.log(iplist);
+                              console.log("[!] Filtered and Converted!");
+                            }
+                          });
+                        }
+
+                        if (iplist == null) { return; }
+                        try {
+                          ws_client_app.send(JSON.stringify({
+                            "action": "scan_network_users",
+                            "interval": "none",
+                            "socketID": socket_unique_id,
+                            "payload": iplist
+                          }));
+                        } catch (e) {
+                          console.error("[-] Failed to send socket message");
+                        } finally {
+                          console.log("[+] Socket message sent");
+                        }
+                        console.log('------------------------------------------');
+                      }
                     },
-                    complete: () => {
-                      console.log('[!] Download manager info request done!');
+                    complete: function () {
+                      console.log("[!] Network scanner completed!");
                     },
-                    load: 'up'
+                    load: 'up',
                   });
-                }
-                break;
+                  break;
 
-              default:
-                break;
+                case 'fetch_download_info':
+                  if (eData.hasOwnProperty('payload')) {
+                    eData.payload['client_ldm'] = true;
+                    ajx({
+                      type: 'POST',
+                      url: '/JDS/req/req_handler.php',
+                      data: eData.payload,
+                      success: (res) => {
+                        console.log(res);
+                      },
+                      complete: () => {
+                        console.log('[!] Download manager info request done!');
+                      },
+                      load: 'up'
+                    });
+                  }
+                  break;
+
+                default:
+                  break;
+              }
             }
-          }
-        };
-      // ------------------------------------------------------------------------>
-
+          };
+        // ------------------------------------------------------------------------>
+      }
+      ws_client_connect();
   <?php
     }
   ?>
