@@ -59,10 +59,11 @@ class jointlib extends stdlib {
     $url = $this->db->escape_string($arr['url']); # File requested
     $ext = $this->db->escape_string($arr['ext']); # File extension
     $size = $this->db->escape_string($arr['size']); # File size
+    $bytes = $this->db->escape_string($arr['bytes']); # File size
     $max_chunk_size = (isset($arr['max_chunk_size'])) ? $this->db->escape_string($arr['max_chunk_size']) : 5;
     $sql = "
-      INSERT INTO svr_download_request (joint_id, user_id, url, ext, size, max_chunk_size)
-      VALUES('$jid', '$uid', '$url', '$ext', '$size', '$max_chunk_size');
+      INSERT INTO svr_download_request (joint_id, user_id, url, ext, size, bytes, max_chunk_size)
+      VALUES('$jid', '$uid', '$url', '$ext', '$size', '$bytes', '$max_chunk_size');
     ";
     $qry = mysqli_query($this->db, $sql);
     return (($qry) ? mysqli_insert_id($this->db) : false); // return ID of inserted row
@@ -207,6 +208,7 @@ class jointlib extends stdlib {
       joint_group.joint_id AS 'jid',
       svr_download_request.url AS 'url',
       svr_download_request.max_chunk_size AS 'chunk_size',
+      svr_download_request.bytes AS 'bytes',
       user.user_id AS 'uid',
       svr_download_request.ext AS 'ext',
       svr_download_request.init AS 'status'
@@ -272,6 +274,35 @@ class jointlib extends stdlib {
     $status = ($status_txt == 'compressing') ? 3 : ( ($status_txt == 'splitting') ? 4 : ( ($status_txt == 'chunkified') ? 5 : null ) );
     if ($status == null) return false;
     $sql = "UPDATE svr_download_request SET init = '$status' WHERE joint_id = '$jid' AND request_id = '$rid'";
+    $qry = mysqli_query($this->db, $sql);
+    return (($qry) ? true : $this->db->error);
+  }
+
+
+  public function splitBytesByPercentile($bytes, $percentile)
+  {
+    $percentile_chunk = ($bytes * $percentile) / 100;
+    $percentIntrator = 0;
+    $chunks = [];
+    while ($percentIntrator < $bytes) {
+      $percentIntrator += $percentile_chunk;
+      $chunks[] = $percentIntrator;
+    }
+    return $chunks;
+  }
+
+
+  public function crt_chunks($chunk)
+  {
+    $chnkID = $chunk['chunk_id'];
+    $chnkJID = $chunk['joint_id'];
+    $chnkRID = $chunk['request_id'];
+    $chnkBSTART = $chunk['byte_start'];
+    $chnkBEND = $chunk['byte_end'];
+    $sql = "
+      INSERT INTO chunk(chunk_id, joint_id, request_id, byte_start, byte_end)
+      VALUES ('$chnkID', '$chnkJID', '$chnkRID', '$chnkBSTART', '$chnkBEND')
+    ";
     $qry = mysqli_query($this->db, $sql);
     return (($qry) ? true : $this->db->error);
   }

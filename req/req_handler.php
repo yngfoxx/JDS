@@ -187,12 +187,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       // File data -----------------------------------------------------------<
       $result['filename'] = pathinfo($data, PATHINFO_FILENAME); # source file name
       $result['size'] = $std->formatUnit($std->getURLFileSize($data)); # format source file size
-      $result['realSize'] = $std->getURLFileSize($data); # source file real size
+      $result['bytes'] = $std->getURLFileSize($data); # source file real size
       // ---------------------------------------------------------------------<
 
 
       // File validity check -------------------------------------------------<
-      if ($result['realSize'] == "-1") {
+      if ($result['bytes'] == "-1") {
         $result = array('server_error' => "Failed to get a downloadable file");
         echo json_encode($result);
         exit();
@@ -231,6 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           'url' => $data,
           'ext' => $result['extension'],
           'size' => $result['size'],
+          'bytes' => $result['bytes'],
           'max_chunk_size' => 'auto' // put default at first
         );
         $crt = $jds->crt_download($arrSVR);
@@ -596,6 +597,36 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $arr['stat'] = $std->db->escape_string($_POST['status']);
 
     $response = $jds->updateDownloadData($arr);
+
+    // Split file chunks
+    if ($arr['stat'] == 'splitting') {
+      $rData = $jds->getRequestInfo($arr['rid'], $arr['jid']);
+      $bytes = $rData['bytes'];
+      $percentile = ($rData['chunk_size'] == 'auto') ? 20 : $rData['chunk_size'];
+      # get chunks per chunk_size (percentile)
+      $chunkArrEnds = $jds->splitBytesByPercentile($bytes, $percentile);
+      $chunkStart = 0; $iterator = 0;
+
+      for ($i=0; $i < count($chunkArrEnds); $i++) {
+        $chunkEnd = $chunkArrEnds[$i];
+        $chunkArr = array(
+          'chunk_id' => 'chnk_'.$iterator,
+          'joint_id' => $arr['jid'],
+          'request_id' => $arr['rid'],
+          'byte_start' => $chunkStart,
+          'byte_end' => $chunkEnd
+        );
+        $crt_chunks = $jds->crt_chunks($chunkArr);
+        $chunkStart = $chunkEnd;
+        $iterator += 1;
+      }
+
+      if ($crt_chunks != true) {
+        $result = array('server_error' => $crt_chunks);
+        echo json_encode($result);
+        exit();
+      }
+    }
     echo $response;
   }
   // -------------------------------------------------------------------------->
@@ -612,8 +643,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (!filter_var($url, FILTER_VALIDATE_URL)) exit();
 
     $ext = $std->db->escape_string($_POST['ext']);
-    $realSize = $std->db->escape_string($_POST['realSize']);
-    $formattedSize = $std->formatUnit($realSize);
+    $bytes = $std->db->escape_string($_POST['bytes']);
+    $formattedSize = $std->formatUnit($bytes);
     $fileOrigin = $_POST['origin']; // object contains url broken into scheme, host and path
 
     # Create new download request from URL recieved -----------------------\/
@@ -623,6 +654,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       'url' => $url,
       'ext' => $ext,
       'size' => $formattedSize,
+      'bytes' => $bytes,
       'max_chunk_size' => 'auto' // put default at first
     );
     $crt = $jds->crt_download($arrSVR);

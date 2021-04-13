@@ -246,7 +246,7 @@
                             url : jRes.input,
                             origin : jRes.origin,
                             ext : jRes.extension,
-                            realSize : jRes.realSize
+                            bytes : jRes.bytes
                           };
                           ajx({
                             type: 'POST',

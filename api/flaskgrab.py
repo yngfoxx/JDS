@@ -229,6 +229,7 @@ class jdsDownloader():
                 'status': 'splitting'
             }
             req = requests.post('http://localhost/JDS/req/req_handler.php', data=payload)
+            print(req.text)
         # ===================================================================== #
 
 
