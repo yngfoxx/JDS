@@ -47,6 +47,9 @@
       <!-- Local download manager -->
       <div class="tnvbr">
         <h3>Download manager</h3>
+        <div class="tnvbr_btns">
+          <a class="tnvbrb-button" data-btn="cdm_refresh">Refresh</a>
+        </div>
       </div>
       <div class="_bdyMain">
         <div class="_bdyContent" data-node-id="local_dm">
@@ -61,6 +64,7 @@
     let client_data = null;
     let client_net_addr = null;
     let recon_cool_down = false;
+    let refresh_cool_down = false;
     let desktop_socket_unique_id = genKey(6);
     let netList = {};
     let ws = new WebSocket("ws://127.0.0.1:5678/");
@@ -103,6 +107,7 @@
                         Request Download information payload
                         initialize new background process for downloading
                       */
+                      localdmpanel_overlay('Fetching');
                       ws.send(
                         JSON.stringify({
                           action: 'fetch_download_info',
@@ -110,6 +115,31 @@
                           sid: desktop_socket_unique_id,
                         })
                       );
+
+                      let refrshcdm_btn = document.querySelectorAll("[data-btn='cdm_refresh']");
+                      refrshcdm_btn.forEach((item, i) => {
+                        item.addEventListener('click', () => {
+                          if (refresh_cool_down == true) {
+                            alert("Download manager refresh is cooling down!");
+                            return;
+                          }
+                          refresh_cool_down = true;
+                          console.log("[!] Refreshing download manager...");
+                          localdmpanel_overlay('Refreshing');
+
+                          ws.send(
+                            JSON.stringify({
+                              action: 'fetch_download_info',
+                              payload: client_data,
+                              sid: desktop_socket_unique_id,
+                            })
+                          );
+
+                          // turn off cooldown after 10 seconds
+                          setTimeout(() => { refresh_cool_down = false; }, 10000);
+                        });
+                      });
+
 
                       // Start network scanner -------------------------------->
                       networkpanel_overlay("Searching local network for users");
@@ -122,9 +152,11 @@
 
 
                       let joint_list = []; // populate joint_list
-                      client_data.joints.forEach((item, i) => {
-                        joint_list.push(item.jid);
-                      });
+                      if (client_data.joints != 0) {
+                        client_data.joints.forEach((item, i) => {
+                          joint_list.push(item.jid);
+                        });
+                      }
                       console.log(joint_list);
 
                       /*

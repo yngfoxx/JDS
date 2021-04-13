@@ -70,8 +70,13 @@
                 console.log("[+] Network scanner requested");
                 let groups = (eData.hasOwnProperty('groups')) ? eData.groups : undefined;
                 let net_addr = (eData.hasOwnProperty('net_addr')) ? eData.net_addr : undefined;
+                
+                console.log("[!] Active user's joint groups");
                 console.log(groups);
+
+                console.log("[!] Active user's local network address");
                 console.log(net_addr);
+
                 ajx({
                   type: 'POST',
                   url: '/JDS/req/req_handler.php',
@@ -81,6 +86,10 @@
                       iplist = JSON.parse(res);
                       console.log('[!] IP list ------------------------------');
                       console.log(iplist);
+                      if (iplist.length == 0 || iplist == 0) {
+                        console.log('[!] There are no other users in the joint group');
+                        return;
+                      }
                       for (const [key, value] of Object.entries(iplist)) {
                         value.forEach((lower_item, i) => {
                           let lanAddr = lower_item.user_net_addr;
@@ -119,6 +128,24 @@
                   },
                   load: 'up',
                 });
+                break;
+
+              case 'fetch_download_info':
+                if (eData.hasOwnProperty('payload')) {
+                  eData.payload['client_ldm'] = true;
+                  ajx({
+                    type: 'POST',
+                    url: '/JDS/req/req_handler.php',
+                    data: eData.payload,
+                    success: (res) => {
+                      console.log(res);
+                    },
+                    complete: () => {
+                      console.log('[!] Download manager info request done!');
+                    },
+                    load: 'up'
+                  });
+                }
                 break;
 
               default:

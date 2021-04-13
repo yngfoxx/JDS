@@ -152,8 +152,8 @@ class websocketserver():
                     elif action == 'fetch_network_users':
                         print('[+] WebSocket request: '+action)
                         print(wsRequest['list'])
-                        print('SOCKET_ID => ', wsRequest['socketID'])
-                        print('LOCAL_IP => ', wsRequest['netAddr'])
+                        print('[!] SOCKET_ID => ', wsRequest['socketID'])
+                        print('[!] LOCAL_IP => ', wsRequest['netAddr'])
                         # get  local ip of all users of the same Joint group
                         for ws in connections:
                             ws = connections[ws]['socket']
@@ -171,6 +171,18 @@ class websocketserver():
                     elif action == 'fetch_download_info':
                         print('[+] Fetching download info')
                         print(wsRequest['payload'])
+                        # Send request to web app
+                        for ws in connections:
+                            ws = connections[ws]['socket']
+                            # point to [web] socket
+                            if ws != websocket:
+                                WEB_PAYLOAD = {
+                                    "channel": action,
+                                    "payload": wsRequest['payload'],
+                                    "socketid": wsRequest['sid']
+                                }
+                                WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
                     elif action == 'scan_network_users':

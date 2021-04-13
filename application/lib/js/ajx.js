@@ -159,23 +159,25 @@ function generate_net_prof(netlist) {
 
 
 function networkpanel_overlay(newMsg) {
-  let networkMsg = document.createElement('A');
-      networkMsg.classList.add('_aMsg');
-      networkMsg.style.color = 'var(--light-gray-v2)';
-      networkMsg.setAttribute('data-snippet', newMsg);
-  let parent = document.querySelector('div[data-node-id="local_recon"]').children[0];
-      replaceInnerDOM(parent, networkMsg);
+  let messageAnchor = document.createElement('A');
+      messageAnchor.classList.add('_aMsg');
+      messageAnchor.style.color = 'var(--light-gray-v2)';
+      messageAnchor.setAttribute('data-snippet', newMsg);
+  let parent = document.querySelector('._bdyContent[data-node-id="local_recon"]');
+      clearDOM(parent);
+      parent.append(messageAnchor);
 }
 
 
 
 function localdmpanel_overlay(newMsg) {
-  let networkMsg = document.createElement('A');
-      networkMsg.classList.add('_aMsg');
-      networkMsg.style.color = 'var(--light-gray-v2)';
-      networkMsg.setAttribute('data-snippet', newMsg);
-  let parent = document.querySelector('div[data-node-id="local_dm"]');
-      replaceInnerDOM(parent, networkMsg);
+  let messageAnchor = document.createElement('A');
+      messageAnchor.classList.add('_aMsg');
+      messageAnchor.style.color = 'var(--light-gray-v2)';
+      messageAnchor.setAttribute('data-snippet', newMsg);
+  let parent = document.querySelector('._bdyContent[data-node-id="local_dm"]');
+      clearDOM(parent);
+      parent.append(messageAnchor);
 }
 
 // <!-- <div class="net_usr_div"> -->

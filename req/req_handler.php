@@ -699,8 +699,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       exit();
     }
     // ------------------------------------------------------------------------>
+  }
 
 
+  if (isset($_POST['client_ldm'])) {
+    $rcvd_devID = $std->db->escape_string($_POST['devID']);
+    $rcvd_userID = $std->db->escape_string($_POST['userID']);
+    $rcvd_joints = $_POST['joints'];
+    
+    echo '[+] Download Manager [INFO]';
   }
   //////////////////////////////////////////////////////////////////////////////
 
