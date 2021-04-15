@@ -730,10 +730,19 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       echo json_encode($result);
       exit();
     }
-    // ------------------------------------------------------------------------>
   }
+  // -------------------------------------------------------------------------->
 
-  // CLIENT DESKTOP APP REQUEST FOR DOWNLOAD MANAGER DATA
+
+  // Get request chunk data --------------------------------------------------->
+  if (isset($_POST['jdsChunks'])) {
+    echo "[+] REQUEST RECEIVED";
+    exit();
+  }
+  // -------------------------------------------------------------------------->
+
+
+  // CLIENT DESKTOP APP REQUEST FOR DOWNLOAD MANAGER DATA --------------------->
   if (isset($_POST['client_ldm'])) {
     $rcvd_devID = $std->db->escape_string($_POST['devID']);
     $rcvd_userID = $std->db->escape_string($_POST['userID']);
@@ -741,6 +750,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     echo '[+] Download Manager [INFO]';
   }
+  // -------------------------------------------------------------------------->
+
   //////////////////////////////////////////////////////////////////////////////
 
 

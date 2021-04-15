@@ -1,4 +1,7 @@
 <?php
+  session_start();
+  include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/joint.php';
+
   echo "<div><h1>Chunk splitting</h1>";
   $bytes = 309721;
   $max_chunk_size = 20; // Percent

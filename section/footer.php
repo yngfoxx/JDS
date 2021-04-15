@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/JDS/lib/js/ajx.js"></script>
+<script type="text/javascript" src="/JDS/lib/js/ajx.js<?php echo "?v=".rand(100000000, 999999999);  ?>"></script>
 <?php
 // USER HOME PAGE ------------------------------------------------------------->
  if (isset($_GET['home'])) { // HOME PAGE ?>

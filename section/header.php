@@ -27,7 +27,7 @@ $DOMAIN = "http://localhost/JDS";
 
 <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 <link rel="stylesheet" href="//unpkg.com/swiper/swiper-bundle.min.css">
-<link rel="stylesheet/less" type="text/css" href="/JDS/lib/less/style.less" />
+<link rel="stylesheet/less" type="text/css" href="/JDS/lib/less/style.less<?php echo "?v=".rand(100000000, 999999999);  ?> " />
 <link rel="stylesheet" href="/JDS/lib/css/fontello/animation.css">
 <link rel="stylesheet" href="/JDS/lib/css/fontello/fontello.css">
 
