@@ -67,224 +67,230 @@
     let refresh_cool_down = false;
     let desktop_socket_unique_id = genKey(6);
     let netList = {};
-    let ws = new WebSocket("ws://127.0.0.1:5678/");
-        ws.onopen = function () { // Request local area network hosts
-          // https://websocket-client.readthedocs.io/en/latest/examples.html
-          ws.send( JSON.stringify({action: 'desktop_client_online', interval: 'none', socketID: desktop_socket_unique_id, socketType: 'desktop'}) );
-          let networkMsg = document.getElementsByClassName('_aMsg')[0];
-          let downloadStat = document.getElementsByClassName('_aMsg')[1];
-          networkMsg.setAttribute('data-snippet', "Waiting for JDS server");
-          downloadStat.setAttribute('data-snippet', "Waiting");
-        }
+    function ws_connect() {
 
-        ws.onerror = function () { alert("Error occured in websocket connection"); }
-        ws.onclose = function () { alert("Connection closed!"); }
+      let ws = new WebSocket("ws://127.0.0.1:5678/");
+          ws.onopen = function () { // Request local area network hosts
+            // https://websocket-client.readthedocs.io/en/latest/examples.html
+            ws.send( JSON.stringify({action: 'desktop_client_online', interval: 'none', socketID: desktop_socket_unique_id, socketType: 'desktop'}) );
+            let networkMsg = document.getElementsByClassName('_aMsg')[0];
+            let downloadStat = document.getElementsByClassName('_aMsg')[1];
+            networkMsg.setAttribute('data-snippet', "Waiting for JDS server");
+            downloadStat.setAttribute('data-snippet', "Waiting");
+          }
 
-        ws.onmessage = function (event) {
-          // wait for event.data with current users info
-          // console.log(event.data);
-          if (isJson(event.data)) {
-            let eData = JSON.parse(event.data);
-            if (eData.hasOwnProperty('channel')) {
-              switch (eData.channel) {
-                /*
-                  Execute when websocket connection between
-                  desktop app and web app are successfully connected
-                */
-                case 'desktop_client_connected':
-                  console.log(eData);
-                  if (eData.hasOwnProperty('payload')) {
-                    if (eData.payload == "") { // get web payload
-                      console.log("[!] Payload is empty.");
-                      ws.send( JSON.stringify({action: 'refresh_webview', interval: 'none'}) );
-                      return;
-                    }
+          ws.onerror = function () { alert("Error occured in websocket connection"); }
+          ws.onclose = function (e) {
+            console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+            setTimeout(function() { ws_connect(); }, 1000);
+          }
 
-                    if (isJson(eData.payload)) { // Check if payload is an object
-                      client_data = JSON.parse(eData.payload);
-                      if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
-                      /*
-                        Request Download information payload
-                        initialize new background process for downloading
-                      */
-                      localdmpanel_overlay('Fetching');
-                      ws.send(
-                        JSON.stringify({
-                          action: 'fetch_download_info',
-                          payload: client_data,
-                          sid: desktop_socket_unique_id,
-                        })
-                      );
-
-                      let refrshcdm_btn = document.querySelectorAll("[data-btn='cdm_refresh']");
-                      refrshcdm_btn.forEach((item, i) => {
-                        item.addEventListener('click', () => {
-                          if (refresh_cool_down == true) {
-                            alert("Download manager refresh is cooling down!");
-                            return;
-                          }
-                          refresh_cool_down = true;
-                          console.log("[!] Refreshing download manager...");
-                          localdmpanel_overlay('Refreshing');
-
-                          ws.send(
-                            JSON.stringify({
-                              action: 'fetch_download_info',
-                              payload: client_data,
-                              sid: desktop_socket_unique_id,
-                            })
-                          );
-
-                          // turn off cooldown after 10 seconds
-                          setTimeout(() => { refresh_cool_down = false; }, 10000);
-                        });
-                      });
-
-
-                      // Start network scanner -------------------------------->
-                      networkpanel_overlay("Searching local network for users");
-                      localdmpanel_overlay('Waiting');
-                      console.log("[+] Application connection established!");
-
-                      // Hide fake preloader
-                      let loader = document.querySelector('._pre_loader');
-                          loader.classList.add('hide');
-
-
-                      let joint_list = []; // populate joint_list
-                      if (client_data.joints != 0) {
-                        client_data.joints.forEach((item, i) => {
-                          joint_list.push(item.jid);
-                        });
+          ws.onmessage = function (event) {
+            // wait for event.data with current users info
+            // console.log(event.data);
+            if (isJson(event.data)) {
+              let eData = JSON.parse(event.data);
+              if (eData.hasOwnProperty('channel')) {
+                switch (eData.channel) {
+                  /*
+                    Execute when websocket connection between
+                    desktop app and web app are successfully connected
+                  */
+                  case 'desktop_client_connected':
+                    console.log(eData);
+                    if (eData.hasOwnProperty('payload')) {
+                      if (eData.payload == "") { // get web payload
+                        console.log("[!] Payload is empty.");
+                        ws.send( JSON.stringify({action: 'refresh_webview', interval: 'none'}) );
+                        return;
                       }
-                      console.log(joint_list);
 
-                      /*
-                        Find Joint group users on local network by there
-                        local IP address
-                      */
-                      client_net_addr = (eData.net_addr || []);
+                      if (isJson(eData.payload)) { // Check if payload is an object
+                        client_data = JSON.parse(eData.payload);
+                        if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
+                        /*
+                          Request Download information payload
+                          initialize new background process for downloading
+                        */
+                        localdmpanel_overlay('Fetching');
+                        ws.send(
+                          JSON.stringify({
+                            action: 'fetch_download_info',
+                            payload: client_data,
+                            sid: desktop_socket_unique_id,
+                          })
+                        );
 
+                        let refrshcdm_btn = document.querySelectorAll("[data-btn='cdm_refresh']");
+                        refrshcdm_btn.forEach((item, i) => {
+                          item.addEventListener('click', () => {
+                            if (refresh_cool_down == true) {
+                              alert("Download manager refresh is cooling down!");
+                              return;
+                            }
+                            refresh_cool_down = true;
+                            console.log("[!] Refreshing download manager...");
+                            localdmpanel_overlay('Refreshing');
 
-                      /*
-                        Request groups members on same local network
-                      */
-                      ws.send(
-                        JSON.stringify({
-                          action: 'fetch_network_users',
-                          interval: '30',
-                          list: joint_list,
-                          socketID: desktop_socket_unique_id,
-                          netAddr: client_net_addr
-                        })
-                      );
+                            ws.send(
+                              JSON.stringify({
+                                action: 'fetch_download_info',
+                                payload: client_data,
+                                sid: desktop_socket_unique_id,
+                              })
+                            );
 
-
-                      // create button click event listener
-                      let scan_btn = document.querySelectorAll("[data-btn='net_recon']");
-                      scan_btn.forEach((item, i) => {
-                        item.addEventListener('click', () => {
-                          if (recon_cool_down == true) {
-                            alert("Scanner is cooling down!");
-                            return;
-                          }
-                          recon_cool_down = true;
-                          console.log("[!] Scanning network for users...");
-                          networkpanel_overlay("Searching local network for users");
-
-                          ws.send(
-                            JSON.stringify({
-                              action: 'fetch_network_users',
-                              interval: '30',
-                              list: joint_list,
-                              socketID: desktop_socket_unique_id,
-                              netAddr: client_net_addr
-                            })
-                          );
-
-                          // turn off cooldown after 10 seconds
-                          setTimeout(() => { recon_cool_down = false; }, 10000);
+                            // turn off cooldown after 10 seconds
+                            setTimeout(() => { refresh_cool_down = false; }, 10000);
+                          });
                         });
-                      });
-                      // ------------------------------------------------------>
+
+
+                        // Start network scanner -------------------------------->
+                        networkpanel_overlay("Searching local network for users");
+                        localdmpanel_overlay('Waiting');
+                        console.log("[+] Application connection established!");
+
+                        // Hide fake preloader
+                        let loader = document.querySelector('._pre_loader');
+                            loader.classList.add('hide');
+
+
+                        let joint_list = []; // populate joint_list
+                        if (client_data.joints != 0) {
+                          client_data.joints.forEach((item, i) => {
+                            joint_list.push(item.jid);
+                          });
+                        }
+                        console.log(joint_list);
+
+                        /*
+                          Find Joint group users on local network by there
+                          local IP address
+                        */
+                        client_net_addr = (eData.net_addr || []);
+
+
+                        /*
+                          Request groups members on same local network
+                        */
+                        ws.send(
+                          JSON.stringify({
+                            action: 'fetch_network_users',
+                            interval: '30',
+                            list: joint_list,
+                            socketID: desktop_socket_unique_id,
+                            netAddr: client_net_addr
+                          })
+                        );
+
+
+                        // create button click event listener
+                        let scan_btn = document.querySelectorAll("[data-btn='net_recon']");
+                        scan_btn.forEach((item, i) => {
+                          item.addEventListener('click', () => {
+                            if (recon_cool_down == true) {
+                              alert("Scanner is cooling down!");
+                              return;
+                            }
+                            recon_cool_down = true;
+                            console.log("[!] Scanning network for users...");
+                            networkpanel_overlay("Searching local network for users");
+
+                            ws.send(
+                              JSON.stringify({
+                                action: 'fetch_network_users',
+                                interval: '30',
+                                list: joint_list,
+                                socketID: desktop_socket_unique_id,
+                                netAddr: client_net_addr
+                              })
+                            );
+
+                            // turn off cooldown after 10 seconds
+                            setTimeout(() => { recon_cool_down = false; }, 10000);
+                          });
+                        });
+                        // ------------------------------------------------------>
+                      }
+
+                      if (eData.hasOwnProperty('uconfig')) {
+
+                      }
                     }
+                    break;
 
-                    if (eData.hasOwnProperty('uconfig')) {
+                  case 'desktop_client_disconnected':
+                    console.log("Client logged out!");
+                    let loader = document.querySelector('._pre_loader');
+                        loader.classList.remove('hide');
+                    let networkMsg = document.getElementsByClassName('_aMsg')[0];
+                    let downloadStat = document.getElementsByClassName('_aMsg')[1];
 
+                        networkMsg.style.color = '#ee5f5f';
+                        networkMsg.setAttribute('data-snippet', "Service is offline");
+
+                        downloadStat.style.color = '#ee5f5f';
+                        downloadStat.setAttribute('data-snippet', "Service is offline");
+                    break;
+
+                  case 'net_scanner_completed':
+                    console.log("[*] Local network scanner completed!");
+                    // restart timer 20 seconds later
+                    if (netList && !isEmpty(netList)) {
+                      clearDOM(document.querySelector("div[data-element-id='netlist']"));
+                      generate_net_prof(netList);
                     }
-                  }
-                  break;
+                    break;
 
-                case 'desktop_client_disconnected':
-                  console.log("Client logged out!");
-                  let loader = document.querySelector('._pre_loader');
-                      loader.classList.remove('hide');
-                  let networkMsg = document.getElementsByClassName('_aMsg')[0];
-                  let downloadStat = document.getElementsByClassName('_aMsg')[1];
-
-                      networkMsg.style.color = '#ee5f5f';
-                      networkMsg.setAttribute('data-snippet', "Service is offline");
-
-                      downloadStat.style.color = '#ee5f5f';
-                      downloadStat.setAttribute('data-snippet', "Service is offline");
-                  break;
-
-                case 'net_scanner_completed':
-                  console.log("[*] Local network scanner completed!");
-                  // restart timer 20 seconds later
-                  if (netList) {
-                    clearDOM(document.querySelector("div[data-element-id='netlist']"));
-                    generate_net_prof(netList);
-                  }
-                  break;
-
-                case 'net_user_discovered':
-                  console.log("----------------------------------");
-                  console.log("[+] User of same group discovered!");
-                  // console.log(eData.payload);
-                  let pLoad = eData.payload;
-                  if (!pLoad.hasOwnProperty('host_joint')) return;
-                  // nlID = pLoad['host_uid'] + '/' + pLoad['host_net_addr'][0];
-                  nlID = 'UUID_'+pLoad['host_uid'];
-                  if (!netList.hasOwnProperty(nlID)) {
-                    console.log('[!] User is not in network list');
-                    netList[nlID] = {
-                      'userID': pLoad['host_uid'],
-                      'userName': pLoad['host_uname'],
-                      'joints': [{jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role']}],
-                      'netAddr': pLoad['host_net_addr']
-                    };
-                    // generate_net_prof(netList[nlID]);
-                    // console.log(netList); // Log the network list to console
-
-                  } else if (netList.hasOwnProperty(nlID)) {
-                    // Update only list of joints if new joint group found
-                    console.log('[!] User is already in network list');
-                    let arr = netList[nlID]['joints'];
-                    let arrIndex = arr.findIndex(function (joint) {
-                      return joint['jid'] == pLoad['host_joint']['jid'];
-                    });
-                    if (arrIndex < 0) {
-                      netList[nlID]['joints'].push({jid: pLoad['host_joint'].jid, role: pLoad['host_joint'].role });
+                  case 'net_user_discovered':
+                    console.log("----------------------------------");
+                    console.log("[+] User of same group discovered!");
+                    // console.log(eData.payload);
+                    let pLoad = eData.payload;
+                    if (!pLoad.hasOwnProperty('host_joint')) return;
+                    // nlID = pLoad['host_uid'] + '/' + pLoad['host_net_addr'][0];
+                    nlID = 'UUID_'+pLoad['host_uid'];
+                    if (!netList.hasOwnProperty(nlID)) {
+                      console.log('[!] User is not in network list');
+                      netList[nlID] = {
+                        'userID': pLoad['host_uid'],
+                        'userName': pLoad['host_uname'],
+                        'joints': [{jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role']}],
+                        'netAddr': pLoad['host_net_addr']
+                      };
                       // generate_net_prof(netList[nlID]);
+                      // console.log(netList); // Log the network list to console
+
+                    } else if (netList.hasOwnProperty(nlID)) {
+                      // Update only list of joints if new joint group found
+                      console.log('[!] User is already in network list');
+                      let arr = netList[nlID]['joints'];
+                      let arrIndex = arr.findIndex(function (joint) {
+                        return joint['jid'] == pLoad['host_joint']['jid'];
+                      });
+                      if (arrIndex < 0) {
+                        netList[nlID]['joints'].push({jid: pLoad['host_joint'].jid, role: pLoad['host_joint'].role });
+                        // generate_net_prof(netList[nlID]);
+                      }
+                      console.log(netList);
                     }
-                    console.log(netList);
-                  }
-                  console.log("----------------------------------");
-                  break;
+                    console.log("----------------------------------");
+                    break;
 
-                case desktop_socket_unique_id:
-                  console.log("Unique message received!");
-                  console.log(eData);
-                  break;
+                  case desktop_socket_unique_id:
+                    console.log("Unique message received!");
+                    console.log(eData);
+                    break;
 
-                default:
-                  break;
+                  default:
+                    break;
+                }
               }
             }
-          }
-        };
-
+          };
+    }
+    ws_connect();
       // Testing POST request
       // (() => {
       //   let parm = '{ "event": "sonar", "type": "lan" }';

@@ -43,7 +43,7 @@
 
           ws_client_app.onerror = function () { alert("Failed to connect to client application"); }
           // ws_client_app.onclose = function () { alert("Connection closed!"); }
-          ws_client_app.onclose = function () {
+          ws_client_app.onclose = function (e) {
             console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
             setTimeout(function() { ws_client_connect(); }, 1000);
           }

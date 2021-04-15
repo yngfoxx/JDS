@@ -164,3 +164,18 @@ function startdecrypt(decrypted, encrypted) {
     // 50ms looks more dramatic
     },50);
 }
+
+
+
+/*-------------------------------------------------------------
+    Check if object is empty
+---------------------------------------------------------------*/
+function isEmpty(obj) {
+  for(var prop in obj) {
+    if(obj.hasOwnProperty(prop)) {
+      return false;
+    }
+  }
+
+  return JSON.stringify(obj) === JSON.stringify({});
+}

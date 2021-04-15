@@ -87,12 +87,16 @@ class websocketserver():
                     print("[+] WebSocket connection closed")
                     if self.init == True:
                         self.stopped = True
+                        time.sleep(5)
                         self.start()
                     continue
 
                 except websockets.exceptions.ConnectionClosedError:
                     print("[+] WebSocket connection error: [Expected]")
-                    self.stopped = True
+                    if self.init == True:
+                        self.stopped = True
+                        time.sleep(5)
+                        self.start()
                     continue
 
                 # Handle websocket recieved input

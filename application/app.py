@@ -177,10 +177,10 @@ class Threader (threading.Thread):
     # https://www.tutorialspoint.com/python/python_multithreading.htm
     def __init__(self, threadID, name, counter):
         threading.Thread.__init__(self)
+        self._stop_event = threading.Event()
         self.threadID = threadID
         self.name = name
         self.counter = counter
-
 
     def run(self):
         print("[+] Starting " + self.name)
@@ -206,13 +206,19 @@ class Threader (threading.Thread):
 
         print("[*] Exiting thread: " + self.name)
 
+    def stop(self):
+        self._stop_event.set()
+
+    def stopped(self):
+        return self._stop_event.is_set()
+
 
 # Exit application ------------------------------------------------------------>
 def exit_():
     app.exec_()
     # app.quit
     for t in threads:
-        # print(t) # Show thread
+        print(t) # Show thread
         if (t.name == "LOCAL_HTTP_SERVER"):
             try:
                 server_lan.stop()
@@ -225,6 +231,8 @@ def exit_():
             except:
                 print("Error while closing WebSocket server!")
 
+        print('[!] Thread isStopped: ', t.stopped())
+        print(t) # Show thread
         t.join()
     print("[+] Threads killed!")
 # ----------------------------------------------------------------------------->
