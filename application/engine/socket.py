@@ -344,9 +344,9 @@ class websocketserver():
     def close(self):
         self.init = False
         try:
+            self.futurestop.set_result(True) # Stop future loop to terminate the program
             self.local_net_scanner = False
             self.stopped = True # Stop while loop in main()
-            self.futurestop.set_result(True) # Stop future loop to terminate the program
             # self.payload_file.close()
             print("[+] WebSocket server stopped")
         except:

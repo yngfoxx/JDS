@@ -294,17 +294,45 @@ class jointlib extends stdlib {
 
   public function crt_chunks($chunk)
   {
-    $chnkID = $chunk['chunk_id'];
+    $chnkID = $chunk['chunk_order'];
     $chnkJID = $chunk['joint_id'];
     $chnkRID = $chunk['request_id'];
     $chnkBSTART = $chunk['byte_start'];
     $chnkBEND = $chunk['byte_end'];
     $sql = "
-      INSERT INTO chunk(chunk_id, joint_id, request_id, byte_start, byte_end)
+      INSERT INTO chunk(chunk_order, joint_id, request_id, byte_start, byte_end)
       VALUES ('$chnkID', '$chnkJID', '$chnkRID', '$chnkBSTART', '$chnkBEND')
     ";
     $qry = mysqli_query($this->db, $sql);
     return (($qry) ? true : $this->db->error);
+  }
+
+
+  public function getChunks($arr)
+  {
+    $chnkJID = $arr['joint_id'];
+    $chnkRID = $arr['request_id'];
+    $sql = "
+      SELECT
+        chunk.id AS 'chunk_id',
+        chunk.chunk_order AS 'order_name',
+        joint_group.joint_id AS 'jid',
+        svr_download_request.request_id AS 'rid',
+        chunk.byte_start AS 'byte_start',
+        chunk.byte_end AS 'byte_end'
+      FROM chunk
+      INNER JOIN joint_group ON joint_group.joint_id = chunk.joint_id
+      INNER JOIN svr_download_request ON svr_download_request.request_id = chunk.request_id
+      WHERE chunk.request_id = '$chnkRID'
+      AND joint_group.joint_id = '$chnkJID'
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    if ($qry && mysqli_num_rows($qry) > 0) {
+      $response = array();
+      while ($arr = mysqli_fetch_assoc($qry)) $response[] = $arr;
+      return $response;
+    }
+    return false;
   }
 }
 ?>

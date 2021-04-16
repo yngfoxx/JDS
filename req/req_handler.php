@@ -610,7 +610,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       for ($i=0; $i < count($chunkArrEnds); $i++) {
         $chunkEnd = $chunkArrEnds[$i];
         $chunkArr = array(
-          'chunk_id' => 'chnk_'.$iterator,
+          'chunk_order' => 'chnk_'.$iterator,
           'joint_id' => $arr['jid'],
           'request_id' => $arr['rid'],
           'byte_start' => $chunkStart,
@@ -736,7 +736,17 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
   // Get request chunk data --------------------------------------------------->
   if (isset($_POST['jdsChunks'])) {
-    echo "[+] REQUEST RECEIVED";
+    // echo "[+] REQUEST RECEIVED";
+    $arr = array();
+    $arr['joint_id'] = $std->db->escape_string($_POST['jid']);
+    $arr['request_id'] = $std->db->escape_string($_POST['rid']);
+    $chnks = $jds->getChunks($arr);
+    if ($chnks != false) {
+      echo json_encode($chnks);
+    } else {
+      $result = array('server_error' => "Failed to get chunks from database", 'code' => '500'); // forbidden
+      echo json_encode($result);
+    }
     exit();
   }
   // -------------------------------------------------------------------------->
