@@ -783,7 +783,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $rcvd_devID = $std->db->escape_string($_POST['devID']);
     $rcvd_userID = $std->db->escape_string($_POST['userID']);
 
-    if (base64_decode($_COOKIE['dKEY'])) == $rcvd_devID) {
+    if (base64_decode($_COOKIE['dKEY']) == $rcvd_devID) {
       if ($auth->getUserIdByDeviceID($rcvd_devID) != $rcvd_userID) {
         $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
         echo json_encode($result);
