@@ -312,21 +312,24 @@ class websocketserver():
 
     async def initialize(self, stop):
         self.ws = websockets.serve(self.main, hostdomain, self.port)
-        async with self.ws:
-            await stop
-
 
 
     def start(self):
-        self.stopped = False
         # The stop condition is set when receiving SIGTERM.
         # https://docs.python.org/3/library/asyncio-future.html#asyncio.Future
+        self.stopped = False
+
         self.loop = asyncio.get_event_loop()
-        self.futurestop = self.loop.create_future()
+        self.start_server = websockets.serve(self.main, hostdomain, self.port)
+
+        # self.futurestop = self.loop.create_future()
         # self.loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
 
         print("[+] Created socket server on port: 5678")
-        asyncio.get_event_loop().run_until_complete(self.initialize(self.futurestop))
+        # asyncio.get_event_loop().run_until_complete(self.initialize(self.futurestop))
+
+        self.loop.run_until_complete(self.start_server)
+        self.loop.run_forever()
 
 
 
@@ -334,7 +337,8 @@ class websocketserver():
         self.init = False
         try:
             # self.futurestop.set_result(True) # Stop future loop to terminate the program
-            self.futurestop.cancel("[!] Loop cancelled.")
+            # self.futurestop.cancel("[!] Loop cancelled.")
+            self.loop.stop()
             self.local_net_scanner = False
             self.stopped = True # Stop while loop in main()
             # self.payload_file.close()
