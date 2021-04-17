@@ -209,6 +209,7 @@ class Threader (threading.Thread):
 
 # Exit application ------------------------------------------------------------>
 def exit_():
+    print("\n [!] Exiting application")
     app.exec_()
     # app.quit
     for t in threads:
