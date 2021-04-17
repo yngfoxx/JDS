@@ -75,29 +75,13 @@ class websocketserver():
 
 
     async def main(self, websocket, path):
-        while self.stopped == False:
+        while self.stopped == False and self.init == True:
             # await websocket.send("connected")
             # clients.add(websocket)
             await self.register(websocket)
             try:
                 # Recieve input from web client ------------------------------->
-                try:
-                    wsInput = await websocket.recv()
-                except websockets.exceptions.ConnectionClosedOK:
-                    print("[+] WebSocket connection closed")
-                    if self.init == True:
-                        self.stopped = True
-                        time.sleep(5)
-                        self.start()
-                    continue
-
-                except websockets.exceptions.ConnectionClosedError:
-                    print("[+] WebSocket connection error: [Expected]")
-                    if self.init == True:
-                        self.stopped = True
-                        time.sleep(5)
-                        self.start()
-                    continue
+                wsInput = await websocket.recv()
 
                 # Handle websocket recieved input
                 wsRequest = json.loads(wsInput)

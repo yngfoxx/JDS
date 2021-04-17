@@ -737,6 +737,19 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // Get request chunk data --------------------------------------------------->
   if (isset($_POST['jdsChunks'])) {
     // echo "[+] REQUEST RECEIVED";
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+
     $arr = array();
     $arr['joint_id'] = $std->db->escape_string($_POST['jid']);
     $arr['request_id'] = $std->db->escape_string($_POST['rid']);
@@ -754,10 +767,32 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
   // CLIENT DESKTOP APP REQUEST FOR DOWNLOAD MANAGER DATA --------------------->
   if (isset($_POST['client_ldm'])) {
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+
     $rcvd_devID = $std->db->escape_string($_POST['devID']);
     $rcvd_userID = $std->db->escape_string($_POST['userID']);
-    $rcvd_joints = $_POST['joints'];
 
+    if (base64_decode($_COOKIE['dKEY'])) == $rcvd_devID) {
+      if ($auth->getUserIdByDeviceID($rcvd_devID) != $rcvd_userID) {
+        $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+
+    }
+
+    var_dump($_POST);
     echo '[+] Download Manager [INFO]';
   }
   // -------------------------------------------------------------------------->

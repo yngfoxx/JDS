@@ -24,7 +24,7 @@ wSocket = socket.websocketserver(5678);
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
-jds_server_domain = "b3ddf114b52f.ngrok.io"
+jds_server_domain = "45a45553279b.ngrok.io"
 
 
 
@@ -231,9 +231,9 @@ def exit_():
             except:
                 print("Error while closing WebSocket server!")
 
-        print('[!] Thread isStopped: ', t.stopped())
         print(t) # Show thread
         t.join()
+        print('[!] Thread isStopped: ', t.stopped())
     print("[+] Threads killed!")
 # ----------------------------------------------------------------------------->
 
