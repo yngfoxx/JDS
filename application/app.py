@@ -206,12 +206,6 @@ class Threader (threading.Thread):
 
         print("[*] Exiting thread: " + self.name)
 
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        return self._stop_event.is_set()
-
 
 # Exit application ------------------------------------------------------------>
 def exit_():
@@ -228,13 +222,14 @@ def exit_():
         elif (t.name == "SOCKET_SERVER"):
             try:
                 wSocket.close()
+                print("[!] Socket server stopped!")
             except:
                 print("Error while closing WebSocket server!")
 
-        print(t) # Show thread
+        # print(t) # Show thread
         t.join()
-        print('[!] Thread isStopped: ', t.stopped())
-    print("[+] Threads killed!")
+
+    print("[!] Closed all threads!")
 # ----------------------------------------------------------------------------->
 
 

@@ -342,7 +342,7 @@ class websocketserver():
             self.local_net_scanner = False
             self.stopped = True # Stop while loop in main()
             # self.payload_file.close()
-            print("[+] WebSocket server stopped")
+            print("[!] Stopping socket server")
         except e:
             print('[-] Error while closing socket: ', e)
 
