@@ -346,10 +346,15 @@ class websocketserver():
         except e:
             print('[-] Error while closing socket: ', e)
 
+
     def restart(self):
+        print('[!] Restarting socket server')
         self.close()
-        while self.futurestop.done() or self.futurestop.cancelled() and self.init == True:
-            self.start()
+
+        time.sleep(30)
+
+        print('[!] Restarting...')
+        self.start()
 
 
 
