@@ -240,6 +240,8 @@
                     if (netList && !isEmpty(netList)) {
                       clearDOM(document.querySelector("div[data-element-id='netlist']"));
                       generate_net_prof(netList);
+                    } else if (isEmpty(netList)) {
+                      networkpanel_overlay("No users found!");
                     }
                     break;
 

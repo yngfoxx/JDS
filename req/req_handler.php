@@ -607,18 +607,46 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
       $chunkArrEnds = $jds->splitBytesByPercentile($bytes, $percentile);
       $chunkStart = 0; $iterator = 0;
 
+      // Child chunk data
+      $childChunkStart = 0;
+      $childChunkOrder = 0;
+
+      $jointMembers = $jds->getJointMembers($arr['jid']); # Group members
+      $childChunkEnd = $chunkArrEnds[0] / count($jointMembers);
+      $childChunkSize = $childChunkEnd;
+
       for ($i=0; $i < count($chunkArrEnds); $i++) {
+        // CHUNK PARENT -------------------------------------------------------\/
         $chunkEnd = $chunkArrEnds[$i];
         $chunkArr = array(
-          'chunk_order' => 'chnk_'.$iterator,
+          'chunk_order' => $iterator,
           'joint_id' => $arr['jid'],
           'request_id' => $arr['rid'],
           'byte_start' => $chunkStart,
-          'byte_end' => $chunkEnd
+          'byte_end' => $chunkEnd,
+          'children' => array()
         );
+
+        # CHUNK CHILDREN -----------------------------------
+        for ($u=0; $u < count($jointMembers); $u++) {
+          $user = $jointMembers[$u];
+          $chunkArr['children'][] = array(
+            'uID' => $user['uid'],
+            'ch_chunk_order' => $childChunkOrder,
+            'ch_chunk_start' => $childChunkStart,
+            'ch_chunk_end' => $childChunkEnd
+          );
+          $childChunkOrder += 1;
+          $childChunkStart = $childChunkEnd;
+          $childChunkEnd += $childChunkSize;
+        }
+        # --------------------------------------------------
+
+        echo json_encode($chunkArr);
         $crt_chunks = $jds->crt_chunks($chunkArr);
         $chunkStart = $chunkEnd;
         $iterator += 1;
+        // --------------------------------------------------------------------/\
       }
 
       if ($crt_chunks != true) {
@@ -784,8 +812,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $rcvd_userID = $std->db->escape_string($_POST['userID']);
 
     if (base64_decode($_COOKIE['dKEY']) == $rcvd_devID) {
-      if ($auth->getUserIdByDeviceID($rcvd_devID) != $rcvd_userID) {
-        $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      if ($auth->getUserIdByDeviceID(base64_encode($rcvd_devID)) != $rcvd_userID) {
+        $result = array('server_error' => "Access violation detected! v3", 'code' => '403'); // forbidden
         echo json_encode($result);
         exit();
       }

@@ -66,7 +66,7 @@ class jointlib extends stdlib {
       VALUES('$jid', '$uid', '$url', '$ext', '$size', '$bytes', '$max_chunk_size');
     ";
     $qry = mysqli_query($this->db, $sql);
-    return (($qry) ? mysqli_insert_id($this->db) : false); // return ID of inserted row
+    return (($qry) ? $this->db->insert_id : false); // return ID of inserted row
   }
 
 
@@ -299,12 +299,29 @@ class jointlib extends stdlib {
     $chnkRID = $chunk['request_id'];
     $chnkBSTART = $chunk['byte_start'];
     $chnkBEND = $chunk['byte_end'];
+    $error = array();
     $sql = "
       INSERT INTO chunk(chunk_order, joint_id, request_id, byte_start, byte_end)
       VALUES ('$chnkID', '$chnkJID', '$chnkRID', '$chnkBSTART', '$chnkBEND')
     ";
     $qry = mysqli_query($this->db, $sql);
-    return (($qry) ? true : $this->db->error);
+    $ch_chnkID = $this->db->insert_id;
+    if ($qry) {
+      $chnkCHILDREN = $chunk['children'];
+      foreach ($chnkCHILDREN as $key => $chnk) {
+        $ch_chnkORDER = $chnk['ch_chunk_order'];
+        $ch_chnkBSTART = $chnk['ch_chunk_start'];
+        $ch_chnkBEND = $chnk['ch_chunk_end'];
+        $ch_chnkUID = $chnk['uID'];
+        $sql = "
+          INSERT INTO chunk_child(chunk_id, chunk_order, byte_start, byte_end, user_id)
+          VALUES ('$ch_chnkID', '$ch_chnkORDER', '$ch_chnkBSTART', '$ch_chnkBEND', '$ch_chnkUID')
+        ";
+        $qry = mysqli_query($this->db, $sql);
+        if (!$qry) array_push($error, array('server_error' => $this->db->error));
+      }
+    }
+    return (count($error) == 0);
   }
 
 

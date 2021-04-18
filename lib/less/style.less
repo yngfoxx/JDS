@@ -16,6 +16,23 @@
 .random(@min, @max) {
   @random: `Math.round(Math.random() * (@{max} - @{min}) + @{min})`;
 }
+
+
+.scrollBar(@width, @border-radius) {
+  &::-webkit-scrollbar {
+    width: @width;
+  }
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: @border-radius;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: @border-radius;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+  }
+}
 // ----------------------------------------------------->
 
 :root {
@@ -600,15 +617,20 @@ select {
                   background-color: #0000005e;
                   ._jdsiroc_content {
                     position: absolute;
-                    top: 20%;
+                    top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
                     width: 99% !important;
                     max-width: 700px;
                     background-color: var(--light-gray);
+                    max-height: 500px;
+                    overflow: auto;
+                    .scrollBar(10px, 10px);
                     ._jdsi_opt_head {
                       text-align: right;
                       padding: 8px;
+                      position: sticky;
+                      top: 0;
                       ._jdsioh_close {
                         width: max-content;
                         text-align: right;

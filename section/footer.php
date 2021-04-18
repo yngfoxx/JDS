@@ -41,7 +41,9 @@
             );
           }
 
-          ws_client_app.onerror = function () { alert("Failed to connect to client application"); }
+          ws_client_app.onerror = function () {
+            // alert("Failed to connect to client application");
+          }
           // ws_client_app.onclose = function () { alert("Connection closed!"); }
           ws_client_app.onclose = function (e) {
             console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
@@ -160,6 +162,7 @@
         // ------------------------------------------------------------------------>
       }
       ws_client_connect();
+      // alert(navigator.userAgent);
   <?php
     }
   ?>
@@ -431,7 +434,7 @@ $("#uprofchange").on('change', function(e) {
 
   // event listener for logout button
   $("a[title='Logout']").on('click', function(e) {
-    if (ws_client_app != undefined && ws_client_app) {
+    try {
       ws_client_app.send(
         JSON.stringify({
           "action": "jds_client_disconnected",
@@ -439,9 +442,12 @@ $("#uprofchange").on('change', function(e) {
           "socketID": socket_unique_id,
         })
       );
-      ws_client_app.close()
+      ws_client_app.close();
+    } catch (e) {
+      alert(e);
+    } finally {
+      window.location.href = "./?logout";
     }
-    window.location.href = "./?logout";
   });
 </script>
 <?php }
