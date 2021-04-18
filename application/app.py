@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import *
 
 
 app = QApplication(sys.argv)
+appIsExiting = False
 
 threads = []
 server_lan = server.lanServer()
@@ -206,11 +207,17 @@ class Threader (threading.Thread):
 
         print("[*] Exiting thread: " + self.name)
 
+        if appIsExiting == False:
+            print("[!] Restarting closed services")
+            if self.name == "SOCKET_SERVER":
+                wSocket.start();
+
 
 # Exit application ------------------------------------------------------------>
 def exit_():
     app.exec_()
     print("\n[!] Exiting application")
+    appIsExiting = True
     # app.quit
     for t in threads:
         print(t) # Show thread

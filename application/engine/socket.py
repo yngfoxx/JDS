@@ -85,7 +85,7 @@ class websocketserver():
                     wsInput = await websocket.recv()
                 except Exception:
                     print('[-]', Exception)
-                    self.restart()
+                    self.stop()
 
 
                 # Handle websocket recieved input
@@ -293,14 +293,14 @@ class websocketserver():
                 print("[+] WebSocket connection closed")
                 if self.init == True:
                     self.stopped = True
-                    self.restart()
+                    self.stop()
                 continue
 
             except websockets.exceptions.ConnectionClosedError:
                 print("[+] WebSocket connection error: [Expected]")
                 if self.init == True:
                     self.stopped = True
-                    self.restart()
+                    self.stop()
                 continue
 
 
@@ -349,11 +349,20 @@ class websocketserver():
 
     def restart(self):
         print('[!] Restarting socket server')
-        self.close()
+        try:
+            # self.futurestop.set_result(True) # Stop future loop to terminate the program
+            # self.futurestop.cancel("[!] Loop cancelled.")
+            self.loop.stop()
+            self.local_net_scanner = False
+            self.stopped = True # Stop while loop in main()
+            # self.payload_file.close()
+            print("[!] Stopping socket server")
+        except e:
+            print('[-] Error while closing socket: ', e)
 
         time.sleep(10)
 
-        print('[!] Restarting...')
+        print('[!] Restarting websocket...')
         self.start()
 
 
