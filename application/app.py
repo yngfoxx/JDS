@@ -210,7 +210,7 @@ class Threader (threading.Thread):
 # Exit application ------------------------------------------------------------>
 def exit_():
     app.exec_()
-    print("\n [!] Exiting application")
+    print("\n[!] Exiting application")
     # app.quit
     for t in threads:
         print(t) # Show thread
