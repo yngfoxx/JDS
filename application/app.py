@@ -250,7 +250,7 @@ def exit_():
 def main():
     # USER INTERFACE ---------------------------------------------------------->
     clientApp = JDS_CLIENT("https://"+jds_server_domain+"/JDS") # CLIENT APPLICATION
-    clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
+    # clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
     # ------------------------------------------------------------------------->
 
 
