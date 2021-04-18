@@ -10,6 +10,7 @@ import sys
 import tempfile
 import requests
 import time
+import os
 
 from engine.platform import domainName
 from engine.server import lanServer
@@ -187,11 +188,15 @@ class websocketserver():
                         while self.local_net_scanner == True:
                             time.sleep(20)
                             attempts += 1
-                            print('[+] SCANNING JOINT USERS ON NETWORK (', attempts, '/ 3 )\n')
+                            print('[+] SCANNING JOINT USERS ON NETWORK (', attempts, '/ 1 )\n')
 
                             for jointGrp in wsRequest['payload']:
                                 print("[!] SENDING POST", jointGrp, "="*90)
                                 local_ip = lanServer().get_ip_list()
+
+                                if not os.path.exists("u_config.txt"):
+                                    self.stop()
+                                    break
 
                                 uconfigFile = open("u_config.txt", 'r')
                                 uconfigData = json.loads(uconfigFile.read())
@@ -247,7 +252,7 @@ class websocketserver():
                                 print("="*114, '\n')
 
                             # Increment net scan attempts
-                            if attempts >= 3:
+                            if attempts >= 1:
                                 print("[*] Local network scanner completed!")
                                 self.local_net_scanner = False
                                 for ws in connections:

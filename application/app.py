@@ -57,7 +57,7 @@ class JDS_DEBUGGER(QMainWindow):
         self.show()
 
     def loadWebPage(self):
-        self.webViewOnline.load(QUrl("http://"+hostdomain+":1231"))
+        self.webViewOnline.load(QUrl("http://"+hostdomain+":1232"))
 
 
 
@@ -207,7 +207,7 @@ class Threader (threading.Thread):
 
         print("[*] Exiting thread: " + self.name)
 
-        if appIsExiting == False:
+        if os.path.exists("u_config.txt"):
             print("[!] Restarting closed services")
             if self.name == "SOCKET_SERVER":
                 wSocket.start();
@@ -217,7 +217,12 @@ class Threader (threading.Thread):
 def exit_():
     app.exec_()
     print("\n[!] Exiting application")
-    appIsExiting = True
+
+    if os.path.exists("u_config.txt"):
+        os.remove("u_config.txt")
+    else:
+        print("[!] User configuration could not be located")
+
     # app.quit
     for t in threads:
         print(t) # Show thread
@@ -245,7 +250,7 @@ def exit_():
 def main():
     # USER INTERFACE ---------------------------------------------------------->
     clientApp = JDS_CLIENT("https://"+jds_server_domain+"/JDS") # CLIENT APPLICATION
-    # clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
+    clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
     # ------------------------------------------------------------------------->
 
 
