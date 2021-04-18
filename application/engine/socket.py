@@ -351,7 +351,7 @@ class websocketserver():
         print('[!] Restarting socket server')
         self.close()
 
-        time.sleep(30)
+        time.sleep(10)
 
         print('[!] Restarting...')
         self.start()
