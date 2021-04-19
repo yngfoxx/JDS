@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.4
+-- version 5.1.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 28, 2021 at 09:01 AM
--- Server version: 10.4.16-MariaDB
--- PHP Version: 7.4.12
+-- Generation Time: Apr 19, 2021 at 04:14 AM
+-- Server version: 10.4.18-MariaDB
+-- PHP Version: 8.0.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -57,7 +57,7 @@ CREATE TABLE `authlogin` (
   `user_id` int(12) NOT NULL,
   `deviceKey` text NOT NULL,
   `usr_channel` text DEFAULT NULL,
-  `local_net_addr` varchar(16) DEFAULT NULL,
+  `local_net_addr` text DEFAULT NULL,
   `dateCreated` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -67,8 +67,74 @@ CREATE TABLE `authlogin` (
 
 INSERT INTO `authlogin` (`id`, `user_id`, `deviceKey`, `usr_channel`, `local_net_addr`, `dateCreated`) VALUES
 (147, 3, '861fa0b40531486db307453b00d36442ccbc1b2b282559c7072f493092ca8881c3e12e65e1725aeb90a1515d2a506b1db676a6cd82af1a77f75554aa2e212e64', NULL, NULL, '2021-02-19 22:26:44'),
-(198, 1, '58489340715a7f0b2241696846787c21cf0b77d4ee7f0eb46a4b9b18d89cbdd742d0abf78f3b1b5155b66cf4522b81f47375428c4bc230d6ce69430c2f0afb5d', NULL, NULL, '2021-03-27 04:45:29'),
-(203, 2, '309ae00604cdcb023a28f301f0c194ea98d6b2597a312b4fe42c7808b42e050e02a963531cf8860a8e506f7b7cc9147f173b29292ac3e941738d410f93dbc64c', NULL, '169.254.233.112', '2021-03-27 23:21:54');
+(283, 1, '4fb144264f91479a822e82a98248f40e3eb114dd8a2fc438aa6e985b883d0b6fcfd31c6b41d2694f84100ddb3711b2089b361197c0983455aead01650d6ff3cf', NULL, NULL, '2021-04-18 09:55:37'),
+(285, 2, 'f260bfdb37c24614f2b9ab902d2b244b6e4e21a5df969dd38317c219dc0609913e62765e939aa8122b230fefc5c22e22778677d0d307144d09c676518f7e2ded', NULL, '[\\\"172.23.144.1\\\",\\\"10.6.8.190\\\",\\\"192.168.52.1\\\",\\\"192.168.232.1\\\"]', '2021-04-18 22:42:28');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chunk`
+--
+
+DROP TABLE IF EXISTS `chunk`;
+CREATE TABLE `chunk` (
+  `id` int(12) NOT NULL,
+  `chunk_order` int(12) NOT NULL,
+  `joint_id` varchar(12) CHARACTER SET utf8mb4 NOT NULL,
+  `request_id` int(12) NOT NULL,
+  `byte_start` text COLLATE utf8mb4_bin NOT NULL,
+  `byte_end` text COLLATE utf8mb4_bin NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+--
+-- Dumping data for table `chunk`
+--
+
+INSERT INTO `chunk` (`id`, `chunk_order`, `joint_id`, `request_id`, `byte_start`, `byte_end`, `date_created`) VALUES
+(87, 0, 'MNX0K1', 520, '0', '73126960', '2021-04-18 22:44:28'),
+(88, 1, 'MNX0K1', 520, '73126960', '146253920', '2021-04-18 22:44:28'),
+(89, 2, 'MNX0K1', 520, '146253920', '219380880', '2021-04-18 22:44:28'),
+(90, 3, 'MNX0K1', 520, '219380880', '292507840', '2021-04-18 22:44:28'),
+(91, 4, 'MNX0K1', 520, '292507840', '365634800', '2021-04-18 22:44:28'),
+(92, 0, '9BSW1Y', 521, '0', '73126960', '2021-04-19 00:36:31'),
+(93, 1, '9BSW1Y', 521, '73126960', '146253920', '2021-04-19 00:36:31'),
+(94, 2, '9BSW1Y', 521, '146253920', '219380880', '2021-04-19 00:36:31'),
+(95, 3, '9BSW1Y', 521, '219380880', '292507840', '2021-04-19 00:36:31'),
+(96, 4, '9BSW1Y', 521, '292507840', '365634800', '2021-04-19 00:36:31');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chunk_child`
+--
+
+DROP TABLE IF EXISTS `chunk_child`;
+CREATE TABLE `chunk_child` (
+  `id` int(12) NOT NULL,
+  `chunk_id` int(12) NOT NULL,
+  `chunk_order` int(12) NOT NULL,
+  `byte_start` text NOT NULL,
+  `byte_end` text NOT NULL,
+  `progress` varchar(12) DEFAULT NULL,
+  `user_id` int(12) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `chunk_child`
+--
+
+INSERT INTO `chunk_child` (`id`, `chunk_id`, `chunk_order`, `byte_start`, `byte_end`, `progress`, `user_id`) VALUES
+(11, 87, 0, '0', '73126960', NULL, 2),
+(12, 88, 1, '73126960', '146253920', NULL, 2),
+(13, 89, 2, '146253920', '219380880', NULL, 2),
+(14, 90, 3, '219380880', '292507840', NULL, 2),
+(15, 91, 4, '292507840', '365634800', NULL, 2),
+(16, 92, 0, '0', '73126960', NULL, 2),
+(17, 93, 1, '73126960', '146253920', NULL, 2),
+(18, 94, 2, '146253920', '219380880', NULL, 2),
+(19, 95, 3, '219380880', '292507840', NULL, 2),
+(20, 96, 4, '292507840', '365634800', NULL, 2);
 
 -- --------------------------------------------------------
 
@@ -96,27 +162,8 @@ CREATE TABLE `file` (
 --
 
 INSERT INTO `file` (`file_id`, `request_id`, `joint_id`, `py_channel`, `server_path`, `size`, `md5_hash`, `sha1_hash`, `sha256_hash`, `progress`, `init_date`) VALUES
-(307, 456, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/456/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-04 18:01:39'),
-(308, 458, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/458/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-04 18:14:00'),
-(309, 460, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/460/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-04 18:56:47'),
-(310, 460, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/460/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-04 19:25:27'),
-(311, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:56:02'),
-(312, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:56:05'),
-(313, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:56:07'),
-(314, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:56:10'),
-(315, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:56:12'),
-(316, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:56:13'),
-(317, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:56:14'),
-(318, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:56:17'),
-(319, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:56:19'),
-(320, 462, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/462/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 08:57:01'),
-(321, 464, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/464/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-03-12 09:00:00'),
-(322, 466, '8XJC6N', '184362', 'C:/xampp/htdocs/JDS/storage/8XJC6N/466/', '852.29 KB', 'd4f5d7654bda4c9842291069b0551f7b', '58504516d5a244fde44dff940b13f57d80c8f021', '9d4ea39ce99f480f252fdbeb616a69b9b11ea7bb29576abe8ec201c2afd159aa', 0, '2021-03-12 09:24:45'),
-(323, 467, 'TDLIV3', '549670', 'C:/xampp/htdocs/JDS/storage/TDLIV3/467/', '6.43 MB', '0f883e6f5db348671c1e26a7dfd2e5f3', 'f6ce20bb436939d331e320418399265872615b15', 'e13e94c34bbdeb3e88d897639878ca12782e955080abff7d5d82efaeba56e584', 94.47984450065759, '2021-03-27 22:48:53'),
-(324, 467, 'TDLIV3', '549670', 'C:/xampp/htdocs/JDS/storage/TDLIV3/467/', '6.43 MB', '0f883e6f5db348671c1e26a7dfd2e5f3', 'f6ce20bb436939d331e320418399265872615b15', 'e13e94c34bbdeb3e88d897639878ca12782e955080abff7d5d82efaeba56e584', 94.47984450065759, '2021-03-27 22:48:59'),
-(325, 467, 'TDLIV3', '549670', 'C:/xampp/htdocs/JDS/storage/TDLIV3/467/', '6.43 MB', '0f883e6f5db348671c1e26a7dfd2e5f3', 'f6ce20bb436939d331e320418399265872615b15', 'e13e94c34bbdeb3e88d897639878ca12782e955080abff7d5d82efaeba56e584', 94.47984450065759, '2021-03-27 22:52:50'),
-(326, 467, 'TDLIV3', '549670', 'C:/xampp/htdocs/JDS/storage/TDLIV3/467/', '6.43 MB', '0f883e6f5db348671c1e26a7dfd2e5f3', 'f6ce20bb436939d331e320418399265872615b15', 'e13e94c34bbdeb3e88d897639878ca12782e955080abff7d5d82efaeba56e584', 94.47984450065759, '2021-03-27 22:52:55'),
-(327, 467, 'TDLIV3', '549670', 'C:/xampp/htdocs/JDS/storage/TDLIV3/467/', '6.43 MB', '0f883e6f5db348671c1e26a7dfd2e5f3', 'f6ce20bb436939d331e320418399265872615b15', 'e13e94c34bbdeb3e88d897639878ca12782e955080abff7d5d82efaeba56e584', 94.47984450065759, '2021-03-27 22:52:58');
+(351, 520, 'MNX0K1', '283697', 'C:/xampp/htdocs/JDS/storage/MNX0K1/520/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-04-18 22:44:14'),
+(352, 521, '9BSW1Y', '543026', 'C:/xampp/htdocs/JDS/storage/9BSW1Y/521/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-04-19 00:36:19');
 
 -- --------------------------------------------------------
 
@@ -139,8 +186,8 @@ CREATE TABLE `joint_group` (
 --
 
 INSERT INTO `joint_group` (`joint_id`, `user_id`, `py_channel`, `access_limit`, `expiry_date`, `date_created`) VALUES
-('8XJC6N', 1, '184362', 10, '2021-04-03 17:01:34', '2021-03-04 18:01:34'),
-('TDLIV3', 2, '549670', 10, '2021-04-26 21:48:04', '2021-03-27 22:48:04');
+('9BSW1Y', 2, '543026', 10, '2021-05-19 00:36:12', '2021-04-19 00:36:12'),
+('MNX0K1', 2, '283697', 10, '2021-05-18 22:43:51', '2021-04-18 22:43:51');
 
 -- --------------------------------------------------------
 
@@ -162,9 +209,8 @@ CREATE TABLE `joint_group_member` (
 --
 
 INSERT INTO `joint_group_member` (`id`, `joint_id`, `user_id`, `joint_role`, `date_added`) VALUES
-(380, '8XJC6N', 1, 'owner', '2021-03-04 18:01:34'),
-(383, '8XJC6N', 2, 'member', '2021-03-12 08:34:22'),
-(387, 'TDLIV3', 2, 'owner', '2021-03-27 22:48:04');
+(417, 'MNX0K1', 2, 'owner', '2021-04-18 22:43:51'),
+(418, '9BSW1Y', 2, 'owner', '2021-04-19 00:36:12');
 
 -- --------------------------------------------------------
 
@@ -180,8 +226,9 @@ CREATE TABLE `svr_download_request` (
   `url` text NOT NULL,
   `ext` varchar(5) NOT NULL,
   `size` text NOT NULL,
+  `bytes` text DEFAULT NULL,
   `max_chunk_size` varchar(11) NOT NULL DEFAULT 'auto',
-  `init` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0 = ''Waiting''\r\n1 = ''Initialized''\r\n2 = ''Downloaded''\r\n3 = ''Compressing''\r\n4 = ''Splitting''\r\n5 = ''Chunkified''',
+  `init` int(1) NOT NULL DEFAULT 0 COMMENT '0 = ''Waiting''\r\n1 = ''Initialized''\r\n2 = ''Downloaded''\r\n3 = ''Compressing''\r\n4 = ''Splitting''\r\n5 = ''Chunkified''',
   `request_datetime` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -189,14 +236,9 @@ CREATE TABLE `svr_download_request` (
 -- Dumping data for table `svr_download_request`
 --
 
-INSERT INTO `svr_download_request` (`request_id`, `joint_id`, `user_id`, `url`, `ext`, `size`, `max_chunk_size`, `init`, `request_datetime`) VALUES
-(456, '8XJC6N', 1, 'https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe', 'exe', '348.70 MB', 'auto', 4, '2021-03-04 18:01:34'),
-(458, '8XJC6N', 1, 'https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe', 'exe', '348.70 MB', 'auto', 4, '2021-03-04 18:13:33'),
-(460, '8XJC6N', 1, 'https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe', 'exe', '348.70 MB', 'auto', 4, '2021-03-04 18:56:43'),
-(462, '8XJC6N', 2, 'https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe', 'exe', '348.70 MB', 'auto', 4, '2021-03-12 08:34:45'),
-(464, '8XJC6N', 1, 'https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe', 'exe', '348.70 MB', 'auto', 4, '2021-03-12 08:59:57'),
-(466, '8XJC6N', 1, 'https://i.pinimg.com/originals/bf/82/f6/bf82f6956a32819af48c2572243e8286.jpg', 'jpg', '852.29 KB', 'auto', 4, '2021-03-12 09:15:42'),
-(467, 'TDLIV3', 2, 'https://cdnb.artstation.com/p/assets/images/images/024/538/827/original/pixel-jeff-clipa-s.gif', 'gif', '6.57 MB', '20', 4, '2021-03-27 22:48:04');
+INSERT INTO `svr_download_request` (`request_id`, `joint_id`, `user_id`, `url`, `ext`, `size`, `bytes`, `max_chunk_size`, `init`, `request_datetime`) VALUES
+(520, 'MNX0K1', 2, 'https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe', 'exe', '348.70 MB', '365634800', 'auto', 4, '2021-04-18 22:43:51'),
+(521, '9BSW1Y', 2, 'https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe', 'exe', '348.70 MB', '365634800', 'auto', 4, '2021-04-19 00:36:12');
 
 -- --------------------------------------------------------
 
@@ -239,6 +281,21 @@ ALTER TABLE `applications`
 ALTER TABLE `authlogin`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `chunk`
+--
+ALTER TABLE `chunk`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `request_id` (`request_id`),
+  ADD KEY `joint_id` (`joint_id`);
+
+--
+-- Indexes for table `chunk_child`
+--
+ALTER TABLE `chunk_child`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `chunk_id` (`chunk_id`);
 
 --
 -- Indexes for table `file`
@@ -291,25 +348,37 @@ ALTER TABLE `applications`
 -- AUTO_INCREMENT for table `authlogin`
 --
 ALTER TABLE `authlogin`
-  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=204;
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=286;
+
+--
+-- AUTO_INCREMENT for table `chunk`
+--
+ALTER TABLE `chunk`
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+
+--
+-- AUTO_INCREMENT for table `chunk_child`
+--
+ALTER TABLE `chunk_child`
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `file`
 --
 ALTER TABLE `file`
-  MODIFY `file_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=328;
+  MODIFY `file_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=353;
 
 --
 -- AUTO_INCREMENT for table `joint_group_member`
 --
 ALTER TABLE `joint_group_member`
-  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=388;
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=419;
 
 --
 -- AUTO_INCREMENT for table `svr_download_request`
 --
 ALTER TABLE `svr_download_request`
-  MODIFY `request_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=468;
+  MODIFY `request_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=522;
 
 --
 -- AUTO_INCREMENT for table `user`
@@ -326,6 +395,19 @@ ALTER TABLE `user`
 --
 ALTER TABLE `authlogin`
   ADD CONSTRAINT `authlogin_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+--
+-- Constraints for table `chunk`
+--
+ALTER TABLE `chunk`
+  ADD CONSTRAINT `chunk_ibfk_1` FOREIGN KEY (`request_id`) REFERENCES `svr_download_request` (`request_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `chunk_ibfk_2` FOREIGN KEY (`joint_id`) REFERENCES `joint_group` (`joint_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `chunk_child`
+--
+ALTER TABLE `chunk_child`
+  ADD CONSTRAINT `chunk_child_ibfk_1` FOREIGN KEY (`chunk_id`) REFERENCES `chunk` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `file`
