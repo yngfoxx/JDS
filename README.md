@@ -35,6 +35,6 @@ Joint Downloading System (JDS) is an online content downloader that eases file d
 ### Ports
 * 8000 - JDS socket server (Alternative is live at https://ws-jds-eu.herokuapp.com/)
 * 5000 - JDS flask downloader API
-* 8000 - Desktop LAN client application
-* 5678 - Desktop WEBSOCKET client application
+* 8000 - Desktop LAN HTTP server for client application
+* 5678 - Desktop WEBSOCKET SERVER for client application
 * 1231 - Desktop client application debugger (Inspect element)
