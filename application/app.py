@@ -57,7 +57,7 @@ class JDS_DEBUGGER(QMainWindow):
         self.show()
 
     def loadWebPage(self):
-        self.webViewOnline.load(QUrl("http://"+hostdomain+":1232"))
+        self.webViewOnline.load(QUrl("http://"+hostdomain+":1231"))
 
 
 

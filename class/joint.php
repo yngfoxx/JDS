@@ -109,6 +109,9 @@ class jointlib extends stdlib {
   }
 
 
+  /*
+   Get users' joint group list
+  */
   public function getUserJointList($uid)
   {
     $uid = $this->db->escape_string($uid);
@@ -129,6 +132,9 @@ class jointlib extends stdlib {
   }
 
 
+  /*
+   Get all downloads in joint group
+  */
   public function getJointDownloadList($jid)
   {
     $jid = $this->db->escape_string($jid);
@@ -224,6 +230,9 @@ class jointlib extends stdlib {
   }
 
 
+  /*
+   Store file basic info in database
+  */
   public function crt_file($arr)
   {
     $jid = $this->db->escape_string($arr['jid']);
@@ -240,6 +249,9 @@ class jointlib extends stdlib {
   }
 
 
+  /*
+   Update the data of the in progress download from python script
+  */
   public function updateFileData($arr)
   {
     $jid = $arr['jid'];
@@ -266,6 +278,9 @@ class jointlib extends stdlib {
   }
 
 
+  /*
+   Update state of server downloaded data from python scripts
+  */
   public function updateDownloadData($arr)
   {
     $jid = $arr['jid'];
@@ -279,6 +294,9 @@ class jointlib extends stdlib {
   }
 
 
+  /*
+   Split the bytes into percentile portions
+  */
   public function splitBytesByPercentile($bytes, $percentile)
   {
     $percentile_chunk = ($bytes * $percentile) / 100;
@@ -292,6 +310,10 @@ class jointlib extends stdlib {
   }
 
 
+  /*
+   Split file into chunks of
+   bytes with this method
+  */
   public function crt_chunks($chunk)
   {
     $chnkID = $chunk['chunk_order'];
@@ -325,6 +347,10 @@ class jointlib extends stdlib {
   }
 
 
+  /*
+   Get all parent chunks of a
+   splitted file in database
+  */
   public function getChunks($arr)
   {
     $chnkJID = $arr['joint_id'];
@@ -349,6 +375,51 @@ class jointlib extends stdlib {
       while ($arr = mysqli_fetch_assoc($qry)) $response[] = $arr;
       return $response;
     }
+    return false;
+  }
+
+
+  /*
+   Get children chunk of a
+   bigger chunk by chunk ID
+  */
+  public function getChunkChildrenByChunkId($chnkID)
+  {
+    $sql = "
+      SELECT
+        chunk_child.chunk_order AS 'order',
+        chunk_child.byte_start AS 'byte_start',
+        chunk_child.byte_end AS 'byte_end',
+        chunk_child.progress AS 'download_progress',
+        chunk_child.user_id AS 'uid'
+      FROM chunk_child
+      WHERE chunk_child.chunk_id = '$chnkID'
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    if ($qry && mysqli_num_rows($qry) > 0) {
+      $response = array();
+      while ($arr = mysqli_fetch_assoc($qry)) $response[] = $arr;
+      return $response;
+    }
+    return false;
+  }
+
+
+  /*
+   Get all server downloaded files that
+   have been split into chunks in database
+  */
+  public function getChunkedFiles($chData)
+  {
+    $chnkJID = $chData['joint_id'];
+    $chnkRID = $chData['request_id'];
+    $sql = "
+      SELECT *
+      FROM svr_download_request
+      WHERE request_id = '$chnkRID' AND joint_id = '$chnkJID' AND (init = 4 OR init = 5)
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    if ($qry && mysqli_num_rows($qry) > 0) return mysqli_fetch_assoc($qry);
     return false;
   }
 }

@@ -279,6 +279,11 @@ class websocketserver():
                                 await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
+                    elif action == 'download_manager_data':
+                        print('[!] Download info received');
+                        print(wsRequest['payload']);
+
+
                     elif action == 'jds_client_disconnected':
                         await self.removeSocket(websocket, wsRequest['socketID'])
                         print('[!] User logged out!')

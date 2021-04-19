@@ -432,7 +432,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   }
 
 
-  # initialize download request
+  # initialize download request ----------------------------------------------->
   if (isset($_POST['jdsInit'])) {
     if (!$_POST['jdsInit']) exit();
     // Initialize joint download
@@ -555,7 +555,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // ------------------------------------------------------------------------>
 
   }
-
+  // -------------------------------------------------------------------------->
 
 
   # Update MySQL from python flask API ---------------------------------------->
@@ -660,6 +660,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // -------------------------------------------------------------------------->
 
 
+
   # Create download request --------------------------------------------------->
   if (isset($_POST['crtDownload'])) {
     // Add requested file to server download request
@@ -698,6 +699,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // -------------------------------------------------------------------------->
 
 
+
   // Network speed tester ----------------------------------------------------->
   if (isset($_POST['speedTest'])) {
     $direction = $std->db->escape_string($_POST['speedTest']);
@@ -711,6 +713,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
   }
   // -------------------------------------------------------------------------->
+
 
 
   // Local network scanner ---------------------------------------------------->
@@ -762,6 +765,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // -------------------------------------------------------------------------->
 
 
+
   // Get request chunk data --------------------------------------------------->
   if (isset($_POST['jdsChunks'])) {
     // echo "[+] REQUEST RECEIVED";
@@ -793,6 +797,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   // -------------------------------------------------------------------------->
 
 
+
   // CLIENT DESKTOP APP REQUEST FOR DOWNLOAD MANAGER DATA --------------------->
   if (isset($_POST['client_ldm'])) {
     // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
@@ -817,11 +822,58 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         echo json_encode($result);
         exit();
       }
-
     }
 
-    var_dump($_POST);
-    echo '[+] Download Manager [INFO]';
+    // Get joint list of downloads in splitting state or higher
+    $chunkedFiles = array();
+    $userJointList = $jds->getUserJointList($rcvd_userID);
+    foreach ($userJointList as $key => $joint) {
+      $jntID = $joint['jid'];
+      $jntROLE = $joint['role'];
+      $jointDownloadList = $jds->getJointDownloadList($jntID);
+      foreach ($jointDownloadList as $key => $downloadReq) {
+        $reqID = $downloadReq['rid'];
+        $arr = array('joint_id' => $jntID, 'request_id' => $reqID);
+        $chunked = $jds->getChunkedFiles($arr);
+        if ($chunked != false) $chunkedFiles[] = $chunked;
+      }
+    }
+
+    // echo json_encode($chunkedFiles);
+    $response = array();
+    $chnksCHILDREN = array();
+    foreach ($chunkedFiles as $key => $fileReq) { // Per request
+      $fileHost = $fileReq['user_id'];
+      $fileJID = $fileReq['joint_id'];
+      $fileRID = $fileReq['request_id'];
+      $fileCHNKS = $jds->getChunks(array('joint_id' => $fileJID, 'request_id' => $fileRID));
+      if (!$fileCHNKS) {
+        $result = array('server_error' => "Failed to get chunks", 'code' => '500'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+      foreach ($fileCHNKS as $key => $chnk) { // Per chunk
+        $chnkID = $chnk['chunk_id'];
+        $ch_children_arr = array();
+        $ch_children = $jds->getChunkChildrenByChunkId($chnkID);
+        if (!$ch_children) {
+          $result = array('server_error' => "Failed to get children of chunks", 'code' => '500'); // forbidden
+          echo json_encode($result);
+          exit();
+        }
+        foreach ($ch_children as $key => $child) if ($child['uid'] == $rcvd_userID) { // Per chunk children
+          $child['jid'] = $fileJID;
+          $child['rid'] = $fileRID;
+          if ($child['download_progress'] == null) $child['download_progress'] = 0;
+          $chnksCHILDREN[$fileJID][] = $child;
+        }
+      }
+      // $response[] = $chnksCHILDREN;
+      // echo json_encode($chnksCHILDREN);
+      // var_dump($chnksCHILDREN);
+    }
+    echo json_encode($chnksCHILDREN);
+    // echo '[+] Download Manager [INFO]';
   }
   // -------------------------------------------------------------------------->
 

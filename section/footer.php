@@ -144,7 +144,22 @@
                       url: '/JDS/req/req_handler.php',
                       data: eData.payload,
                       success: (res) => {
-                        console.log(res);
+                        if (isJson(res)) {
+                          let chnkData = JSON.parse(res);
+                          alert(chnkData);
+                          try {
+                            ws_client_app.send(JSON.stringify({
+                              "action": "download_manager_data",
+                              "interval": "none",
+                              "socketID": socket_unique_id,
+                              "payload": chnkData
+                            }));
+                          } catch (e) {
+                            console.log("[-] Failed to send socket message.");
+                          } finally {
+                            console.log("[+] Socket message sent");
+                          }
+                        }
                       },
                       complete: () => {
                         console.log('[!] Download manager info request done!');
