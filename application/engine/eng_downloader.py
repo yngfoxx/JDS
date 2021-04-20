@@ -10,6 +10,7 @@ from pySmartDL import SmartDL
 
 # CLIENT DOWNLOAD MANAGER
 # test URL: "https://www.bing.com/th?id=OIP.1L3zMoMScZvtQ9VLhf4MRgHaLH&w=200&h=300&c=8&o=5&pid=1.7"
+# test URL: "https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe"
 
 parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
 parser.add_argument('-u', '--url', type=str, required=True, help='The URL of the target file')

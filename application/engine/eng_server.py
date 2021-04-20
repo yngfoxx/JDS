@@ -12,7 +12,7 @@ from sys import platform
 from os import curdir, sep
 
 from http.server import SimpleHTTPRequestHandler, HTTPServer
-from engine.platform import domainName
+from engine.eng_platform import domainName
 
 # https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
 from netifaces import interfaces, ifaddresses, AF_INET

@@ -4,9 +4,9 @@ import time
 import threading
 
 from threading import Thread
-from engine import server
-from engine import socket
-from engine.platform import domainName
+from engine import eng_server
+from engine import eng_socket
+from engine.eng_platform import domainName
 
 from PyQt5.QtCore import *
 from PyQt5.QtWebChannel import *
