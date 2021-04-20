@@ -20,8 +20,8 @@ app = QApplication(sys.argv)
 appIsExiting = False
 
 threads = []
-server_lan = server.lanServer()
-wSocket = socket.websocketserver(5678);
+server_lan = eng_server.lanServer()
+wSocket = eng_socket.websocketserver(5678);
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
