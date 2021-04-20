@@ -282,7 +282,14 @@ class websocketserver():
                     elif action == 'download_manager_data':
                         print('[!] Download info received');
                         print(wsRequest['payload']);
-                        # separate all downloads and start them one after another
+                        # initialize download manager
+                        for jid in wsRequest['payload']:
+                            jointPayload = wsRequest['payload'][jid]
+                            print('\n[',jid,']', '-'*80)
+                            for chunk in wsRequest['payload'][jid]:
+                                print(chunk)
+                            print('-'*90)
+                        # /storage/JointID/RequestID/Arch_JointID_RequestID.zip
 
 
                     elif action == 'jds_client_disconnected':

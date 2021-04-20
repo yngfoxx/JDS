@@ -169,7 +169,7 @@ class JDS_CLIENT(QMainWindow):
 
     def loadClientPage(self):
         self.webViewClient.load(QUrl("http://"+hostdomain+":8000/index.html"))
-        self.webViewClient.setMinimumWidth(250)
+        self.webViewClient.setMinimumWidth(350)
         self.webViewClient.setMaximumWidth(450)
 
 
