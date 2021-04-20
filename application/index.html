@@ -87,7 +87,6 @@
 
           ws.onmessage = function (event) {
             // wait for event.data with current users info
-            // console.log(event.data);
             if (isJson(event.data)) {
               let eData = JSON.parse(event.data);
               if (eData.hasOwnProperty('channel')) {
@@ -97,7 +96,7 @@
                     desktop app and web app are successfully connected
                   */
                   case 'desktop_client_connected':
-                    console.log(eData);
+                    // alert(JSON.stringify(eData));
                     if (eData.hasOwnProperty('payload')) {
                       if (eData.payload == "") { // get web payload
                         console.log("[!] Payload is empty.");
@@ -105,8 +104,13 @@
                         return;
                       }
 
+                      // document.body.append(document.createTextNode(eData.payload));
+                      // let loader = document.querySelector('._pre_loader');
+                      //     loader.classList.add('hide');
+
                       if (isJson(eData.payload)) { // Check if payload is an object
                         client_data = JSON.parse(eData.payload);
+                        // alert(JSON.stringify(client_data));
                         if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
                         /*
                           Request Download information payload

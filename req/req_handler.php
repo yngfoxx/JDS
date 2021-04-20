@@ -4,6 +4,7 @@ session_start();
 // PACKAGES ---------------------------
 include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/standard.php';
 include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/auth.php';
+include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/user.php';
 include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/joint.php';
 include $_SERVER['DOCUMENT_ROOT']. "/JDS/class/class.easyzip.php";
 // ------------------------------------
@@ -12,6 +13,7 @@ include $_SERVER['DOCUMENT_ROOT']. "/JDS/class/class.easyzip.php";
 // OBJECTS [reusable] -----------------
 $std = new stdlib();
 $auth = new auth();
+$usr = new user();
 $jds = new jointlib();
 $result = array();
 // ------------------------------------
@@ -714,6 +716,34 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   }
   // -------------------------------------------------------------------------->
 
+
+
+  // Get user config data ----------------------------------------------------->
+  if (isset($_POST['uData'])) {
+    // SECURITY CHECK {CHECK IF USER IS AUTHENTIC}
+    if (isset($_COOKIE['dKEY'])) {
+      if (!$auth->verfUser($_COOKIE['dKEY'])) {
+        $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+        echo json_encode($result);
+        exit();
+      }
+    } else {
+      $result = array('server_error' => "Access violation detected! v2", 'code' => '403'); // forbidden
+      echo json_encode($result);
+      exit();
+    }
+
+    $user_data = $usr->getUserByDeviceID($_COOKIE['dKEY']);
+    $arr['dID'] = base64_decode($_COOKIE['dKEY']);
+    $arr['uID'] = $user_data['id'];
+    $arr['uName'] = $user_data['username'];
+    $arr['uEmail'] = $user_data['email'];
+    $arr['jds'] = $jds->getUserJointList($arr['uID']);
+
+    echo json_encode($arr);
+    exit();
+  }
+  // -------------------------------------------------------------------------->
 
 
   // Local network scanner ---------------------------------------------------->

@@ -3,184 +3,187 @@
 // USER HOME PAGE ------------------------------------------------------------->
  if (isset($_GET['home'])) { // HOME PAGE ?>
   <script type="text/javascript">
-  let socket_unique_id = genKey(6);
-  <?php
-    include_once $_SERVER['DOCUMENT_ROOT'] . "/JDS/class/user.php";
-    include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/auth.php';
-    include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/joint.php';
+  const socket_unique_id = genKey(6);
+  function ws_client_connect() {
+    // Connect to client application ------------------------------------------->
+    var ws_client_app = new WebSocket("ws://127.0.0.1:5678/");
+      ws_client_app.onopen = function () {
+        ajx({
+          type: 'POST',
+          url: '/JDS/req/req_handler.php',
+          data: {uData: true},
+          success: (res) => {
+            if (isJson(res)) {
+              let uData = JSON.parse(res);
+              ws_client_app.send(JSON.stringify({
+                  "action": "jds_client_connected",
+                  "interval": "none",
+                  "socketID": socket_unique_id,
+                  "socketType": "web",
+                  "payload": {
+                    "devID": uData.dID,
+                    "userID": uData.uID,
+                    "username": uData.uName,
+                    "joints": uData.jds
+                  }
+                }));
+            }
+          },
+          complete: () => {
+            console.log("Done!!!!");
+          },
+          load: 'up'
+        });
+      }
 
-    $usr = new user();
-    $auth = new auth();
-    $jds = new jointlib();
+      ws_client_app.onerror = function () {
+        // alert("Failed to connect to client application");
+      }
+      // ws_client_app.onclose = function () { alert("Connection closed!"); }
+      ws_client_app.onclose = function (e) {
+        console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+        setTimeout(function() { ws_client_connect(); }, 1000);
+      }
 
-    if (isset($_COOKIE['dKEY'])) {
-      $user_data = $usr->getUserByDeviceID($_COOKIE['dKEY']);
-      $devID = base64_decode($_COOKIE['dKEY']);
-      $userID = $user_data['id'];
-      $username = $user_data['username'];
-      $email = $user_data['email'];
-      $joints = json_encode($jds->getUserJointList($userID));
-      ?>
-      function ws_client_connect() {
-        // Connect to client application ------------------------------------------->
-        var ws_client_app = new WebSocket("ws://127.0.0.1:5678/");
-          ws_client_app.onopen = function () {
-            ws_client_app.send(
-              JSON.stringify({
-                "action": "jds_client_connected",
-                "interval": "none",
-                "socketID": socket_unique_id,
-                "socketType": "web",
-                "payload": {
-                  "devID": "<?php echo $devID; ?>",
-                  "userID": "<?php echo $userID; ?>",
-                  "username": "<?php echo $username; ?>",
-                  "joints": <?php echo $joints; ?>,
-                }
-              })
-            );
-          }
+      ws_client_app.onmessage = function (event) {
+        let eData = JSON.parse(event.data);
+        if (eData.hasOwnProperty('channel')) {
+          switch (eData.channel) {
+            case 'refresh':
+              ajx({
+                type: 'POST',
+                url: '/JDS/req/req_handler.php',
+                data: {uData: true},
+                success: (res) => {
+                  if (isJson(res)) {
+                    let uData = JSON.parse(res);
+                    ws_client_app.send(JSON.stringify({
+                        "action": "jds_client_connected",
+                        "interval": "none",
+                        "socketID": socket_unique_id,
+                        "socketType": "web",
+                        "payload": {
+                          "devID": uData.dID,
+                          "userID": uData.uID,
+                          "username": uData.uName,
+                          "joints": uData.jds
+                        }
+                      }));
+                  }
+                },
+                complete: () => {
+                  console.log("Done!!!!");
+                },
+                load: 'up'
+              });
+              break;
 
-          ws_client_app.onerror = function () {
-            // alert("Failed to connect to client application");
-          }
-          // ws_client_app.onclose = function () { alert("Connection closed!"); }
-          ws_client_app.onclose = function (e) {
-            console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
-            setTimeout(function() { ws_client_connect(); }, 1000);
-          }
+            case 'net_scanner':
+              console.log("[+] Network scanner requested");
+              let groups = (eData.hasOwnProperty('groups')) ? eData.groups : undefined;
+              let net_addr = (eData.hasOwnProperty('net_addr')) ? eData.net_addr : undefined;
 
-          ws_client_app.onmessage = function (event) {
-            let eData = JSON.parse(event.data);
-            if (eData.hasOwnProperty('channel')) {
-              switch (eData.channel) {
-                case 'refresh':
-                  ws_client_app.send(
-                    JSON.stringify({
-                      "action": "jds_client_connected",
-                      "interval": "none",
-                      "socketID": socket_unique_id,
-                      "socketType": "web",
-                      "payload": {
-                        "devID": "<?php echo $devID; ?>",
-                        "userID": "<?php echo $userID; ?>",
-                        "username": "<?php echo $username; ?>",
-                        "joints": <?php echo $joints; ?>,
-                      }
-                    })
-                  );
-                  // location.reload();
-                  break;
+              console.log("[!] Active user's joint groups");
+              console.log(groups);
 
-                case 'net_scanner':
-                  console.log("[+] Network scanner requested");
-                  let groups = (eData.hasOwnProperty('groups')) ? eData.groups : undefined;
-                  let net_addr = (eData.hasOwnProperty('net_addr')) ? eData.net_addr : undefined;
+              console.log("[!] Active user's local network address");
+              console.log(net_addr);
 
-                  console.log("[!] Active user's joint groups");
-                  console.log(groups);
-
-                  console.log("[!] Active user's local network address");
-                  console.log(net_addr);
-
-                  ajx({
-                    type: 'POST',
-                    url: '/JDS/req/req_handler.php',
-                    data: {netScan: true, addr: net_addr, joint_list: groups},
-                    success: function (res) {
-                      if (isJson(res)) {
-                        iplist = JSON.parse(res);
-                        console.log('[!] IP list ------------------------------');
-                        console.log(iplist);
-                        if (iplist.length == 0 || iplist == 0) {
-                          console.log('[!] There are no other users in the joint group');
+              ajx({
+                type: 'POST',
+                url: '/JDS/req/req_handler.php',
+                data: {netScan: true, addr: net_addr, joint_list: groups},
+                success: function (res) {
+                  if (isJson(res)) {
+                    iplist = JSON.parse(res);
+                    console.log('[!] IP list ------------------------------');
+                    console.log(iplist);
+                    if (iplist.length == 0 || iplist == 0) {
+                      console.log('[!] There are no other users in the joint group');
+                      return;
+                    }
+                    for (const [key, value] of Object.entries(iplist)) {
+                      value.forEach((lower_item, i) => {
+                        let lanAddr = lower_item.user_net_addr;
+                        if (lower_item.user_net_addr == null) {
+                          lower_item.user_net_addr = '';
                           return;
                         }
-                        for (const [key, value] of Object.entries(iplist)) {
-                          value.forEach((lower_item, i) => {
-                            let lanAddr = lower_item.user_net_addr;
-                            if (lower_item.user_net_addr == null) {
-                              lower_item.user_net_addr = '';
-                              return;
-                            }
-                            lanAddr = lanAddr.replace(/\\/gi, '');
-                            if (isJson(lanAddr)) {
-                              addrlist = JSON.parse(lanAddr);
-                              lower_item.user_net_addr = addrlist;
-                              console.log(iplist);
-                              console.log("[!] Filtered and Converted!");
-                            }
-                          });
+                        lanAddr = lanAddr.replace(/\\/gi, '');
+                        if (isJson(lanAddr)) {
+                          addrlist = JSON.parse(lanAddr);
+                          lower_item.user_net_addr = addrlist;
+                          console.log(iplist);
+                          console.log("[!] Filtered and Converted!");
                         }
+                      });
+                    }
 
-                        if (iplist == null) { return; }
-                        try {
-                          ws_client_app.send(JSON.stringify({
-                            "action": "scan_network_users",
-                            "interval": "none",
-                            "socketID": socket_unique_id,
-                            "payload": iplist
-                          }));
-                        } catch (e) {
-                          console.error("[-] Failed to send socket message");
-                        } finally {
-                          console.log("[+] Socket message sent");
-                        }
-                        console.log('------------------------------------------');
-                      }
-                    },
-                    complete: function () {
-                      console.log("[!] Network scanner completed!");
-                    },
-                    load: 'up',
-                  });
-                  break;
-
-                case 'fetch_download_info':
-                  if (eData.hasOwnProperty('payload')) {
-                    eData.payload['client_ldm'] = true;
-                    ajx({
-                      type: 'POST',
-                      url: '/JDS/req/req_handler.php',
-                      data: eData.payload,
-                      success: (res) => {
-                        if (isJson(res)) {
-                          let chnkData = JSON.parse(res);
-                          alert(chnkData);
-                          try {
-                            ws_client_app.send(JSON.stringify({
-                              "action": "download_manager_data",
-                              "interval": "none",
-                              "socketID": socket_unique_id,
-                              "payload": chnkData
-                            }));
-                          } catch (e) {
-                            console.log("[-] Failed to send socket message.");
-                          } finally {
-                            console.log("[+] Socket message sent");
-                          }
-                        }
-                      },
-                      complete: () => {
-                        console.log('[!] Download manager info request done!');
-                      },
-                      load: 'up'
-                    });
+                    if (iplist == null) { return; }
+                    try {
+                      ws_client_app.send(JSON.stringify({
+                        "action": "scan_network_users",
+                        "interval": "none",
+                        "socketID": socket_unique_id,
+                        "payload": iplist
+                      }));
+                    } catch (e) {
+                      console.error("[-] Failed to send socket message");
+                    } finally {
+                      console.log("[+] Socket message sent");
+                    }
+                    console.log('------------------------------------------');
                   }
-                  break;
+                },
+                complete: function () {
+                  console.log("[!] Network scanner completed!");
+                },
+                load: 'up',
+              });
+              break;
 
-                default:
-                  break;
+            case 'fetch_download_info':
+              if (eData.hasOwnProperty('payload')) {
+                eData.payload['client_ldm'] = true;
+                ajx({
+                  type: 'POST',
+                  url: '/JDS/req/req_handler.php',
+                  data: eData.payload,
+                  success: (res) => {
+                    if (isJson(res)) {
+                      let chnkData = JSON.parse(res);
+                      // alert(chnkData);
+                      try {
+                        ws_client_app.send(JSON.stringify({
+                          "action": "download_manager_data",
+                          "interval": "none",
+                          "socketID": socket_unique_id,
+                          "payload": chnkData
+                        }));
+                      } catch (e) {
+                        console.log("[-] Failed to send socket message.");
+                      } finally {
+                        console.log("[+] Socket message sent");
+                      }
+                    }
+                  },
+                  complete: () => {
+                    console.log('[!] Download manager info request done!');
+                  },
+                  load: 'up'
+                });
               }
-            }
-          };
-        // ------------------------------------------------------------------------>
-      }
-      ws_client_connect();
-      // alert(navigator.userAgent);
-  <?php
-    }
-  ?>
+              break;
+
+            default:
+              break;
+          }
+        }
+      };
+    // ------------------------------------------------------------------------>
+  }
+  ws_client_connect();
+  // alert(navigator.userAgent);
   </script>
 
   <script type="text/javascript">

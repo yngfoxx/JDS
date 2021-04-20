@@ -282,6 +282,7 @@ class websocketserver():
                     elif action == 'download_manager_data':
                         print('[!] Download info received');
                         print(wsRequest['payload']);
+                        # separate all downloads and start them one after another
 
 
                     elif action == 'jds_client_disconnected':
