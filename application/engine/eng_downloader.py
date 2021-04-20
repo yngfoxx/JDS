@@ -17,6 +17,7 @@ from pySmartDL import SmartDL
 parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
 parser.add_argument('-jid', '--joint_id', type=str, required=True, help='Joint ID of target file')
 parser.add_argument('-rid', '--request_id', type=str, required=True, help='Request ID of target file')
+parser.add_argument('-chnk', '--chunk_order', type=str, required=True, help='Chunk order number')
 parser.add_argument('-bs', '--byte_start', type=str, required=False, help='Byte start of the file stream')
 parser.add_argument('-be', '--byte_end', type=str, required=False, help='Byte end of the file stream')
 args = parser.parse_args()
@@ -24,28 +25,63 @@ args = parser.parse_args()
 
 def download(arg):
     # Arguments --------------------------------------------------------------->
+    engine_config = None
     jointID = arg['jid'].replace("\'", "")
     requestID = arg['rid'].replace("\'", "")
+    chunkORDER = arg['order'].replace("\'", "")
 
+    print('[+] Starting download', '-'*80, '\n Joint_ID:\t', jointID, '\n Request_ID:\t', requestID, '\n Chunk_ORDER:\t', chunkORDER, '\n')
+
+
+    # Paths
     url = 'http://127.0.0.1/JDS/storage/'+jointID+'/'+requestID+'/Arch_'+jointID+'_'+requestID+'.zip'
+    storage = "../storage/"+jointID
 
-    dest = "../storage/"+jointID
-    if os.path.exists(dest) == False:
-        # Make J0INT download directory
-        os.mkdir(dest)
-        dest = dest + "/" + requestID
-        # Make file folder based on request ID
-        if os.path.exists(dest) == False:
-            os.mkdir(dest)
+    # Create default storage folder if missing
+    if os.path.exists("../storage") == False:
+        os.mkdir("../storage/")
+
+
+    # Create J0INT download directory
+    if os.path.exists(storage) == False:
+        os.mkdir(storage)
+        storage = storage + "/" + requestID
+        if os.path.exists(storage) == False:
+            os.mkdir(storage)
+
 
     # Directories have been created
-    dest = "../storage/" + jointID + "/" + requestID
+    storage = "../storage/" + jointID + "/" + requestID
+
+    # Chunk file destination
+    chunkPATH = storage + "/" + "Chnk_"+jointID+"_"+requestID+"_"+chunkORDER+".J0INT"
+    chunkCONF = storage + "/chunkconf.json"
+
+    # GET data from J0INT engine_config file
+    if os.path.exists(chunkCONF) == True:
+        rEngine_config = open(chunkCONF, "r")
+        engine_config = rEngine_config.read()
+        rEngine_config.close()
+        # Validate chunks with engine_config.json
+
+
+    # Create J0INT engine_config file to be used as a temporary database
+    wEngine_config = open(chunkCONF, "w")
+
+
+    # check if chunk exists and is valid
+    if os.path.exists(chunkPATH) == True:
+        # compare size to byte_end and hash stored in engine_config
+        print("[!] Chunk exists, exiting...")
+        print('-'*101)
+        return
+
+
+
+    # Create chunk
+    chunk = open(chunkPATH, 'wb')
 
     headers_dlm_arg = {}
-    # downloads = open('../d_config.txt', 'w')
-    # downloads.write(payload)
-    # downloads.close()
-
     if 'byte_start' in arg and 'byte_end' in arg:
         byte_start = arg['byte_start']
         byte_end = arg['byte_end']
@@ -63,12 +99,13 @@ def download(arg):
     headers_arg = {"Range" : "bytes=0-100"}
     r = requests.get(url, headers=headers_arg)
     if r.status_code >= 400:
-        return ("File status returned: ", r.status_code)
+        print("[-] File status returned: ", r.status_code)
+        return
     # ------------------------------------------------------------------------->
 
 
     # Smart downloader -------------------------------------------------------->
-    fileDLM = SmartDL(url, dest, request_args=headers_dlm_arg)
+    fileDLM = SmartDL(url, storage, request_args=headers_dlm_arg)
     fileDLM.start(blocking=False)
 
     data = {}
@@ -81,7 +118,7 @@ def download(arg):
         data['bar'] = fileDLM.get_progress_bar()
         data['status'] = fileDLM.get_status()
 
-        print(data)
+        # print(data)
         # [TODO] MAIN FUNCTIONS =>
         # 1. Inform socket server of download progress
         # 2. Check if a pause request has been sent to this thread by socket communication
@@ -99,30 +136,41 @@ def download(arg):
         # 1. Inform socket server of thread download progress
 
     else:
-        print("There were some errors:")
+        print("[!] There were some errors:")
         for e in fileDLM.get_errors():
             print(str(e))
         # [TODO] MAIN FUNCTIONS =>
         # 1. Inform socket server of thread download error
 
 
-    # data = fileDLM.get_data()
-    # print('\n[DATA]\n', data)
+    # Store binary data into file
+    fileBIN = fileDLM.get_data(binary=True)
+    # print('\n[BINARY]\n', fileBIN)
+    chunk.write(fileBIN)
+    chunk.close()
 
+    # Delete downloaded file
     path = fileDLM.get_dest()
-    print('\n[PATH]\n', path)
+    print('\n[PATH]', path)
+    if os.path.exists(path):
+        os.remove(path)
+        print('[+] Cleaned up temporary file: ', path);
+    else:
+        print('[-] Could not find file: ',path);
 
-    # json = fileDLM.get_json()
-    # print('\n[JSON]\n', json)
+    config.close()
 
-    # hash = fileDLM.get_data_hash(False)
-    # print('\n[HASH]\n', hash)
+    print('-'*101)
+
     # ------------------------------------------------------------------------->
 
 if __name__ == '__main__':
+    # COMMAND: python eng_downloader.py -jid 'joint_id' -rid 'request_id' -bs 'byte_start' -be 'byte_end'
+    # COMMAND: python eng_downloader.py -jid 'LYKW7R' -rid '523' -bs 0 -be 4196
     parms = {}
     parms['jid'] = args.joint_id
     parms['rid'] = args.request_id
+    parms['order'] = args.chunk_order
     parms['byte_start'] = args.byte_start
     parms['byte_end'] = args.byte_end
     download(parms)
