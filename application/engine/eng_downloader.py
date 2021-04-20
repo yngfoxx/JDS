@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import requests
@@ -14,8 +15,8 @@ from pySmartDL import SmartDL
 # test URL: "https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe"
 
 parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
-parser.add_argument('-u', '--url', type=str, required=True, help='The URL of the target file')
-parser.add_argument('-d', '--dest', type=str, required=True, help='The download destination')
+parser.add_argument('-jid', '--joint_id', type=str, required=True, help='Joint ID of target file')
+parser.add_argument('-rid', '--request_id', type=str, required=True, help='Request ID of target file')
 parser.add_argument('-bs', '--byte_start', type=str, required=False, help='Byte start of the file stream')
 parser.add_argument('-be', '--byte_end', type=str, required=False, help='Byte end of the file stream')
 args = parser.parse_args()
@@ -23,11 +24,25 @@ args = parser.parse_args()
 
 def download(arg):
     # Arguments --------------------------------------------------------------->
-    url = arg['url']
-    dest = arg['dest']
-    headers_dlm_arg = {}
+    jointID = arg['jid'].replace("\'", "")
+    requestID = arg['rid'].replace("\'", "")
 
-    downloads = open('d_config.txt', 'w')
+    url = 'http://127.0.0.1/JDS/storage/'+jointID+'/'+requestID+'/Arch_'+jointID+'_'+requestID+'.zip'
+
+    dest = "../storage/"+jointID
+    if os.path.exists(dest) == False:
+        # Make J0INT download directory
+        os.mkdir(dest)
+        dest = dest + "/" + requestID
+        # Make file folder based on request ID
+        if os.path.exists(dest) == False:
+            os.mkdir(dest)
+
+    # Directories have been created
+    dest = "../storage/" + jointID + "/" + requestID
+
+    headers_dlm_arg = {}
+    # downloads = open('../d_config.txt', 'w')
     # downloads.write(payload)
     # downloads.close()
 
@@ -54,7 +69,6 @@ def download(arg):
 
     # Smart downloader -------------------------------------------------------->
     fileDLM = SmartDL(url, dest, request_args=headers_dlm_arg)
-    downloads.add(fileDLM)
     fileDLM.start(blocking=False)
 
     data = {}
@@ -101,14 +115,14 @@ def download(arg):
     # json = fileDLM.get_json()
     # print('\n[JSON]\n', json)
 
-    hash = fileDLM.get_data_hash(False)
-    print('\n[HASH]\n', hash)
+    # hash = fileDLM.get_data_hash(False)
+    # print('\n[HASH]\n', hash)
     # ------------------------------------------------------------------------->
 
 if __name__ == '__main__':
     parms = {}
-    parms['url'] = args.url
-    parms['dest'] = args.dest
+    parms['jid'] = args.joint_id
+    parms['rid'] = args.request_id
     parms['byte_start'] = args.byte_start
     parms['byte_end'] = args.byte_end
     download(parms)
