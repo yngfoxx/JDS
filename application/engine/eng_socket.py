@@ -17,7 +17,7 @@ import _thread as thread
 from engine.eng_standard import stdlib
 from engine.eng_server import lanServer
 from engine.eng_platform import domainName
-from engine.eng_downloader import downloadManagerSS
+# from engine.eng_downloader import downloadManagerSS
 
 # https://github.com/tornadoweb/tornado/issues/2531
 from tornado.platform.asyncio import AnyThreadEventLoopPolicy
@@ -313,6 +313,7 @@ class websocketserver():
                         for jid in wsRequest['payload']:
                             jointPayload = wsRequest['payload'][jid]
                             print('[+] Download manager on J0INT:', jid);
+                            dArgSet = []
                             for chunk in wsRequest['payload'][jid]:
                                 if os.path.exists("u_config.txt"):
                                     uconfigFile = open("u_config.txt", 'r')
@@ -328,14 +329,16 @@ class websocketserver():
                                             'byte_start' : chunk['byte_start'],
                                             'byte_end' : chunk['byte_end'],
                                         }
-                                        for program in connections:
-                                            wsType = connections[program]['type']
-                                            ws = connections[program]['socket']
-                                            # point to [dMNGR] socket
-                                            DMNGR_PAYLOAD = { "dMNGR": "validate_download_data", "payload": dArg }
-                                            DMNGR_PAYLOAD_JSON = json.dumps(DMNGR_PAYLOAD)
-                                            # /storage/JointID/RequestID/Arch_JointID_RequestID.zip
-                                            await asyncio.wait([ws.send(DMNGR_PAYLOAD_JSON)])
+                                        dArgSet.append(dArg)
+
+                            for program in connections:
+                                wsType = connections[program]['type']
+                                ws = connections[program]['socket']
+                                # point to [dMNGR] socket
+                                DMNGR_PAYLOAD = { "dMNGR": "validate_download_data", "payload": dArgSet }
+                                DMNGR_PAYLOAD_JSON = json.dumps(DMNGR_PAYLOAD)
+                                # /storage/JointID/RequestID/Arch_JointID_RequestID.zip
+                                await asyncio.wait([ws.send(DMNGR_PAYLOAD_JSON)])
 
 
                     # Get realtime chunk download progress from download manager

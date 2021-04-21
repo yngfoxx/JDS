@@ -13,9 +13,12 @@ import string
 
 from queue import Queue
 from pySmartDL import SmartDL
+from concurrent.futures import ThreadPoolExecutor
 
 from engine.eng_standard import stdlib
+
 stdlib = stdlib()
+_executor = ThreadPoolExecutor(1)
 
 # http://itaybb.github.io/pySmartDL/examples.html
 # http://itaybb.github.io/pySmartDL/code.html?highlight=pause#pySmartDL.SmartDL.pause
@@ -79,9 +82,9 @@ class downloadManagerSS():
     def connect(self):
         self.loop = asyncio.get_event_loop()
         print('[!] Connecting download manager...')
-        asyncio.run(self.connectSocketServer())
-        # self.loop.ensure_future(self.connectSocketServer())
-        print('[!] Download manager exited gracefully')
+        self.loop.run_until_complete(self.connectSocketServer())
+        self.loop.close()
+        print('[!] Download manager exited')
     # ------------------------------------------------------------------------->
 
     # Downloader -------------------------------------------------------------->
@@ -173,7 +176,7 @@ class downloadManagerSS():
                                     wsJSON['action'] = 'realtime_download_progress'
                                     wsPayload = json.dumps(wsJSON)
                                     await self.ws.send(wsPayload)
-                                    print('[!] Sent realtime data')
+                                    print('[!] Sent realtime data ~ Already exists')
                                 else:
                                     print('[!] Download manager socket is not connected')
                                 print('-'*101)
@@ -216,7 +219,7 @@ class downloadManagerSS():
                 wsPayload = json.dumps(wsJSON)
                 try:
                     await self.ws.send(wsPayload)
-                    print('[!] Sent realtime data')
+                    print('[!] Sent realtime data ~ Downloading')
                 except Exception as e:
                     print('[-] Error while sending RealTime data:', e)
 
@@ -237,7 +240,7 @@ class downloadManagerSS():
                 wsJSON['action'] = 'realtime_download_progress'
                 wsPayload = json.dumps(wsJSON)
                 await self.ws.send(wsPayload)
-                print('[!] Sent realtime data')
+                print('[!] Sent realtime data ~ Finished')
 
 
         else:
@@ -292,20 +295,16 @@ class downloadManagerSS():
     # Queue manager ----------------------------------------------------------->
     def downloadManager(self, dArg):
         dParm = {}
-        dParm['jid'] = dArg['jid']
-        dParm['rid'] = dArg['rid']
-        dParm['order'] = dArg['order']
-        dParm['byte_start'] = dArg['byte_start']
-        dParm['byte_end'] = dArg['byte_end']
 
-        threading.Thread(target=self.worker, daemon=True).start()
+        for dParm in dArg:
+            threading.Thread(target=self.worker, daemon=True).start()
 
-        self.downloadQueue.put(dParm)
-        print("[!] Download added to que")
+            self.downloadQueue.put(dParm)
+            print("[!] Download added to que")
 
-        # block until all tasks are done
-        self.downloadQueue.join()
-        print('[!] download completed')
+            # block until all tasks are done
+            self.downloadQueue.join()
+            print('[!] download completed')
     # ------------------------------------------------------------------------->
 
 

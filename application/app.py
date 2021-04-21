@@ -218,7 +218,10 @@ class Threader (threading.Thread):
         if os.path.exists("u_config.txt"):
             print("[!] Restarting closed services")
             if self.name == "SOCKET_SERVER":
-                wSocket.start();
+                wSocket.start()
+
+            elif self.name == "DOWNLOAD_MNGR":
+                downloadMngrService.connect()
 
 
 # Exit application ------------------------------------------------------------>
