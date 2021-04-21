@@ -12,6 +12,7 @@ import requests
 import time
 import os
 
+from engine.eng_downloader import downloadManager
 from engine.eng_platform import domainName
 from engine.eng_server import lanServer
 
@@ -287,7 +288,21 @@ class websocketserver():
                             jointPayload = wsRequest['payload'][jid]
                             print('\n[',jid,']', '-'*80)
                             for chunk in wsRequest['payload'][jid]:
-                                print(chunk)
+                                if os.path.exists("u_config.txt"):
+                                    uconfigFile = open("u_config.txt", 'r')
+                                    uconfigData = json.loads(uconfigFile.read())
+                                    uconfigFile.close()
+
+                                    # Only download chunks assigned to the user
+                                    if uconfigData['userID'] == chunk['uid']:
+                                        dArg = {
+                                            'jid' : jid,
+                                            'rid' : chunk['rid'],
+                                            'order' : chunk['order'],
+                                            'byte_start' : chunk['byte_start'],
+                                            'byte_end' : chunk['byte_end'],
+                                        }
+                                        downloadManager(dArg)
                             print('-'*91)
                         # /storage/JointID/RequestID/Arch_JointID_RequestID.zip
 

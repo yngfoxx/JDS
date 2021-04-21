@@ -3,43 +3,69 @@ import sys
 import time
 import requests
 import argparse
+import json
+import hashlib
+import threading
+
+from queue import Queue
 from pySmartDL import SmartDL
 
 # http://itaybb.github.io/pySmartDL/examples.html
 # http://itaybb.github.io/pySmartDL/code.html?highlight=pause#pySmartDL.SmartDL.pause
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
 # https://stackoverflow.com/questions/40691996/python-requests-http-range-not-working
+# https://www.devdungeon.com/content/working-binary-data-python#writefile
+# https://docs.python.org/3/library/queue.html
 
 # CLIENT DOWNLOAD MANAGER
 # test URL: "https://www.bing.com/th?id=OIP.1L3zMoMScZvtQ9VLhf4MRgHaLH&w=200&h=300&c=8&o=5&pid=1.7"
 # test URL: "https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe"
 
-parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
-parser.add_argument('-jid', '--joint_id', type=str, required=True, help='Joint ID of target file')
-parser.add_argument('-rid', '--request_id', type=str, required=True, help='Request ID of target file')
-parser.add_argument('-chnk', '--chunk_order', type=str, required=True, help='Chunk order number')
-parser.add_argument('-bs', '--byte_start', type=str, required=False, help='Byte start of the file stream')
-parser.add_argument('-be', '--byte_end', type=str, required=False, help='Byte end of the file stream')
-args = parser.parse_args()
+
+# Download queue -----
+downloadQue = Queue()
+dParm = {}
+# --------------------
 
 
-def download(arg):
-    # Arguments --------------------------------------------------------------->
+# https://stackoverflow.com/questions/3431825/generating-an-md5-checksum-of-a-file
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+
+# Downloader ------------------------------------------------------------------>
+def downloader(arg):
+    # Arguments ---------------------------------------------------------------\/
     engine_config = None
     jointID = arg['jid'].replace("\'", "")
     requestID = arg['rid'].replace("\'", "")
     chunkORDER = arg['order'].replace("\'", "")
+    headers_dlm_arg = {}
+    if 'byte_start' in arg and 'byte_end' in arg:
+        byte_start = float(arg['byte_start'])
+        byte_end = float(arg['byte_end'])
+        headers_dlm_arg = {
+            "headers" : {
+                "Range" : "bytes="+str(byte_start)+"-"+str(byte_end),
+            }
+        }
+    else:
+        headers_dlm_arg = {"headers":{}}
 
     print('[+] Starting download', '-'*80, '\n Joint_ID:\t', jointID, '\n Request_ID:\t', requestID, '\n Chunk_ORDER:\t', chunkORDER, '\n')
 
 
     # Paths
     url = 'http://127.0.0.1/JDS/storage/'+jointID+'/'+requestID+'/Arch_'+jointID+'_'+requestID+'.zip'
-    storage = "../storage/"+jointID
+    storage = "storage/"+jointID
 
     # Create default storage folder if missing
-    if os.path.exists("../storage") == False:
-        os.mkdir("../storage/")
+    if os.path.exists("storage") == False:
+        os.mkdir("storage")
 
 
     # Create J0INT download directory
@@ -51,72 +77,80 @@ def download(arg):
 
 
     # Directories have been created
-    storage = "../storage/" + jointID + "/" + requestID
+    storage = "storage/" + jointID + "/" + requestID
+
 
     # Chunk file destination
     chunkPATH = storage + "/" + "Chnk_"+jointID+"_"+requestID+"_"+chunkORDER+".J0INT"
-    chunkCONF = storage + "/chunkconf.json"
+    chunkCONF = storage + "/config.json"
+
+
+    # Chunk config data
+    chunkJSON = {}
+    chunkJSON['id'] = int(chunkORDER);
+    chunkJSON['jid'] = jointID;
+    chunkJSON['rid'] = requestID;
+    chunkJSON['filename'] = "Chnk_"+jointID+"_"+requestID+"_"+chunkORDER+".J0INT";
+    chunkJSON['byte_start'] = float(byte_start);
+    chunkJSON['byte_end'] = float(byte_end);
+    chunkJSON['status'] = None;
 
     # GET data from J0INT engine_config file
     if os.path.exists(chunkCONF) == True:
-        rEngine_config = open(chunkCONF, "r")
-        engine_config = rEngine_config.read()
-        rEngine_config.close()
-        # Validate chunks with engine_config.json
+        with open(chunkCONF, "r") as chConf:
+            for line in chConf:
+                chnkJSON = json.loads(line)
+                if jointID == str(chnkJSON['jid']) and requestID == str(chnkJSON['rid']) and chunkORDER == str(chnkJSON['id']):
+                    chnkNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkORDER+".J0INT";
+                    # check if chunk is valid
+                    if os.path.exists(chunkPATH) == True:
+                        # compare size and hash stored in config.json
+                        # to the available file in chunkPATH
+                        print('[+]', chnkNAME, '~ File match found\n')
 
+                        storedHash = chnkJSON['hash']['md5']
+                        print('[!] Stored md5 hash:', storedHash)
 
-    # Create J0INT engine_config file to be used as a temporary database
-    wEngine_config = open(chunkCONF, "w")
+                        calcHash = md5(chunkPATH)
+                        print('[!] Calculated md5 hash:', calcHash)
 
-
-    # check if chunk exists and is valid
-    if os.path.exists(chunkPATH) == True:
-        # compare size to byte_end and hash stored in engine_config
-        print("[!] Chunk exists, exiting...")
-        print('-'*101)
-        return
-
-
-
-    # Create chunk
-    chunk = open(chunkPATH, 'wb')
-
-    headers_dlm_arg = {}
-    if 'byte_start' in arg and 'byte_end' in arg:
-        byte_start = arg['byte_start']
-        byte_end = arg['byte_end']
-        headers_dlm_arg = {
-            "headers" : {
-                "Range" : "bytes="+str(byte_start)+"-"+str(byte_end),
-            }
-        }
+                        if storedHash == calcHash:
+                            print("[!] Chunk exists, exiting...")
+                            # Notify socket server of download completion
+                            print('-'*101)
+                            return
     else:
-        headers_dlm_arg = {"headers":{}}
-    # ------------------------------------------------------------------------->
+        # Generate congig file
+        wEngine_config = open(chunkCONF, "w")
+        wEngine_config.close()
+    # -------------------------------------------------------------------------/\
 
 
-    # Validate url ------------------------------------------------------------>
+    # Validate url ------------------------------------------------------------\/
     headers_arg = {"Range" : "bytes=0-100"}
     r = requests.get(url, headers=headers_arg)
     if r.status_code >= 400:
         print("[-] File status returned: ", r.status_code)
         return
-    # ------------------------------------------------------------------------->
+    # -------------------------------------------------------------------------/\
 
 
-    # Smart downloader -------------------------------------------------------->
+    # Smart downloader --------------------------------------------------------\/
     fileDLM = SmartDL(url, storage, request_args=headers_dlm_arg)
     fileDLM.start(blocking=False)
 
     data = {}
 
     while not fileDLM.isFinished():
-        data['speed'] = fileDLM.get_speed(human=True)
-        data['size'] = fileDLM.get_dl_size(human=True)
-        data['eta'] = fileDLM.get_eta(human=True)
-        data['progress'] = (fileDLM.get_progress() * 100)
-        data['bar'] = fileDLM.get_progress_bar()
-        data['status'] = fileDLM.get_status()
+        # data['speed'] = fileDLM.get_speed(human=True)
+        # data['size'] = fileDLM.get_dl_size(human=True)
+        # data['eta'] = fileDLM.get_eta(human=True)
+        # data['progress'] = (fileDLM.get_progress() * 100)
+        # data['bar'] = fileDLM.get_progress_bar()
+        # data['status'] = fileDLM.get_status()
+
+        chunkJSON['size'] = fileDLM.get_dl_size()
+        chunkJSON['status'] = fileDLM.get_status()
 
         # print(data)
         # [TODO] MAIN FUNCTIONS =>
@@ -127,11 +161,19 @@ def download(arg):
         time.sleep(0.2)
 
     if fileDLM.isSuccessful():
-        data['path'] = fileDLM.get_dest()
-        data['time_elapsed'] = fileDLM.get_dl_time(human=True)
-        data['md5'] = fileDLM.get_data_hash('md5')
-        data['sha1'] = fileDLM.get_data_hash('sha1')
-        data['sha256'] = fileDLM.get_data_hash('sha256')
+        # data['path'] = fileDLM.get_dest()
+        # data['time_elapsed'] = fileDLM.get_dl_time(human=True)
+        # data['md5'] = fileDLM.get_data_hash('md5')
+        # data['sha1'] = fileDLM.get_data_hash('sha1')
+        # data['sha256'] = fileDLM.get_data_hash('sha256')
+
+        chunkJSON['hash'] = {
+            'time_elapsed' : fileDLM.get_dl_time(human=True),
+            'md5' : fileDLM.get_data_hash('md5'),
+            'sha1' : fileDLM.get_data_hash('sha1'),
+            'sha256' : fileDLM.get_data_hash('sha256'),
+        }
+
         # [TODO] MAIN FUNCTIONS =>
         # 1. Inform socket server of thread download progress
 
@@ -146,31 +188,75 @@ def download(arg):
     # Store binary data into file
     fileBIN = fileDLM.get_data(binary=True)
     # print('\n[BINARY]\n', fileBIN)
+
+    with open(chunkCONF, 'a') as chunkDATA:
+        chunkDATA.write(json.dumps(chunkJSON)+'\n')
+
+    # Create chunk, store bytes in J0INT file
+    chunk = open(chunkPATH, 'wb')
     chunk.write(fileBIN)
     chunk.close()
 
     # Delete downloaded file
     path = fileDLM.get_dest()
-    print('\n[PATH]', path)
+    print('\n[TEMP]', path)
     if os.path.exists(path):
         os.remove(path)
         print('[+] Cleaned up temporary file: ', path);
     else:
         print('[-] Could not find file: ',path);
 
-    config.close()
-
     print('-'*101)
+    return "done"
+    # -------------------------------------------------------------------------/\
+# ----------------------------------------------------------------------------->
 
-    # ------------------------------------------------------------------------->
+
+# Thread object --------------------------------------------------------------->
+def worker():
+    while True:
+        dParm = downloadQue.get()
+        downloader(dParm)
+        downloadQue.task_done()
+# ----------------------------------------------------------------------------->
+
+
+# Queue manager --------------------------------------------------------------->
+def downloadManager(dArg):
+    dParm['jid'] = dArg['jid']
+    dParm['rid'] = dArg['rid']
+    dParm['order'] = dArg['order']
+    dParm['byte_start'] = dArg['byte_start']
+    dParm['byte_end'] = dArg['byte_end']
+
+    threading.Thread(target=worker, daemon=True).start()
+
+    downloadQue.put(dParm)
+    print("[!] Download added to que")
+
+    # block until all tasks are done
+    downloadQue.join()
+    print('[!] download completed')
+# ----------------------------------------------------------------------------->
+
 
 if __name__ == '__main__':
-    # COMMAND: python eng_downloader.py -jid 'joint_id' -rid 'request_id' -bs 'byte_start' -be 'byte_end'
-    # COMMAND: python eng_downloader.py -jid 'LYKW7R' -rid '523' -bs 0 -be 4196
+    # COMMAND: python eng_downloader.py -jid 'joint_id' -rid 'request_id' -bs 'byte_start' -be 'byte_end' -chnk 'chunk_order_number'
+    # COMMAND: python eng_downloader.py -jid 'LYKW7R' -rid '523' -bs 0 -be 36563480 -chnk 0
+    parser = argparse.ArgumentParser(prog='grab', description='download contents from internet using Python')
+    parser.add_argument('-jid', '--joint_id', type=str, required=True, help='Joint ID of target file')
+    parser.add_argument('-rid', '--request_id', type=str, required=True, help='Request ID of target file')
+    parser.add_argument('-chnk', '--chunk_order', type=str, required=True, help='Chunk order number')
+    parser.add_argument('-bs', '--byte_start', type=str, required=False, help='Byte start of the file stream')
+    parser.add_argument('-be', '--byte_end', type=str, required=False, help='Byte end of the file stream')
+    args = parser.parse_args()
+
     parms = {}
     parms['jid'] = args.joint_id
     parms['rid'] = args.request_id
     parms['order'] = args.chunk_order
     parms['byte_start'] = args.byte_start
     parms['byte_end'] = args.byte_end
-    download(parms)
+
+    response = downloader(parms)
+    print(response)
