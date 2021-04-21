@@ -5,9 +5,9 @@ import threading
 
 from threading import Thread
 from engine import eng_server
-from engine import eng_downloader
 from engine import eng_socket
 from engine.eng_platform import domainName
+from engine.eng_downloader import downloadManagerSS
 
 from PyQt5.QtCore import *
 from PyQt5.QtWebChannel import *
@@ -23,6 +23,8 @@ appIsExiting = False
 threads = []
 server_lan = eng_server.lanServer()
 wSocket = eng_socket.websocketserver(5678);
+
+downloadMngrService = downloadManagerSS()
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
@@ -187,7 +189,7 @@ class Threader (threading.Thread):
     def run(self):
         print("[+] Starting " + self.name)
 
-        if (self.name == "LOCAL_HTTP_SERVER"):
+        if self.name == "LOCAL_HTTP_SERVER":
             # HTTP SERVER SECTION --------------------------------------------->
             try:
                 server_lan.start()
@@ -195,18 +197,18 @@ class Threader (threading.Thread):
                 print("[!] Error while starting LAN server: ", err)
             # ----------------------------------------------------------------->
 
-        elif (self.name == "SOCKET_SERVER"):
+        elif self.name == "SOCKET_SERVER":
             # SOCKET SERVER SECTION ------------------------------------------->
             # https://websockets.readthedocs.io/en/stable/intro.html
-            wSocket.start();
+            wSocket.start()
             # ----------------------------------------------------------------->
 
-        elif (self.name == "DOWNLOAD_MNGR"):
+        elif self.name == "DOWNLOAD_MNGR":
             # DOWNLOAD MANAGER SECTION ---------------------------------------->
-            eng_downloader.init_DownloadManagerSocket();
+            downloadMngrService.connect()
             # ----------------------------------------------------------------->
 
-        elif (self.name == "DEBUGGER"):
+        elif self.name == "DEBUGGER":
             # DEBUGGER SECTION ------------------------------------------------>
             clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
             # ----------------------------------------------------------------->
@@ -245,6 +247,13 @@ def exit_():
             except:
                 print("Error while closing WebSocket server!")
 
+        elif (t.name == "DOWNLOAD_MNGR"):
+            try:
+                # downloadMngrService.connect()
+                print("[!] Close download manager service")
+            except:
+                print("Error while closing download manager service!")
+
         # print(t) # Show thread
         t.join()
 
@@ -272,6 +281,13 @@ def main():
     threads.append(thread2)
     print("[+] Socket server initialized")
 
+
+    # downloadMngr.start()
+
+    # time.sleep(20)
+
+    # downloadMngrService = downloadManagerSS()
+    # threading.Thread(target=downloadMngrService.connect(), daemon=True)
 
     thread3 = Threader(3, "DOWNLOAD_MNGR", 3)
     thread3.start()

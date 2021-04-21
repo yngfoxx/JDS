@@ -8,6 +8,8 @@ import hashlib
 import threading
 import asyncio
 import websockets
+import random
+import string
 
 from queue import Queue
 from pySmartDL import SmartDL
@@ -27,6 +29,8 @@ from pySmartDL import SmartDL
 # Download queue -----
 downloadQue = Queue()
 dParm = {}
+# downloads = set()
+# download_index = 0
 # --------------------
 
 
@@ -37,6 +41,11 @@ def md5(fname):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+def makeRandomKey(length):
+    letters = string.ascii_uppercase + string.digits
+    return ( ''.join(random.choice(letters) for i in range(length)) )
 
 
 # Downloader ------------------------------------------------------------------>
@@ -141,6 +150,9 @@ def downloader(arg):
     fileDLM = SmartDL(url, storage, request_args=headers_dlm_arg)
     fileDLM.start(blocking=False)
 
+    # downloads.add({ "id": download_index, "manifest": chunkJSON, "dl": fileDLM })
+    # download_index += 1
+
     data = {}
 
     while not fileDLM.isFinished():
@@ -242,16 +254,49 @@ def downloadManager(dArg):
 # ----------------------------------------------------------------------------->
 
 
-async def connectSocketServer():
-    uri = "ws://localhost:5678"
-    async with websockets.connect(uri) as websocket:
-        await websocket.send({ "action": "downloader", "msg": "[!] connected to socket server" })
-        await websocket.recv()
+# Download manager client web socket class handler
+class downloadManagerSS():
+    def __init__(self):
+        super().__init__()
+        self.uri = "ws://localhost:5678"
+        self.connected = True
+        self.socket_id = makeRandomKey(12)
+        self.socket_payload = json.dumps({ "action": "download_manager_connected", "socketType": "download_mngr",  "socketID": self.socket_id })
 
 
-def init_DownloadManagerSocket():
-    print('[!] Download manager connected to socket server')
-    asyncio.get_event_loop().run_until_complete(connectSocketServer())
+    async def connectSocketServer(self):
+        async with websockets.connect(self.uri) as websocket:
+            # download manager is now connected
+            await websocket.send(self.socket_payload)
+            while self.connected == True:
+                try:
+                    wsInput = await websocket.recv()
+
+                    if wsInput != None:
+                        wsRequest = json.loads(wsInput)
+                        if 'dMNGR' in wsRequest:
+                            if wsRequest['dMNGR'] == "validate_download_data":
+                                print('[!] Download manager activity', '*'*40)
+                                downloadManager(wsRequest['payload'])
+                                print('-'*110)
+
+                        elif self.socket_id in wsRequest:
+                            print('[!] Download manager received:', wsRequest)
+                except Exception as e:
+                    print('[-] Error in download manager socket connection')
+                    print(e)
+
+                await asyncio.sleep(random.random() * 3)
+
+
+    def connect(self):
+        self.loop = asyncio.get_event_loop()
+        print('[!] Connecting download manager...')
+        asyncio.run(self.connectSocketServer())
+        # self.loop.ensure_future(self.connectSocketServer())
+
+    def initWS(self):
+        threading.Thread(target=self.connect(), daemon=True)
 
 
 if __name__ == '__main__':

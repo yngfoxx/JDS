@@ -11,8 +11,11 @@ import tempfile
 import requests
 import time
 import os
+import threading
+import _thread as thread
 
 from engine.eng_downloader import downloadManager
+from engine.eng_downloader import downloadManagerSS
 from engine.eng_platform import domainName
 from engine.eng_server import lanServer
 
@@ -65,9 +68,9 @@ class websocketserver():
         connections[str(socketID)] = { "socket": websocket, "type": socketType }
         for ws in connections:
             print("[!] ", ws, " => ", connections[ws])
-            if (connections[ws]["socket"].closed == True):
+            if connections[ws]["socket"].closed == True or not connections[ws]["socket"]:
                 print("[+] ", ws, " is closed, removing from connection list")
-                self.removeSocket(connections[ws], ws)
+                await self.removeSocket(connections[ws], ws)
 
 
     # Unregister the WebSocket with a socket ID
@@ -87,7 +90,7 @@ class websocketserver():
                     wsInput = await websocket.recv()
                 except Exception:
                     print('[-]', Exception)
-                    self.stop()
+                    self.close()
 
 
                 # Handle websocket recieved input
@@ -95,9 +98,6 @@ class websocketserver():
                 if 'action' in wsRequest:
                     action = wsRequest['action']
                     print("[+] Action: "+action);
-
-                    if 'msg' in wsRequest:
-                        print(wsRequest['msg'])
 
                     # jds_client_connected
                     if action == 'jds_client_connected':
@@ -129,7 +129,8 @@ class websocketserver():
                             pass
                         # --------------------------------------------------------->
 
-                    # desktop_client_online
+
+                    # App is now connected to websocket
                     elif action == 'desktop_client_online':
                         await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
 
@@ -147,7 +148,8 @@ class websocketserver():
                         }
                         CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
 
-                    # fetch_network_users
+
+                    # Fetch users on local network
                     elif action == 'fetch_network_users':
                         print('[+] WebSocket request: '+action)
                         print(wsRequest['list'])
@@ -167,23 +169,7 @@ class websocketserver():
                                 await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
-                    elif action == 'fetch_download_info':
-                        print('[+] Fetching download info')
-                        print(wsRequest['payload'])
-                        # Send request to web app
-                        for ws in connections:
-                            ws = connections[ws]['socket']
-                            # point to [web] socket
-                            if ws != websocket:
-                                WEB_PAYLOAD = {
-                                    "channel": action,
-                                    "payload": wsRequest['payload'],
-                                    "socketid": wsRequest['sid']
-                                }
-                                WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
-                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
-
-
+                    # Scan users on local network
                     elif action == 'scan_network_users':
                         # Use payload to scan given IP's on local network
                         # print(wsRequest['payload'])
@@ -273,6 +259,7 @@ class websocketserver():
                                 break
 
 
+                    # Refresh webview data
                     elif action == 'refresh_webview':
                         print('[+] Refresh webview command sent!')
                         for ws in connections:
@@ -284,13 +271,48 @@ class websocketserver():
                                 await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
+                    # Fetch J0INT download info
+                    elif action == 'update_download_manager':
+
+                        print('[!] Updating download manager...')
+                        # Send request to web app
+                        for ws in connections:
+                            ws = connections[ws]['socket']
+                            # point to [web] socket
+                            if ws != websocket:
+                                WEB_PAYLOAD = {
+                                    "channel": "fetch_download_info",
+                                    "payload": wsRequest['payload'],
+                                    "socketid": wsRequest['sid']
+                                }
+                                WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+
+
+                    # Add download manager to socket connections
+                    elif action == 'download_manager_connected':
+                        print('[+] Download manager connected')
+                        await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
+                        for ws in connections:
+                            wsType = connections[ws]['type']
+                            ws = connections[ws]['socket']
+                            # point to [web] socket
+                            if wsType != 'download_mngr':
+                                WEB_PAYLOAD = {
+                                "channel": "download_manager_connected",
+                                "socketID": wsRequest['socketID']
+                                }
+                                WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+
+
                     elif action == 'download_manager_data':
-                        print('[!] Download info received');
+                        print('[+] Fill download manager');
                         print(wsRequest['payload']);
                         # initialize download manager
                         for jid in wsRequest['payload']:
                             jointPayload = wsRequest['payload'][jid]
-                            print('\n[',jid,']', '-'*80)
+                            print('[+] Download manager on J0INT:', jid);
                             for chunk in wsRequest['payload'][jid]:
                                 if os.path.exists("u_config.txt"):
                                     uconfigFile = open("u_config.txt", 'r')
@@ -306,9 +328,15 @@ class websocketserver():
                                             'byte_start' : chunk['byte_start'],
                                             'byte_end' : chunk['byte_end'],
                                         }
-                                        downloadManager(dArg)
-                            print('-'*91)
-                        # /storage/JointID/RequestID/Arch_JointID_RequestID.zip
+                                        for program in connections:
+                                            wsType = connections[program]['type']
+                                            ws = connections[program]['socket']
+                                            # point to [dMNGR] socket
+                                            DMNGR_PAYLOAD = { "dMNGR": "validate_download_data", "payload": dArg }
+                                            DMNGR_PAYLOAD_JSON = json.dumps(DMNGR_PAYLOAD)
+                                            await asyncio.wait([ws.send(DMNGR_PAYLOAD_JSON)])
+                                            # downloadManager(dArg)
+                                            # /storage/JointID/RequestID/Arch_JointID_RequestID.zip
 
 
                     elif action == 'jds_client_disconnected':
@@ -330,14 +358,14 @@ class websocketserver():
                 print("[+] WebSocket connection closed")
                 if self.init == True:
                     self.stopped = True
-                    self.stop()
+                    self.close()
                 continue
 
             except websockets.exceptions.ConnectionClosedError:
                 print("[+] WebSocket connection error: [Expected]")
                 if self.init == True:
                     self.stopped = True
-                    self.stop()
+                    self.close()
                 continue
 
 

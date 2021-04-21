@@ -48,7 +48,7 @@
       <div class="tnvbr">
         <h3>Download manager</h3>
         <div class="tnvbr_btns">
-          <a class="tnvbrb-button" data-btn="cdm_refresh">Refresh</a>
+          <a class="tnvbrb-button" data-btn="cdm_update">Update</a>
         </div>
       </div>
       <div class="_bdyMain">
@@ -119,13 +119,13 @@
                         localdmpanel_overlay('Fetching');
                         ws.send(
                           JSON.stringify({
-                            action: 'fetch_download_info',
+                            action: 'update_download_manager',
                             payload: client_data,
                             sid: desktop_socket_unique_id,
                           })
                         );
 
-                        let refrshcdm_btn = document.querySelectorAll("[data-btn='cdm_refresh']");
+                        let refrshcdm_btn = document.querySelectorAll("[data-btn='cdm_update']");
                         refrshcdm_btn.forEach((item, i) => {
                           item.addEventListener('click', () => {
                             if (refresh_cool_down == true) {
@@ -133,12 +133,12 @@
                               return;
                             }
                             refresh_cool_down = true;
-                            console.log("[!] Refreshing download manager...");
-                            localdmpanel_overlay('Refreshing');
+                            console.log("[!] Updating download manager...");
+                            localdmpanel_overlay('Updating');
 
                             ws.send(
                               JSON.stringify({
-                                action: 'fetch_download_info',
+                                action: 'update_download_manager',
                                 payload: client_data,
                                 sid: desktop_socket_unique_id,
                               })
