@@ -238,26 +238,26 @@ def exit_():
             try:
                 server_lan.stop()
             except:
-                print("Error while closing LAN server!")
+                print("[-] Error while closing LAN server!")
 
         elif (t.name == "SOCKET_SERVER"):
             try:
                 wSocket.close()
                 print("[!] Socket server stopped!")
-            except:
-                print("Error while closing WebSocket server!")
+            except Exception as e:
+                print("[-] Error while closing WebSocket server:", e)
 
         elif (t.name == "DOWNLOAD_MNGR"):
             try:
                 # downloadMngrService.connect()
                 print("[!] Close download manager service")
             except:
-                print("Error while closing download manager service!")
+                print("[-] Error while closing download manager service!")
 
         # print(t) # Show thread
         t.join()
 
-    print("[!] Closed all threads!")
+    print("[+] Closed all threads!")
 # ----------------------------------------------------------------------------->
 
 

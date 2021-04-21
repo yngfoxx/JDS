@@ -400,6 +400,14 @@ class websocketserver():
 
     def close(self):
         self.init = False
+        for ws in connections:
+            ws = connections[ws]['socket']
+            # point to [web] socket
+            SOCKT_PAYLOAD = { "action": "exit", "channel": "exit", "dMNGR": "exit"}
+            SOCKT_PAYLOAD_JSON = json.dumps(SOCKT_PAYLOAD)
+            await asyncio.wait([ws.send(SOCKT_PAYLOAD_JSON)])
+
+        time.sleep(10)
         try:
             # self.futurestop.set_result(True) # Stop future loop to terminate the program
             # self.futurestop.cancel("[!] Loop cancelled.")

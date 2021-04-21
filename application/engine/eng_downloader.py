@@ -276,18 +276,18 @@ class downloadManagerSS():
                         wsRequest = json.loads(wsInput)
                         if 'dMNGR' in wsRequest:
                             if wsRequest['dMNGR'] == "validate_download_data":
-                                print('[!] Download manager activity', '*'*40)
+                                print('\n[!] Download manager activity', '='*80+'>')
                                 downloadManager(wsRequest['payload'])
-                                print('-'*110)
+                                print('='*110+'>')
 
                         elif self.socket_id in wsRequest:
                             print('[!] Download manager received:', wsRequest)
                 except Exception as e:
                     print('[-] Error in download manager socket connection')
                     print(e)
+                    pass
 
                 await asyncio.sleep(random.random() * 3)
-
 
     def connect(self):
         self.loop = asyncio.get_event_loop()
