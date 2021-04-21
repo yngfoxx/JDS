@@ -69,6 +69,7 @@ class downloadManagerSS():
                 except Exception as e:
                     print('[-] Error in download manager socket connection')
                     print(e)
+                    self.connected = False
                     pass
 
                 await asyncio.sleep(random.random() * 3)
@@ -165,7 +166,20 @@ class downloadManagerSS():
 
                             if storedHash == calcHash:
                                 print("[!] Chunk exists, exiting...")
+                                # Append missing parameters
+                                chunkJSON['size'] = chnkJSON['size']
+                                chunkJSON['status'] = chnkJSON['status']
+                                chunkJSON['eta'] = chnkJSON['eta']
+                                chunkJSON['progress'] = chnkJSON['progress']
+                                chunkJSON['time_elapsed'] = chnkJSON['time_elapsed']
+                                chunkJSON['hash'] = chnkJSON['hash']
                                 # Notify socket server of download completion
+                                if self.ws != None:
+                                    wsJSON = chunkJSON
+                                    wsJSON['action'] = 'realtime_download_progress'
+                                    wsPayload = json.dumps(wsJSON)
+                                    await self.ws.send(wsPayload)
+                                    print('[!] Sent realtime data')
                                 print('-'*101)
                                 return
         else:
@@ -188,9 +202,6 @@ class downloadManagerSS():
         fileDLM = SmartDL(url, storage, request_args=headers_dlm_arg)
         fileDLM.start(blocking=False)
 
-        # downloads.add({ "id": download_index, "manifest": chunkJSON, "dl": fileDLM })
-        # download_index += 1
-
         data = {}
 
         while not fileDLM.isFinished():
@@ -208,8 +219,9 @@ class downloadManagerSS():
                 wsJSON['action'] = 'realtime_download_progress'
                 wsPayload = json.dumps(wsJSON)
                 await self.ws.send(wsPayload)
+                print('[!] Sent realtime data')
 
-            time.sleep(0.2)
+            time.sleep(0.5)
 
         if fileDLM.isSuccessful():
             # MAIN FUNCTIONS =>
@@ -222,8 +234,11 @@ class downloadManagerSS():
                 'sha256' : fileDLM.get_data_hash('sha256'),
             }
             if self.ws != None:
-                wsPayload = json.dumps(chunkJSON)
+                wsJSON = chunkJSON
+                wsJSON['action'] = 'realtime_download_progress'
+                wsPayload = json.dumps(wsJSON)
                 await self.ws.send(wsPayload)
+                print('[!] Sent realtime data')
 
 
         else:

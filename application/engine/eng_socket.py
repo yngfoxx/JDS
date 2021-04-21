@@ -340,8 +340,15 @@ class websocketserver():
 
                     # Get realtime chunk download progress from download manager
                     elif action == 'realtime_download_progress':
-                        print('[!] Live chunk download progress received')
+                        print('[+] Live chunk download progress received')
                         print(wsRequest)
+                        for wSKT in connections:
+                            wsType = connections[wSKT]['type']
+                            ws = connections[wSKT]['socket']
+                            # point to [desktop] socket
+                            if wsType == 'desktop':
+                                WEB_PAYLOAD_JSON = json.dumps(wsRequest)
+                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
                     elif action == 'jds_client_disconnected':
