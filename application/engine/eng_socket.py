@@ -334,9 +334,14 @@ class websocketserver():
                                             # point to [dMNGR] socket
                                             DMNGR_PAYLOAD = { "dMNGR": "validate_download_data", "payload": dArg }
                                             DMNGR_PAYLOAD_JSON = json.dumps(DMNGR_PAYLOAD)
-                                            await asyncio.wait([ws.send(DMNGR_PAYLOAD_JSON)])
-                                            # downloadManager(dArg)
                                             # /storage/JointID/RequestID/Arch_JointID_RequestID.zip
+                                            await asyncio.wait([ws.send(DMNGR_PAYLOAD_JSON)])
+
+
+                    # Get realtime chunk download progress from download manager
+                    elif action == 'realtime_download_progress':
+                        print('[!] Live chunk download progress received')
+                        print(wsRequest)
 
 
                     elif action == 'jds_client_disconnected':

@@ -38,10 +38,12 @@ class downloadManagerSS():
         self.socket_id = stdlib.makeRandomKey(12)
         self.downloadQueue = Queue()
         self.socket_payload = json.dumps({ "action": "download_manager_connected", "socketType": "download_mngr",  "socketID": self.socket_id })
+        self.ws = None
 
 
     async def connectSocketServer(self):
         async with websockets.connect(self.uri) as websocket:
+            self.ws = websocket
             # download manager is now connected
             await websocket.send(self.socket_payload)
             while self.connected == True:
@@ -82,7 +84,10 @@ class downloadManagerSS():
     # ------------------------------------------------------------------------->
 
     # Downloader -------------------------------------------------------------->
-    def downloader(self, arg):
+    async def downloader(self, arg):
+        if self.ws != None:
+            print('[!] WebSocket is accessible:', self.ws)
+
         # Arguments ---------------------------------------------------------------\/
         engine_config = None
         jointID = arg['jid'].replace("\'", "")
@@ -189,47 +194,50 @@ class downloadManagerSS():
         data = {}
 
         while not fileDLM.isFinished():
-            # data['speed'] = fileDLM.get_speed(human=True)
-            # data['size'] = fileDLM.get_dl_size(human=True)
-            # data['eta'] = fileDLM.get_eta(human=True)
-            # data['progress'] = (fileDLM.get_progress() * 100)
-            # data['bar'] = fileDLM.get_progress_bar()
-            # data['status'] = fileDLM.get_status()
-
-            chunkJSON['size'] = fileDLM.get_dl_size()
-            chunkJSON['status'] = fileDLM.get_status()
-
-            # print(data)
-            # [TODO] MAIN FUNCTIONS =>
+            # MAIN FUNCTIONS =>
             # 1. Inform socket server of download progress
             # 2. Check if a pause request has been sent to this thread by socket communication
             # 3. Check if an unpause request was sent to this thread by socket communication
 
+            chunkJSON['size'] = fileDLM.get_dl_size()
+            chunkJSON['status'] = fileDLM.get_status()
+            chunkJSON['eta'] = fileDLM.get_eta(human=True)
+            chunkJSON['progress'] = (fileDLM.get_progress() * 100)
+            if self.ws != None:
+                wsJSON = chunkJSON
+                wsJSON['action'] = 'realtime_download_progress'
+                wsPayload = json.dumps(wsJSON)
+                await self.ws.send(wsPayload)
+
             time.sleep(0.2)
 
         if fileDLM.isSuccessful():
-            # data['path'] = fileDLM.get_dest()
-            # data['time_elapsed'] = fileDLM.get_dl_time(human=True)
-            # data['md5'] = fileDLM.get_data_hash('md5')
-            # data['sha1'] = fileDLM.get_data_hash('sha1')
-            # data['sha256'] = fileDLM.get_data_hash('sha256')
+            # MAIN FUNCTIONS =>
+            # 1. Inform socket server of thread download progress
 
+            chunkJSON['time_elapsed'] = fileDLM.get_dl_time(human=True)
             chunkJSON['hash'] = {
-                'time_elapsed' : fileDLM.get_dl_time(human=True),
                 'md5' : fileDLM.get_data_hash('md5'),
                 'sha1' : fileDLM.get_data_hash('sha1'),
                 'sha256' : fileDLM.get_data_hash('sha256'),
             }
+            if self.ws != None:
+                wsPayload = json.dumps(chunkJSON)
+                await self.ws.send(wsPayload)
 
-            # [TODO] MAIN FUNCTIONS =>
-            # 1. Inform socket server of thread download progress
 
         else:
             print("[!] There were some errors:")
+            # MAIN FUNCTIONS =>
+            # 1. Inform socket server of thread download error
+
             for e in fileDLM.get_errors():
                 print(str(e))
-            # [TODO] MAIN FUNCTIONS =>
-            # 1. Inform socket server of thread download error
+
+            if self.ws != None:
+                chunkJSON['error'] = fileDLM.get_errors()
+                wsPayload = json.dumps(chunkJSON)
+                await self.ws.send(wsPayload)
 
 
         # Store binary data into file
@@ -261,8 +269,8 @@ class downloadManagerSS():
     # Thread object ----------------------------------------------------------->
     def worker(self):
         while True:
-            dQueue = self.downloadQueue.get()
-            self.downloader(dQueue)
+            dQueueItem = self.downloadQueue.get()
+            asyncio.get_event_loop().run_until_complete(self.downloader(dQueueItem))
             self.downloadQueue.task_done()
     # ------------------------------------------------------------------------->
 
