@@ -290,6 +290,11 @@
                     console.log(eData);
                     break;
 
+                  case 'exit':
+                    ws.close();
+                    console.log("[!] Web desktop client exited gracefully");
+                    break;
+
                   default:
                     break;
                 }

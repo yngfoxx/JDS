@@ -175,6 +175,11 @@
               }
               break;
 
+            case 'exit':
+              ws_client_app.close();
+              console.log("[!]  Gracefully disconnected from desktop client");
+              break;
+
             default:
               break;
           }

@@ -85,17 +85,17 @@ class websocketserver():
             # clients.add(websocket)
             await self.register(websocket)
             try:
+                wsInput = None
                 # Recieve input from web client ------------------------------->
                 try:
                     wsInput = await websocket.recv()
-                except Exception:
-                    print('[-]', Exception)
-                    self.close()
-
+                except Exception as e:
+                    print('[-] Could not receive websocket data, reason:', e)
+                    break
 
                 # Handle websocket recieved input
                 wsRequest = json.loads(wsInput)
-                if 'action' in wsRequest:
+                if 'action' in wsRequest and wsInput != None:
                     action = wsRequest['action']
                     print("[+] Action: "+action);
 
@@ -349,6 +349,11 @@ class websocketserver():
                             await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
                         except:
                             pass
+
+
+                    elif action == 'exit':
+                        print('[!] Closing all multi-threaded programs')
+
                     # ------------------------------------------------------------->
 
                     await asyncio.sleep(random.random() * 3)
@@ -358,14 +363,14 @@ class websocketserver():
                 print("[+] WebSocket connection closed")
                 if self.init == True:
                     self.stopped = True
-                    self.close()
+                    # self.close()
                 continue
 
             except websockets.exceptions.ConnectionClosedError:
                 print("[+] WebSocket connection error: [Expected]")
                 if self.init == True:
                     self.stopped = True
-                    self.close()
+                    # self.close()
                 continue
 
 
@@ -396,18 +401,20 @@ class websocketserver():
         self.loop.run_until_complete(self.start_server)
         self.loop.run_forever()
 
+    async def gracefulExit(self):
+        for wSKT in connections:
+            wsType = connections[wSKT]['type']
+            ws = connections[wSKT]['socket']
 
-
-    def close(self):
-        self.init = False
-        for ws in connections:
-            ws = connections[ws]['socket']
-            # point to [web] socket
-            SOCKT_PAYLOAD = { "action": "exit", "channel": "exit", "dMNGR": "exit"}
+            SOCKT_PAYLOAD = { "channel": "exit" } if wsType == 'desktop' else  { "dMNGR": "exit" }
             SOCKT_PAYLOAD_JSON = json.dumps(SOCKT_PAYLOAD)
             await asyncio.wait([ws.send(SOCKT_PAYLOAD_JSON)])
+            await asyncio.sleep(1)
+            print("[+] Exit signal sent to a socket")
 
-        time.sleep(10)
+    def close(self):
+        asyncio.run(self.gracefulExit())
+        self.init = False
         try:
             # self.futurestop.set_result(True) # Stop future loop to terminate the program
             # self.futurestop.cancel("[!] Loop cancelled.")

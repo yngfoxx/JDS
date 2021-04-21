@@ -280,8 +280,14 @@ class downloadManagerSS():
                                 downloadManager(wsRequest['payload'])
                                 print('='*110+'>')
 
+                            elif wsRequest['dMNGR'] == "exit":
+                                # exit loop to terminate script
+                                self.connected = False
+                                break
+
                         elif self.socket_id in wsRequest:
                             print('[!] Download manager received:', wsRequest)
+
                 except Exception as e:
                     print('[-] Error in download manager socket connection')
                     print(e)
@@ -294,6 +300,7 @@ class downloadManagerSS():
         print('[!] Connecting download manager...')
         asyncio.run(self.connectSocketServer())
         # self.loop.ensure_future(self.connectSocketServer())
+        print('[!] Download manager exited gracefully')
 
     def initWS(self):
         threading.Thread(target=self.connect(), daemon=True)
