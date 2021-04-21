@@ -167,19 +167,15 @@ class downloadManagerSS():
                             if storedHash == calcHash:
                                 print("[!] Chunk exists, exiting...")
                                 # Append missing parameters
-                                chunkJSON['size'] = chnkJSON['size']
-                                chunkJSON['status'] = chnkJSON['status']
-                                chunkJSON['eta'] = chnkJSON['eta']
-                                chunkJSON['progress'] = chnkJSON['progress']
-                                chunkJSON['time_elapsed'] = chnkJSON['time_elapsed']
-                                chunkJSON['hash'] = chnkJSON['hash']
                                 # Notify socket server of download completion
-                                if self.ws != None:
-                                    wsJSON = chunkJSON
+                                if self.connected == True:
+                                    wsJSON = chnkJSON
                                     wsJSON['action'] = 'realtime_download_progress'
                                     wsPayload = json.dumps(wsJSON)
                                     await self.ws.send(wsPayload)
                                     print('[!] Sent realtime data')
+                                else:
+                                    print('[!] Download manager socket is not connected')
                                 print('-'*101)
                                 return
         else:
@@ -218,10 +214,13 @@ class downloadManagerSS():
                 wsJSON = chunkJSON
                 wsJSON['action'] = 'realtime_download_progress'
                 wsPayload = json.dumps(wsJSON)
-                await self.ws.send(wsPayload)
-                print('[!] Sent realtime data')
+                try:
+                    await self.ws.send(wsPayload)
+                    print('[!] Sent realtime data')
+                except Exception as e:
+                    print('[-] Error while sending RealTime data:', e)
 
-            time.sleep(0.5)
+            await asyncio.sleep(random.random() * 3)
 
         if fileDLM.isSuccessful():
             # MAIN FUNCTIONS =>

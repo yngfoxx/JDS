@@ -341,13 +341,19 @@ class websocketserver():
                     # Get realtime chunk download progress from download manager
                     elif action == 'realtime_download_progress':
                         print('[+] Live chunk download progress received')
-                        print(wsRequest)
+                        wsPload = {}
+                        for wsData in wsRequest:
+                            if wsData != 'action':
+                                wsPload[wsData] = wsRequest[wsData]
+
+                        wsPload['channel'] = 'realtime_download_progress'
+                        # print(wsPload)
                         for wSKT in connections:
                             wsType = connections[wSKT]['type']
                             ws = connections[wSKT]['socket']
                             # point to [desktop] socket
                             if wsType == 'desktop':
-                                WEB_PAYLOAD_JSON = json.dumps(wsRequest)
+                                WEB_PAYLOAD_JSON = json.dumps(wsPload)
                                 await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
