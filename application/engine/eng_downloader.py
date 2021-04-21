@@ -111,23 +111,22 @@ class downloadManagerSS():
 
         # Paths
         url = 'http://127.0.0.1/JDS/storage/'+jointID+'/'+requestID+'/Arch_'+jointID+'_'+requestID+'.zip'
-        storage = "storage/"+jointID
 
-        # Create default storage folder if missing
+        # Create storage folder if missing
         if os.path.exists("storage") == False:
             os.mkdir("storage")
 
 
-        # Create J0INT download directory
+        # Create J0INT directory if missing
+        storage = "storage/"+jointID
         if os.path.exists(storage) == False:
             os.mkdir(storage)
-            storage = storage + "/" + requestID
-            if os.path.exists(storage) == False:
-                os.mkdir(storage)
 
 
-        # Directories have been created
+        # Create request directory if missing
         storage = "storage/" + jointID + "/" + requestID
+        if os.path.exists(storage) == False:
+            os.mkdir(storage)
 
 
         # Chunk file destination
@@ -145,7 +144,8 @@ class downloadManagerSS():
         chunkJSON['byte_end'] = float(byte_end);
         chunkJSON['status'] = None;
 
-        # GET data from J0INT engine_config file
+
+        # GET data from existing J0INT config file
         if os.path.exists(chunkCONF) == True:
             with open(chunkCONF, "r") as chConf:
                 for line in chConf:
@@ -183,7 +183,7 @@ class downloadManagerSS():
                                 print('-'*101)
                                 return
         else:
-            # Generate congig file
+            # Generate config file
             wEngine_config = open(chunkCONF, "w")
             wEngine_config.close()
         # -------------------------------------------------------------------------/\
