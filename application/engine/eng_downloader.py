@@ -82,8 +82,8 @@ class downloadManagerSS():
     def connect(self):
         self.loop = asyncio.get_event_loop()
         print('[!] Connecting download manager...')
-        self.loop.run_until_complete(self.connectSocketServer())
-        self.loop.close()
+        asyncio.get_event_loop().run_until_complete(self.connectSocketServer())
+        asyncio.get_event_loop().close()
         print('[!] Download manager exited')
     # ------------------------------------------------------------------------->
 
@@ -287,7 +287,12 @@ class downloadManagerSS():
     def worker(self):
         while True:
             dQueueItem = self.downloadQueue.get()
-            asyncio.get_event_loop().run_until_complete(self.downloader(dQueueItem))
+
+            # https://www.aeracode.org/2018/02/19/python-async-simplified/
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            result = loop.run_until_complete(self.downloader(dQueueItem))
+
             self.downloadQueue.task_done()
     # ------------------------------------------------------------------------->
 
