@@ -6,6 +6,8 @@ import argparse
 import json
 import hashlib
 import threading
+import asyncio
+import websockets
 
 from queue import Queue
 from pySmartDL import SmartDL
@@ -238,6 +240,18 @@ def downloadManager(dArg):
     downloadQue.join()
     print('[!] download completed')
 # ----------------------------------------------------------------------------->
+
+
+async def connectSocketServer():
+    uri = "ws://localhost:5678"
+    async with websockets.connect(uri) as websocket:
+        await websocket.send({ "action": "downloader", "msg": "[!] connected to socket server" })
+        await websocket.recv()
+
+
+def init_DownloadManagerSocket():
+    print('[!] Download manager connected to socket server')
+    asyncio.get_event_loop().run_until_complete(connectSocketServer())
 
 
 if __name__ == '__main__':

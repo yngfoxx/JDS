@@ -95,6 +95,10 @@ class websocketserver():
                 if 'action' in wsRequest:
                     action = wsRequest['action']
                     print("[+] Action: "+action);
+
+                    if 'msg' in wsRequest:
+                        print(wsRequest['msg'])
+
                     # jds_client_connected
                     if action == 'jds_client_connected':
                         await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])

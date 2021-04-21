@@ -5,6 +5,7 @@ import threading
 
 from threading import Thread
 from engine import eng_server
+from engine import eng_downloader
 from engine import eng_socket
 from engine.eng_platform import domainName
 
@@ -200,6 +201,11 @@ class Threader (threading.Thread):
             wSocket.start();
             # ----------------------------------------------------------------->
 
+        elif (self.name == "DOWNLOAD_MNGR"):
+            # DOWNLOAD MANAGER SECTION ---------------------------------------->
+            eng_downloader.init_DownloadManagerSocket();
+            # ----------------------------------------------------------------->
+
         elif (self.name == "DEBUGGER"):
             # DEBUGGER SECTION ------------------------------------------------>
             clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
@@ -267,9 +273,15 @@ def main():
     print("[+] Socket server initialized")
 
 
-    # thread3 = Threader(3, "DEBUGGER", 3)
-    # thread3.start()
-    # threads.append(thread3)
+    thread3 = Threader(3, "DOWNLOAD_MNGR", 3)
+    thread3.start()
+    threads.append(thread3)
+    print("[+] Download manager initialized")
+
+
+    # thread4 = Threader(4, "DEBUGGER", 4)
+    # thread4.start()
+    # threads.append(thread4)
     # print("[+] Debugger initialized")
     # ------------------------------------------------------------------------->
 
