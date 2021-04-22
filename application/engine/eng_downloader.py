@@ -80,11 +80,15 @@ class downloadManagerSS():
 
     #
     def connect(self):
-        self.loop = asyncio.get_event_loop()
         print('[!] Connecting download manager...')
         asyncio.get_event_loop().run_until_complete(self.connectSocketServer())
         asyncio.get_event_loop().close()
-        print('[!] Download manager exited')
+        print('[!] Download manager exited ~ Partially')
+        if self.connected == True:
+            self.loop = asyncio.new_event_loop()
+            self.loop.run_until_complete(self.connectSocketServer())
+            self.loop.close()
+        print('[!] Download manager exited ~ Finally')
     # ------------------------------------------------------------------------->
 
     # Downloader -------------------------------------------------------------->
@@ -181,12 +185,12 @@ class downloadManagerSS():
                                 wsPayload = json.dumps(chnkJSON)
 
                                 # Get line to edit in config.json
-                                configFile = open(chunkPATH, 'r')
+                                configFile = open(chunkCONF, 'r')
                                 configLines = configFile.readlines()
-                                configLines[lineIndex] = wsPayload
+                                configLines[lineIndex] = wsPayload+'\n'
 
-                                # Set edited line in config.json
-                                configFile = open(chunkPATH, 'w')
+                                Set edited line in config.json
+                                configFile = open(chunkCONF, 'w')
                                 configFile.writelines(configLines)
                                 configFile.close()
 
