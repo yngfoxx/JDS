@@ -40,7 +40,7 @@ class downloadManagerSS():
         self.uri = "ws://localhost:5678"
         self.connected = True
         self.keepAlive = True
-        self.socket_id = None
+        self.socket_id = stdlib.makeRandomKey(12)
         self.downloadQueue = Queue()
 
 
@@ -48,7 +48,6 @@ class downloadManagerSS():
         async with websockets.connect(self.uri) as websocket:
             self.ws = websocket
             self.connected = True
-            self.socket_id = stdlib.makeRandomKey(12)
             self.socket_payload = json.dumps({ "action": "download_manager_connected", "socketType": "download_mngr",  "socketID": self.socket_id })
             # download manager is now connected
             await websocket.send(self.socket_payload)
@@ -87,8 +86,9 @@ class downloadManagerSS():
         print('[!] Connecting download manager...')
         asyncio.get_event_loop().run_until_complete(self.connectSocketServer())
         asyncio.get_event_loop().close()
-        print('[!] Download manager exited ~ Partially')
-        if self.keepAlive == True:
+        print('[!] Download manager exited ~ 1st layer')
+
+        while self.keepAlive == True:
             self.loop = asyncio.new_event_loop()
             self.loop.run_until_complete(self.connectSocketServer())
             self.loop.close()

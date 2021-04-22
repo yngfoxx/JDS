@@ -12,7 +12,11 @@ import requests
 import time
 import os
 import threading
-import _thread as thread
+
+try:
+    import thread
+except ImportError:
+    import _thread as thread
 
 from engine.eng_standard import stdlib
 from engine.eng_server import lanServer
@@ -62,21 +66,23 @@ class websocketserver():
         await self.notify_clients()
 
 
+    # Unregister the WebSocket with a socket ID
+    def removeSocket(self, WebSocket, socketID):
+        connections.pop(str(socketID))
+        print("[+] A WebSocket connection closed")
+        print(clients)
+
+
     # Register the WebSocket with a socket ID
-    async def addSocket(self, websocket, socketID, socketType):
+    def addSocket(self, websocket, socketID, socketType):
         print("[+] New WebSocket connection: ", socketID)
         connections[str(socketID)] = { "socket": websocket, "type": socketType }
         for ws in connections:
             print("[!] ", ws, " => ", connections[ws])
             if connections[ws]["socket"].closed == True or not connections[ws]["socket"]:
                 print("[+] ", ws, " is closed, removing from connection list")
-                await self.removeSocket(connections[ws], ws)
+                self.removeSocket(connections[ws], ws)
 
-
-    # Unregister the WebSocket with a socket ID
-    async def removeSocket(self, WebSocket, socketID):
-        connections.pop(str(socketID))
-        print("[+] A WebSocket connection closed")
 
 
     async def main(self, websocket, path):
@@ -101,7 +107,7 @@ class websocketserver():
 
                     # jds_client_connected
                     if action == 'jds_client_connected':
-                        await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
+                        self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
 
                         # save payload in temporary file -------------------------->
                         payload = str(wsRequest['payload'])
@@ -132,7 +138,7 @@ class websocketserver():
 
                     # App is now connected to websocket
                     elif action == 'desktop_client_online':
-                        await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
+                        self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
 
                         print('[+] Desktop socket connected to local socket server')
                         self.payload_file.seek(0)
@@ -292,7 +298,7 @@ class websocketserver():
                     # Add download manager to socket connections
                     elif action == 'download_manager_connected':
                         print('[+] Download manager connected')
-                        await self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
+                        self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
                         for ws in connections:
                             wsType = connections[ws]['type']
                             ws = connections[ws]['socket']
@@ -361,7 +367,7 @@ class websocketserver():
 
 
                     elif action == 'jds_client_disconnected':
-                        await self.removeSocket(websocket, wsRequest['socketID'])
+                        self.removeSocket(websocket, wsRequest['socketID'])
                         print('[!] User logged out!')
                         CLIENT_PAYLOAD = { "channel": "desktop_client_disconnected", "socket": wsRequest['socketID'] }
                         CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
@@ -421,6 +427,8 @@ class websocketserver():
 
         self.loop.run_until_complete(self.start_server)
         self.loop.run_forever()
+        print('[!] Socket server has shutdown')
+        print('[!] Application status:', self.init)
 
     async def gracefulExit(self):
         for wSKT in connections:
