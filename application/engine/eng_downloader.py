@@ -36,17 +36,20 @@ _executor = ThreadPoolExecutor(1)
 class downloadManagerSS():
     def __init__(self):
         super().__init__()
+        self.ws = None
         self.uri = "ws://localhost:5678"
         self.connected = True
-        self.socket_id = stdlib.makeRandomKey(12)
+        self.keepAlive = True
+        self.socket_id = None
         self.downloadQueue = Queue()
-        self.socket_payload = json.dumps({ "action": "download_manager_connected", "socketType": "download_mngr",  "socketID": self.socket_id })
-        self.ws = None
 
 
     async def connectSocketServer(self):
         async with websockets.connect(self.uri) as websocket:
             self.ws = websocket
+            self.connected = True
+            self.socket_id = stdlib.makeRandomKey(12)
+            self.socket_payload = json.dumps({ "action": "download_manager_connected", "socketType": "download_mngr",  "socketID": self.socket_id })
             # download manager is now connected
             await websocket.send(self.socket_payload)
             while self.connected == True:
@@ -64,6 +67,7 @@ class downloadManagerSS():
                             elif wsRequest['dMNGR'] == "exit":
                                 # exit loop to terminate script
                                 self.connected = False
+                                self.keepAlive = False
                                 break
 
                         elif self.socket_id in wsRequest:
@@ -84,7 +88,7 @@ class downloadManagerSS():
         asyncio.get_event_loop().run_until_complete(self.connectSocketServer())
         asyncio.get_event_loop().close()
         print('[!] Download manager exited ~ Partially')
-        if self.connected == True:
+        if self.keepAlive == True:
             self.loop = asyncio.new_event_loop()
             self.loop.run_until_complete(self.connectSocketServer())
             self.loop.close()
@@ -264,8 +268,11 @@ class downloadManagerSS():
                 wsJSON = chunkJSON
                 wsJSON['action'] = 'realtime_download_progress'
                 wsPayload = json.dumps(wsJSON)
-                await self.ws.send(wsPayload)
-                print('[!] Sent realtime data ~ Finished')
+                try:
+                    await self.ws.send(wsPayload)
+                    print('[!] Sent realtime data ~ Finished')
+                except Exception as e:
+                    print('[-] Error while sending RealTime data:', e)
 
 
         else:
