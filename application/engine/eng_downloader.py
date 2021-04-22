@@ -151,6 +151,7 @@ class downloadManagerSS():
         # GET data from existing J0INT config file
         if os.path.exists(chunkCONF) == True:
             with open(chunkCONF, "r") as chConf:
+                lineIndex = 0
                 for line in chConf:
                     chnkJSON = json.loads(line)
                     if jointID == str(chnkJSON['jid']) and requestID == str(chnkJSON['rid']) and chunkORDER == str(chnkJSON['id']):
@@ -169,18 +170,35 @@ class downloadManagerSS():
 
                             if storedHash == calcHash:
                                 print("[!] Chunk exists, exiting...")
-                                # Append missing parameters
+                                # Edit config.json, Append missing parameters
+                                # REF: https://www.kite.com/python/answers/how-to-edit-a-specific-line-in-a-text-file-in-python#:~:text=Use%20file.,at%20a%20certain%20line%20number.
+                                # revalidate file data based (due to hash authenticity)
+
+                                chnkJSON['size'] = os.path.getsize(chunkPATH)
+                                chnkJSON['progress'] = 100.0
+                                chnkJSON['status'] = "finished"
+                                chnkJSON['action'] = 'realtime_download_progress'
+                                wsPayload = json.dumps(chnkJSON)
+
+                                # Get line to edit in config.json
+                                configFile = open(chunkPATH, 'r')
+                                configLines = configFile.readlines()
+                                configLines[lineIndex] = wsPayload
+
+                                # Set edited line in config.json
+                                configFile = open(chunkPATH, 'w')
+                                configFile.writelines(configLines)
+                                configFile.close()
+
                                 # Notify socket server of download completion
                                 if self.connected == True:
-                                    wsJSON = chnkJSON
-                                    wsJSON['action'] = 'realtime_download_progress'
-                                    wsPayload = json.dumps(wsJSON)
                                     await self.ws.send(wsPayload)
                                     print('[!] Sent realtime data ~ Already exists')
                                 else:
                                     print('[!] Download manager socket is not connected')
                                 print('-'*101)
                                 return
+                    lineIndex += 1
         else:
             # Generate config file
             wEngine_config = open(chunkCONF, "w")
@@ -228,7 +246,10 @@ class downloadManagerSS():
         if fileDLM.isSuccessful():
             # MAIN FUNCTIONS =>
             # 1. Inform socket server of thread download progress
-
+            chunkJSON['size'] = fileDLM.get_dl_size()
+            chunkJSON['status'] = fileDLM.get_status()
+            chunkJSON['eta'] = fileDLM.get_eta(human=True)
+            chunkJSON['progress'] = (fileDLM.get_progress() * 100)
             chunkJSON['time_elapsed'] = fileDLM.get_dl_time(human=True)
             chunkJSON['hash'] = {
                 'md5' : fileDLM.get_data_hash('md5'),
