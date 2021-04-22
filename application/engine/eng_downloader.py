@@ -189,7 +189,7 @@ class downloadManagerSS():
                                 configLines = configFile.readlines()
                                 configLines[lineIndex] = wsPayload+'\n'
 
-                                Set edited line in config.json
+                                # Set edited line in config.json
                                 configFile = open(chunkCONF, 'w')
                                 configFile.writelines(configLines)
                                 configFile.close()
