@@ -221,8 +221,27 @@
                     $('._bibf_div_c_cont').fadeIn();
                     let downConfig = document.querySelector('._bibf_dc_div');
                     downConfig.setAttribute("data-svr-id", jRes.svrID);
-                    // show panes [LOAD JOINT GROUP] -------------------------->
-                    loadJDS({ jID: jRes.jdsID });
+                    // [LOAD THE NEW JOINT GROUP] ----------------------------->
+                    ajx({ type: 'POST', url: '/JDS/req/req_handler.php', data: {uData: true},
+                      success: (res) => {
+                        if (isJson(res)) {
+                          let uData = JSON.parse(res);
+                          try {
+                            ws_client_app.send(JSON.stringify({
+                              "action": "jds_client_connected",
+                              "interval": "none",
+                              "socketID": socket_unique_id,
+                              "socketType": "web",
+                              "payload": { "devID": uData.dID, "userID": uData.uID, "username": uData.uName, "joints": uData.jds }
+                            }));
+                          } catch (e) {
+                            console.log('[!] Client WebSocket was unreachable: '+e);
+                          } finally {
+                            loadJDS({ jID: jRes.jdsID });
+                          }
+                        }
+                      },
+                      complete: () => { console.log("Done!!!!"); }, load: 'up' });
                     // -------------------------------------------------------->
                   } else {
                     // delete temporary group or add to existing group

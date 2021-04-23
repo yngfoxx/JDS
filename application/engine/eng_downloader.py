@@ -42,6 +42,7 @@ class downloadManagerSS():
         self.keepAlive = True
         self.socket_id = stdlib.makeRandomKey(12)
         self.downloadQueue = Queue()
+        self.threads = []
 
 
     async def connectSocketServer(self):
@@ -84,15 +85,11 @@ class downloadManagerSS():
     #
     def connect(self):
         print('[!] Connecting download manager...')
-        asyncio.get_event_loop().run_until_complete(self.connectSocketServer())
-        asyncio.get_event_loop().close()
-        print('[!] Download manager exited ~ 1st layer')
-
         while self.keepAlive == True:
             self.loop = asyncio.new_event_loop()
             self.loop.run_until_complete(self.connectSocketServer())
             self.loop.close()
-        print('[!] Download manager exited ~ Finally')
+        print('[!] Download manager exited')
     # ------------------------------------------------------------------------->
 
     # Downloader -------------------------------------------------------------->
@@ -247,7 +244,7 @@ class downloadManagerSS():
                     await self.ws.send(wsPayload)
                     print('[!] Sent realtime data ~ Downloading')
                 except Exception as e:
-                    print('[-] Error while sending RealTime data:', e)
+                    print('\n\n[-] Error while sending RealTime data:', e)
 
             await asyncio.sleep(random.random() * 3)
 
@@ -272,7 +269,7 @@ class downloadManagerSS():
                     await self.ws.send(wsPayload)
                     print('[!] Sent realtime data ~ Finished')
                 except Exception as e:
-                    print('[-] Error while sending RealTime data:', e)
+                    print('\n\n[-] Error while sending RealTime data:', e)
 
 
         else:
@@ -286,7 +283,11 @@ class downloadManagerSS():
             if self.ws != None:
                 chunkJSON['error'] = fileDLM.get_errors()
                 wsPayload = json.dumps(chunkJSON)
-                await self.ws.send(wsPayload)
+                try:
+                    await self.ws.send(wsPayload)
+                    print('[!] Sent realtime data ~ Error')
+                except Exception as e:
+                    print('\n\n[-] Error while sending RealTime data:', e)
 
 
         # Store binary data into file
@@ -311,7 +312,6 @@ class downloadManagerSS():
             print('[-] Could not find file: ',path);
 
         print('-'*101)
-        return "done"
         # ---------------------------------------------------------------------/\
     # ------------------------------------------------------------------------->
 
@@ -320,10 +320,14 @@ class downloadManagerSS():
         while True:
             dQueueItem = self.downloadQueue.get()
 
-            # https://www.aeracode.org/2018/02/19/python-async-simplified/
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            result = loop.run_until_complete(self.downloader(dQueueItem))
+            try:
+                # https://www.aeracode.org/2018/02/19/python-async-simplified/
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                result = loop.run_until_complete(self.downloader(dQueueItem))
+            except Exception as e:
+                print('[!] Error in worker:', e)
+
 
             self.downloadQueue.task_done()
     # ------------------------------------------------------------------------->
@@ -331,17 +335,18 @@ class downloadManagerSS():
 
     # Queue manager ----------------------------------------------------------->
     def downloadManager(self, dArg):
-        dParm = {}
-
+        workerIndex = 0
         for dParm in dArg:
-            threading.Thread(target=self.worker, daemon=True).start()
-
             self.downloadQueue.put(dParm)
             print("[!] Download added to que")
 
+            workerThread = threading.Thread(target=self.worker, name=f'worker_{workerIndex}', daemon=True)
+            workerThread.start()
+            self.threads.append(workerThread)
+
             # block until all tasks are done
             self.downloadQueue.join()
-            print('[!] download completed')
+        print('[!] download completed')
     # ------------------------------------------------------------------------->
 
 

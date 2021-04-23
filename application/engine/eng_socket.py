@@ -97,6 +97,10 @@ class websocketserver():
                     wsInput = await websocket.recv()
                 except Exception as e:
                     print('[-] Could not receive websocket data, reason:', e)
+                    for sock in connections:
+                        if connections[sock]['socket'] == websocket:
+                            print('[!] Socket error origin:', websocket, '\n[!] SEO type:', connections[sock]['type']+'\n')
+
                     break
 
                 # Handle websocket recieved input
@@ -111,6 +115,7 @@ class websocketserver():
 
                         # save payload in temporary file -------------------------->
                         payload = str(wsRequest['payload'])
+                        self.payload_file.truncate()
                         self.payload_file.write(str.encode(payload))
                         print("[+] Payload stored in temp file!")
 
@@ -345,6 +350,7 @@ class websocketserver():
                                 DMNGR_PAYLOAD_JSON = json.dumps(DMNGR_PAYLOAD)
                                 # /storage/JointID/RequestID/Arch_JointID_RequestID.zip
                                 await asyncio.wait([ws.send(DMNGR_PAYLOAD_JSON)])
+                        await asyncio.sleep(random.random() * 3)
 
 
                     # Get realtime chunk download progress from download manager

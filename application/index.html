@@ -286,7 +286,47 @@
                     break;
 
                   case 'realtime_download_progress':
-                    console.log('[!] RealTime data: ', eData);
+                    networkpanel_overlay('Ping');
+                    
+                    let dmdr = document.createElement('DIV');
+                        dmdr.classList.add('dm_download_row');
+
+
+                        let dmIcon = document.createElement('DIV');
+                            dmIcon.classList.add('dm_icon');
+                            dmIcon.setAttribute('data-type', 'down');
+                            dmdr.append(dmIcon);
+
+
+                        let dmContent = document.createElement('DIV');
+                            dmContent.classList.add('dm_content');
+                            let dmcName = document.createElement('DIV');
+                                dmcName.classList.add('dmc_name');
+                                dmcName.innerText = '[CHNKID] Arch_JID_RID.zip';
+                                dmContent.append(dmcName);
+
+                            let dmcProgress = document.createElement('DIV');
+                                dmcProgress.classList.add('dmc_progress');
+                                let dmcpBar document.createElement('DIV');
+                                    dmcpBar.classList.add('dmcp_bar');
+                                    dmcProgress.append(dmcpBar);
+                                dmContent.append(dmcProgress);
+
+                            let dmcDescrp = document.createElement('DIV');
+                                dmcDescrp.classList.add('dmc_descrp');
+                                for (var iter = 0; iter < 3; iter++) {
+                                  let dmcdText = document.createElement('DIV');
+                                      dmcdText.classList.add('dmcd_text');
+                                      if (iter == 0) dmcdText.innerText = 'J:';
+                                      if (iter == 1) dmcdText.innerText = 'S:';
+                                      if (iter == 2) dmcdText.innerText = 'R:';
+                                      if (iter == 3) dmcdText.innerText = 'P:';
+                                      dmcDescrp.append(dmcdText);
+                                }
+                                dmContent.append(dmcDescrp);
+
+                            dmdr.append(dmContent);
+                      break;
 
                   case desktop_socket_unique_id:
                     console.log("Unique message received!");
@@ -324,7 +364,8 @@
 
     </script>
 
-    <!-- <div class="dm_download_row">
+    <!--
+    <div class="dm_download_row">
       <div class="dm_icon" data-type="down"></div>
       <div class="dm_content">
           <div class="dmc_name">[12] Arch_LYW7R_142.zip</div>
@@ -338,6 +379,7 @@
             <div class="dmcd_text">P: 50%</div>
           </div>
       </div>
-    </div> -->
+    </div>
+    -->
   </body>
 </html>
