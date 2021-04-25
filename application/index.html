@@ -288,7 +288,17 @@
                   case 'realtime_download_progress':
                     // Clear messages in download panel
                     let parent = document.querySelector('._bdyContent[data-node-id="local_dm"]');
-                        if (parent.getAttribute('data-init') != true) clearDOM(parent);
+
+                    if (parent.getAttribute('data-init') != true) clearDOM(parent);
+                    parent.setAttribute('data-init', true);
+
+                    let chnkID = eData.id;
+                    let chnkJID = eData.jid;
+                    let chnkRID = eData.rid;
+                    let chnkFNAME = eData.filename;
+                    let chnkSIZE = eData.size;
+                    let chnkPROG = eData.progress;
+                    let chnkTELAPSED = eData.time_elapsed;
 
                     let dmdr = document.createElement('DIV');
                         dmdr.classList.add('dm_download_row');
@@ -303,13 +313,14 @@
                             dmContent.classList.add('dm_content');
                             let dmcName = document.createElement('DIV');
                                 dmcName.classList.add('dmc_name');
-                                dmcName.innerText = '[CHNKID] Arch_JID_RID.zip';
+                                dmcName.innerText = '['+chnkID+'] Arch_'+chnkJID+'_'+chnkRID+'.zip';
                                 dmContent.append(dmcName);
 
                             let dmcProgress = document.createElement('DIV');
                                 dmcProgress.classList.add('dmc_progress');
                                 let dmcpBar = document.createElement('DIV');
                                     dmcpBar.classList.add('dmcp_bar');
+                                    dmcpBar.style.width = chnkPROG + '%';
                                     dmcProgress.append(dmcpBar);
                                 dmContent.append(dmcProgress);
 
