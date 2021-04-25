@@ -46,7 +46,7 @@ class downloadManagerSS():
 
 
     async def connectSocketServer(self):
-        async with websockets.connect(self.uri) as websocket:
+        async with websockets.connect(self.uri, ping_interval=None) as websocket:
             self.ws = websocket
             self.connected = True
             self.socket_payload = json.dumps({ "action": "download_manager_connected", "socketType": "download_mngr",  "socketID": self.socket_id })
@@ -76,7 +76,7 @@ class downloadManagerSS():
                 except Exception as e:
                     print('[-] Error in download manager socket connection')
                     print(e)
-                    self.connected = False
+                    # self.connected = False
                     pass
 
                 await asyncio.sleep(random.random() * 3)
@@ -282,6 +282,7 @@ class downloadManagerSS():
 
             if self.ws != None:
                 chunkJSON['error'] = fileDLM.get_errors()
+                chunkJSON['action'] = 'realtime_download_progress'
                 wsPayload = json.dumps(chunkJSON)
                 try:
                     await self.ws.send(wsPayload)

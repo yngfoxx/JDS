@@ -286,11 +286,12 @@
                     break;
 
                   case 'realtime_download_progress':
-                    networkpanel_overlay('Ping');
-                    
+                    // Clear messages in download panel
+                    let parent = document.querySelector('._bdyContent[data-node-id="local_dm"]');
+                        if (parent.getAttribute('data-init') != true) clearDOM(parent);
+
                     let dmdr = document.createElement('DIV');
                         dmdr.classList.add('dm_download_row');
-
 
                         let dmIcon = document.createElement('DIV');
                             dmIcon.classList.add('dm_icon');
@@ -307,7 +308,7 @@
 
                             let dmcProgress = document.createElement('DIV');
                                 dmcProgress.classList.add('dmc_progress');
-                                let dmcpBar document.createElement('DIV');
+                                let dmcpBar = document.createElement('DIV');
                                     dmcpBar.classList.add('dmcp_bar');
                                     dmcProgress.append(dmcpBar);
                                 dmContent.append(dmcProgress);
@@ -326,6 +327,8 @@
                                 dmContent.append(dmcDescrp);
 
                             dmdr.append(dmContent);
+
+                        parent.append(dmdr);
                       break;
 
                   case desktop_socket_unique_id:
