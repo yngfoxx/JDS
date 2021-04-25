@@ -288,9 +288,7 @@
                   case 'realtime_download_progress':
                     // Clear messages in download panel
                     let parent = document.querySelector('._bdyContent[data-node-id="local_dm"]');
-
-                    if (parent.getAttribute('data-init') != true) clearDOM(parent);
-                    parent.setAttribute('data-init', true);
+                    if (parent.children[0].className == '_aMsg') clearDOM(parent);
 
                     let chnkID = eData.id;
                     let chnkJID = eData.jid;
@@ -326,13 +324,13 @@
 
                             let dmcDescrp = document.createElement('DIV');
                                 dmcDescrp.classList.add('dmc_descrp');
-                                for (var iter = 0; iter < 3; iter++) {
+                                for (var iter = 0; iter < 4; iter++) {
                                   let dmcdText = document.createElement('DIV');
                                       dmcdText.classList.add('dmcd_text');
-                                      if (iter == 0) dmcdText.innerText = 'J:';
-                                      if (iter == 1) dmcdText.innerText = 'S:';
-                                      if (iter == 2) dmcdText.innerText = 'R:';
-                                      if (iter == 3) dmcdText.innerText = 'P:';
+                                      if (iter == 0) dmcdText.innerText = 'J: '+chnkJID;
+                                      if (iter == 1) dmcdText.innerText = 'S: '+chnkSIZE;
+                                      if (iter == 2) dmcdText.innerText = 'R: '+chnkRID;
+                                      if (iter == 3) dmcdText.innerText = 'P: '+chnkPROG + '%';
                                       dmcDescrp.append(dmcdText);
                                 }
                                 dmContent.append(dmcDescrp);

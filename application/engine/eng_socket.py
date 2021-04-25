@@ -350,12 +350,13 @@ class websocketserver():
                                 DMNGR_PAYLOAD_JSON = json.dumps(DMNGR_PAYLOAD)
                                 # /storage/JointID/RequestID/Arch_JointID_RequestID.zip
                                 await asyncio.wait([ws.send(DMNGR_PAYLOAD_JSON)])
-                            time.sleep(3)
+                            await asyncio.sleep(random.random() * 3)
 
 
                     # Get realtime chunk download progress from download manager
                     elif action == 'realtime_download_progress':
                         print('[+] Live chunk download progress received')
+                        await asyncio.sleep(random.random() * 3)
                         wsPload = {}
                         for wsData in wsRequest:
                             if wsData != 'action':
