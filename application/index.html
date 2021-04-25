@@ -288,7 +288,7 @@
                   case 'realtime_download_progress':
                     // Clear messages in download panel
                     let parent = document.querySelector('._bdyContent[data-node-id="local_dm"]');
-                    if (parent.children[0].className == '_aMsg') clearDOM(parent);
+                    if (parent.children[0] && parent.children[0].className == '_aMsg') clearDOM(parent);
 
                     let chnkID = eData.id;
                     let chnkJID = eData.jid;
@@ -297,9 +297,18 @@
                     let chnkSIZE = humanFileSize(eData.size, false);
                     let chnkPROG = eData.progress;
                     let chnkTELAPSED = eData.time_elapsed;
+                    let chnkElementID = chnkJID+'_'+chnkRID+'_'+chnkID;
+
+                    let chnkElement = document.querySelector('.dm_download_row[data-download-id="'+chnkElementID+'"]');
+                    if (chnkElement) {
+                      let chnkProgBar = chnkElement.children[1].children[1].children[0];
+                      chnkProgBar.style.width = chnkPROG + '%';
+                      return;
+                    }
 
                     let dmdr = document.createElement('DIV');
                         dmdr.classList.add('dm_download_row');
+                        dmdr.setAttribute('data-download-id', chnkElementID)
 
                         let dmIcon = document.createElement('DIV');
                             dmIcon.classList.add('dm_icon');

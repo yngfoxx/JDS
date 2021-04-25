@@ -229,7 +229,7 @@ class websocketserver():
                                         # Begin LAN handshake ----------------------------------------------------------->
                                         response = None
                                         try:
-                                            req = requests.post(targetDomain, data=json.dumps(payload), headers=cHeaders)
+                                            req = requests.post(targetDomain, data=json.dumps(payload), headers=cHeaders, timeout=3.05)
                                             if req.status_code == 200:
                                                 response = json.loads(req.text)
                                                 print('[!] RESPONSE => ', response)

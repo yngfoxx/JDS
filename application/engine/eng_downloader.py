@@ -331,6 +331,7 @@ class downloadManagerSS():
 
 
             self.downloadQueue.task_done()
+            print('[+] A task completed..')
     # ------------------------------------------------------------------------->
 
 
