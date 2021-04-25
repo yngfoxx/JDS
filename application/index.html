@@ -302,7 +302,9 @@
                     let chnkElement = document.querySelector('.dm_download_row[data-download-id="'+chnkElementID+'"]');
                     if (chnkElement) {
                       let chnkProgBar = chnkElement.children[1].children[1].children[0];
-                      chnkProgBar.style.width = chnkPROG + '%';
+                      let chnkProgTxt = chnkElement.children[1].children[2].children[3];
+                          chnkProgBar.style.width = chnkPROG + '%';
+                          chnkProgTxt.innerText = 'P: '+chnkPROG + '%';
                       return;
                     }
 
@@ -346,7 +348,7 @@
 
                             dmdr.append(dmContent);
 
-                        parent.append(dmdr);
+                        parent.prepend(dmdr);
                       break;
 
                   case desktop_socket_unique_id:

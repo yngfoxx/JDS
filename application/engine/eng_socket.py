@@ -196,11 +196,11 @@ class websocketserver():
                                 print("[!] SENDING POST", jointGrp, "="*90)
                                 local_ip = lanServer().get_ip_list()
 
-                                if not os.path.exists("u_config.txt"):
+                                if not os.path.exists("u_config.json"):
                                     self.stop()
                                     break
 
-                                uconfigFile = open("u_config.txt", 'r')
+                                uconfigFile = open("u_config.json", 'r')
                                 uconfigData = json.loads(uconfigFile.read())
                                 uconfigFile.close()
 
@@ -326,8 +326,8 @@ class websocketserver():
                             print('[+] Download manager on J0INT:', jid);
                             dArgSet = []
                             for chunk in wsRequest['payload'][jid]:
-                                if os.path.exists("u_config.txt"):
-                                    uconfigFile = open("u_config.txt", 'r')
+                                if os.path.exists("u_config.json"):
+                                    uconfigFile = open("u_config.json", 'r')
                                     uconfigData = json.loads(uconfigFile.read())
                                     uconfigFile.close()
 
@@ -376,6 +376,12 @@ class websocketserver():
                     elif action == 'jds_client_disconnected':
                         self.removeSocket(websocket, wsRequest['socketID'])
                         print('[!] User logged out!')
+                        # Delete u_config.json
+                        if os.path.exists("u_config.json"):
+                            os.remove("u_config.json")
+                        else:
+                            print("[!] User configuration could not be located")
+
                         CLIENT_PAYLOAD = { "channel": "desktop_client_disconnected", "socket": wsRequest['socketID'] }
                         CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
 
@@ -424,7 +430,7 @@ class websocketserver():
         self.stopped = False
 
         self.loop = asyncio.get_event_loop()
-        self.start_server = websockets.serve(self.main, hostdomain, self.port)
+        self.start_server = websockets.serve(self.main, hostdomain, self.port, ping_interval=None)
 
         # self.futurestop = self.loop.create_future()
         # self.loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)

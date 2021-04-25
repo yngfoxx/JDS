@@ -123,14 +123,14 @@ class LocalServer(SimpleHTTPRequestHandler):
                 }
 
                 try:
-                    # Get user configuration payload/data in u_config.txt file
-                    uconfigFile = open("u_config.txt", 'r')
+                    # Get user configuration payload/data in u_config.json file
+                    uconfigFile = open("u_config.json", 'r')
                     uconfigData = json.loads(uconfigFile.read())
                     uconfigFile.close()
                 except Exception as e:
-                    print('[!] Ran into a problem while handling \"u_config.txt\"')
+                    print('[!] Ran into a problem while handling \"u_config.json\"')
                     self._set_response()
-                    self.wfile.write(str.encode('[!] Ran into a problem while handling \"u_config.txt\"'))
+                    self.wfile.write(str.encode('[!] Ran into a problem while handling \"u_config.json\"'))
 
                 # Filter the uconfig data for the important variables needed
                 if uconfigData != '':
@@ -177,7 +177,7 @@ class lanServer():
 
 
     def set_uconfig(self, payload):
-        self.uconfig = open('u_config.txt', 'w')
+        self.uconfig = open('u_config.json', 'w')
         self.uconfig.write(payload)
         self.uconfig.close()
         print("[+] LAN recvd payload: ", payload)

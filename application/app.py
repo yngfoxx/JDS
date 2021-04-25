@@ -215,7 +215,7 @@ class Threader (threading.Thread):
 
         print("[*] Exiting thread: " + self.name)
 
-        if os.path.exists("u_config.txt"):
+        if os.path.exists("u_config.json"):
             print("[!] Restarting closed services")
             if self.name == "SOCKET_SERVER":
                 wSocket.start()
@@ -229,8 +229,8 @@ def exit_():
     app.exec_()
     print("\n[!] Exiting application")
 
-    if os.path.exists("u_config.txt"):
-        os.remove("u_config.txt")
+    if os.path.exists("u_config.json"):
+        os.remove("u_config.json")
     else:
         print("[!] User configuration could not be located")
 
