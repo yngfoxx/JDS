@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <title>Joint Downloading System [CLIENT]</title>
 
-    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+    <link rel="icon" type="image/png" href="logo-512x512.png"/>
     <meta name="application-name" content="JDS [CLIENT]"/>
 
     <meta propety="og:locale" content="en-GB"/>
@@ -76,8 +76,17 @@
       user_socket.emit('msg', 'connected');
     });
 
+    user_socket.on('msg', (data) => {
+      console.log(data);
+    });
+
     user_socket.on(userchannelID, (data) => {
-      alert(data);
+      if (isJson(data)) {
+        let ioData = JSON.parse(data);
+        console.log(ioData);
+      } else {
+        console.log(data);
+      }
     });
     // ---------------------------------------------------------------------------->
     </script>
