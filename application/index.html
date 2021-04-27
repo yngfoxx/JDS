@@ -76,10 +76,6 @@
       user_socket.emit('msg', 'connected');
     });
 
-    user_socket.on('msg', (data) => {
-      console.log(data);
-    });
-
     user_socket.on(userchannelID, (data) => {
       if (isJson(data)) {
         let ioData = JSON.parse(data);
