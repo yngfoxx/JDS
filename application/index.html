@@ -62,11 +62,32 @@
     <script type="text/javascript" src="/lib/js/script.js"></script>
     <script type="text/javascript" src="/lib/js/ajx.js"></script>
     <script type="text/javascript">
+    // SOCKET MANAGER ------------------------------------------------------------->
+    const CID = rand(1000000000, 9999999999); // Client ID
+    const userchannelID = genKey(12); // USER UNIQUE CHANNEL ID
+    const usrKEY = 'Aj6dN8WfWbPq1HdnHJFXwsXV7MDRrCCU';
+    const user_socket = io('https://ws-jds-eu.herokuapp.com/usr_'+CID, {
+      reconnectionDelayMax: 10000,
+      auth: { token: usrKEY, channel: userchannelID, clientId: CID, type: 'desktop' },
+      forceNew: true
+    });
+
+    user_socket.on('connect', () => {
+      user_socket.emit('msg', 'connected');
+    });
+
+    user_socket.on(userchannelID, (data) => {
+      alert(data);
+    });
+    // ---------------------------------------------------------------------------->
+    </script>
+
+    <script type="text/javascript">
     let client_data = null;
     let client_net_addr = null;
     let recon_cool_down = false;
     let refresh_cool_down = false;
-    
+
     const desktop_socket_unique_id = 'izTUTM';
     let netList = {};
     function ws_connect() {
