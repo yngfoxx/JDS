@@ -73,16 +73,13 @@
     });
 
     user_socket.on('connect', () => {
-      user_socket.emit('msg', 'connected');
+      user_socket.emit('msg', '[!] connected to https://ws-jds-eu.herokuapp.com/usr_'+CID);
+      user_socket.emit('client_app_msg', {foo: 'bar'});
     });
 
     user_socket.on(userchannelID, (data) => {
-      if (isJson(data)) {
-        let ioData = JSON.parse(data);
-        console.log(ioData);
-      } else {
-        console.log(data);
-      }
+      let ioData = (isJson(data)) ? JSON.parse(data) : data;
+      console.log(ioData);
     });
     // ---------------------------------------------------------------------------->
     </script>
