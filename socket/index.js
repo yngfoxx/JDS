@@ -41,7 +41,6 @@ const admin_server_nsp = io.of(/^\/su_\d+$/);
 const user_nsp = io.of(/^\/usr_\d+$/);
 const cookie = require('cookie');
 
-let user_array = [];
 
 
 // ADMIN SOCKET NAMESPACE/CHANNELS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\/
@@ -73,7 +72,9 @@ admin_server_nsp.on('connection', (socket) => {
 
 
 
-// USER SOCKET NAMESPACE/CHANNEL>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\/
+// USER SOCKET NAMESPACE/CHANNEL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\/
+let usrClients = []; // server client list
+
 user_nsp.use((socket, next) => { // Authenticate admin channel
   let handshake = socket.handshake;
   if (usrkey.includes(handshake.auth.token)) return next(); // check authenticity of key
@@ -84,28 +85,42 @@ user_nsp.use((socket, next) => { // Authenticate admin channel
 user_nsp.on('connection', (socket) => {
   const user_channel = socket.nsp; // newNamespace.name === '/usr_123456
   let handshake = socket.handshake;
-  // console.log(handshake.query);
-  // console.log(handshake.auth);
+  console.log("\n============================================================================================>");
+  // Add client to server client list -------
+  let uData = { clientId: handshake.auth.clientId, channel: handshake.auth.channel, type: handshake.auth.type };
+  usrClients.push(uData);
+  // ----------------------------------------
 
-  // Announce user connection
+  // SOCKET ON DISCONNECT EVENT ----------------------------------------------->
+  socket.on('disconnect', () => {
+    socket.leave(handshake.auth.channel);
+    let client = usrClients[usrClients.indexOf(uData)]
+    console.log("\n============================================================================================>");
+    console.log("\n[*] USER DISCONNECTED FROM SOCKET: "+client.room);
+
+    admin_server_nsp.emit('msg', {socket_type: 'user', socket_data: `[-] USER SOCKET [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
+    admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{USERS} =>'+JSON.stringify(usrClients)});
+  });
+  // -------------------------------------------------------------------------->
+
+
+  // USER CONNECTED ----------------------------------------------------------->
   admin_server_nsp.emit('msg', {socket_type: 'user', socket_data: '{USER} => ['+socket.id+'] NEW CONNECTION TO '+user_channel.name}); // send message direct to the admin namespace
+
 
   // GET DEVICE KEY
   const cookies = cookie.parse(socket.request.headers.cookie || '');
   const device_key = (cookies.dKEY || '');
+
 
   // SOCKET EVENT PROCESSING
   socket.on('msg', (data) => {
     user_channel.emit('msg', data); // send message direct to the namespace
     admin_server_nsp.emit('msg', {socket_type: 'user', socket_data: data}); // send message direct to the admin namespace
   });
-
-  // BASIC SOCKET COMMANDS
-  socket.on('disconnect', function () {
-    admin_server_nsp.emit('msg', {socket_type: 'user', socket_data: `USER [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
-  });
+  // -------------------------------------------------------------------------->
 });
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>/\
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>/\
 
 
 
@@ -143,7 +158,9 @@ python_server_nsp.on('connection', (socket) => {
   let uData = { uuid: handshake.auth.uid, room: handshake.auth.gc };
   pyClients.push(uData);
 
-  // SOCKET ON DISCONNECT EVENT
+
+
+  // SOCKET ON DISCONNECT EVENT ----------------------------------------------->
   socket.on('disconnect', () => {
     socket.leave(handshake.auth.gc);
     let user = pyClients[pyClients.indexOf(uData)]
@@ -162,7 +179,10 @@ python_server_nsp.on('connection', (socket) => {
     admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `[-] PYTHON SOCKET [${socket.id}] DISCONNECTED`}); // send message direct to the admin namespace
     admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{USERS} =>'+JSON.stringify(pyClients)});
   });
+  // -------------------------------------------------------------------------->
 
+
+  // USER CONNECTED ----------------------------------------------------------->
   // python_server_nsp.to(socketGC).emit('msg', 'Welcome to Joint Downloading System'); // send status of all users in the channel
   admin_server_nsp.emit('msg', {socket_type: 'python', socket_data: `[+] PYTHON SOCKET [${socket.id}] CONNECTED`}); // send message direct to the admin namespace
   admin_server_nsp.emit('msg', {socket_type: 'admin', socket_data: '{USERS} =>'+JSON.stringify(pyClients)}); // Notify admin
@@ -253,6 +273,7 @@ python_server_nsp.on('connection', (socket) => {
       }
     }
   });
+  // -------------------------------------------------------------------------->
 });
 // ==========================================================================================================================================================================/\
 
