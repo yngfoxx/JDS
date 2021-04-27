@@ -28,7 +28,7 @@ downloadMngrService = downloadManagerSS()
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
-jds_server_domain = "c6d249ef3657.ngrok.io"
+jds_server_domain = "46a7eef900f4.ngrok.io"
 
 
 
