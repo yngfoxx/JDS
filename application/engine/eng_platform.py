@@ -16,6 +16,10 @@ class domainName(object):
             self.domain = "localhost"
         return str(self.domain)
 
+
+    def getServerDomain(self):
+        return "46a7eef900f4.ngrok.io"
+
 if __name__ == '__main__':
     domainOBJ = domainName()
     domainOBJ.getDomain()

@@ -159,25 +159,27 @@ function generate_net_prof(netlist) {
 
 
 function networkpanel_overlay(newMsg) {
+  let parent = document.querySelector('._bdyContent[data-node-id="local_recon"]');
+      parent.style.position = "relative";
+      if (parent.children[0].className == '_aMsg') parent.children[0].remove();
   let messageAnchor = document.createElement('A');
       messageAnchor.classList.add('_aMsg');
       messageAnchor.style.color = 'var(--light-gray-v2)';
       messageAnchor.setAttribute('data-snippet', newMsg);
-  let parent = document.querySelector('._bdyContent[data-node-id="local_recon"]');
-      clearDOM(parent);
-      parent.append(messageAnchor);
+      parent.prepend(messageAnchor);
 }
 
 
 
 function localdmpanel_overlay(newMsg) {
+  let parent = document.querySelector('._bdyContent[data-node-id="local_dm"]');
+      parent.style.position = "relative";
+      if (parent.children[0].className == '_aMsg') parent.children[0].remove();
   let messageAnchor = document.createElement('A');
       messageAnchor.classList.add('_aMsg');
       messageAnchor.style.color = 'var(--light-gray-v2)';
       messageAnchor.setAttribute('data-snippet', newMsg);
-  let parent = document.querySelector('._bdyContent[data-node-id="local_dm"]');
-      clearDOM(parent);
-      parent.append(messageAnchor);
+      parent.prepend(messageAnchor);
 }
 
 // <!-- <div class="net_usr_div"> -->

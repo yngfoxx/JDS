@@ -141,6 +141,35 @@ class websocketserver():
                         # --------------------------------------------------------->
 
 
+                    if action == "jds_client_refresh":
+                        # save payload in temporary file -------------------------->
+                        payload = str(wsRequest['payload'])
+                        self.payload_file.truncate()
+                        self.payload_file.write(str.encode(payload))
+                        print("[+] Payload stored in temp file!")
+
+                        self.payload_file.seek(0)
+                        pLoad = self.payload_file.read().decode('utf-8')
+                        pLoad = pLoad.replace("\'", "\"")
+
+                        # Store uconfig in lan server -----------------------------
+                        lanServer().set_uconfig(pLoad)
+
+                        # local_ip = socket.gethostbyname(socket.gethostname())
+                        local_ip = lanServer().get_ip_list()
+                        CLIENT_PAYLOAD = {
+                            "channel": "desktop_client_refresh",
+                            "net_addr": local_ip,
+                            "payload": pLoad
+                        }
+                        CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
+                        try:
+                            await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
+                        except:
+                            pass
+                        # --------------------------------------------------------->
+
+
                     # App is now connected to websocket
                     elif action == 'desktop_client_online':
                         self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
@@ -158,6 +187,7 @@ class websocketserver():
                             "payload": pLoad
                         }
                         CLIENT_PAYLOAD_JSON = json.dumps(CLIENT_PAYLOAD)
+                        print('[!] Sent: desktop_client_connected')
 
 
                     # Fetch users on local network

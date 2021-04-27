@@ -58,6 +58,7 @@
       </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
     <script type="text/javascript" src="/lib/js/script.js"></script>
     <script type="text/javascript" src="/lib/js/ajx.js"></script>
     <script type="text/javascript">
@@ -65,22 +66,30 @@
     let client_net_addr = null;
     let recon_cool_down = false;
     let refresh_cool_down = false;
-    let desktop_socket_unique_id = genKey(6);
+    // const desktop_socket_unique_id = genKey(6);
+    const desktop_socket_unique_id = 'izTUTM';
     let netList = {};
     function ws_connect() {
 
       let ws = new WebSocket("ws://127.0.0.1:5678/");
           ws.onopen = function () { // Request local area network hosts
             // https://websocket-client.readthedocs.io/en/latest/examples.html
-            ws.send( JSON.stringify({action: 'desktop_client_online', interval: 'none', socketID: desktop_socket_unique_id, socketType: 'desktop'}) );
+            ws.send( JSON.stringify({
+              action: 'desktop_client_online',
+              interval: 'none',
+              socketID: desktop_socket_unique_id,
+              socketType: 'desktop'
+            }));
             let networkMsg = document.getElementsByClassName('_aMsg')[0];
             let downloadStat = document.getElementsByClassName('_aMsg')[1];
-            networkMsg.setAttribute('data-snippet', "Waiting for JDS server");
-            downloadStat.setAttribute('data-snippet', "Waiting");
+
+            networkpanel_overlay('Waiting for JDS server');
+            localdmpanel_overlay('Loading');
           }
 
           ws.onerror = function () { alert("Error occured in websocket connection"); }
           ws.onclose = function (e) {
+            alert(e.reason);
             console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
             setTimeout(function() { ws_connect(); }, 1000);
           }
@@ -96,34 +105,37 @@
                     desktop app and web app are successfully connected
                   */
                   case 'desktop_client_connected':
-                    // alert(JSON.stringify(eData));
                     if (eData.hasOwnProperty('payload')) {
                       if (eData.payload == "") { // get web payload
                         console.log("[!] Payload is empty.");
-                        ws.send( JSON.stringify({action: 'refresh_webview', interval: 'none'}) );
+                        ws.send(JSON.stringify({
+                          action: 'jds_client_refresh',
+                          interval: 'none'
+                        }));
                         return;
                       }
-
-                      // document.body.append(document.createTextNode(eData.payload));
-                      // let loader = document.querySelector('._pre_loader');
-                      //     loader.classList.add('hide');
 
                       if (isJson(eData.payload)) { // Check if payload is an object
                         client_data = JSON.parse(eData.payload);
                         // alert(JSON.stringify(client_data));
                         if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
+
+                        ws.send(JSON.stringify({
+                          action: 'jds_client_refresh',
+                          payload: client_data,
+                          interval: 'none'
+                        }));
+
                         /*
                           Request Download information payload
                           initialize new background process for downloading
                         */
                         localdmpanel_overlay('Fetching');
-                        ws.send(
-                          JSON.stringify({
-                            action: 'update_download_manager',
-                            payload: client_data,
-                            sid: desktop_socket_unique_id,
-                          })
-                        );
+                        ws.send(JSON.stringify({
+                          action: 'update_download_manager',
+                          payload: client_data,
+                          sid: desktop_socket_unique_id,
+                        }));
 
                         let refrshcdm_btn = document.querySelectorAll("[data-btn='cdm_update']");
                         refrshcdm_btn.forEach((item, i) => {
@@ -149,10 +161,8 @@
                           });
                         });
 
-
                         // Start network scanner -------------------------------->
                         networkpanel_overlay("Searching local network for users");
-                        localdmpanel_overlay('Waiting');
                         console.log("[+] Application connection established!");
 
                         // Hide fake preloader
@@ -171,13 +181,9 @@
                         /*
                           Find Joint group users on local network by there
                           local IP address
-                        */
-                        client_net_addr = (eData.net_addr || []);
-
-
-                        /*
                           Request groups members on same local network
                         */
+                        client_net_addr = (eData.net_addr || []);
                         ws.send(
                           JSON.stringify({
                             action: 'fetch_network_users',
@@ -224,6 +230,48 @@
                     }
                     break;
 
+                  case 'desktop_client_refresh':
+                    if (isJson(eData.payload)) { // Check if payload is an object
+                      client_data = JSON.parse(eData.payload);
+                      // alert(JSON.stringify(client_data));
+                      if (typeof(Storage) !== "undefined") sessionStorage.setItem("client_data", client_data);
+                      /*
+                        Request Download information payload
+                        initialize new background process for downloading
+                        */
+                        localdmpanel_overlay('Fetching');
+                        ws.send(JSON.stringify({
+                          action: 'update_download_manager',
+                          payload: client_data,
+                          sid: desktop_socket_unique_id,
+                        }));
+
+
+                        let joint_list = []; // populate joint_list
+                        if (client_data.joints != 0) {
+                          client_data.joints.forEach((item, i) => {
+                            joint_list.push(item.jid);
+                          });
+                        }
+                        console.log(joint_list);
+
+                        /*
+                          Find Joint group users on local network by there
+                          local IP address
+                        */
+                        client_net_addr = (client_net_addr || []);
+                        // Request groups members on same local network
+                        ws.send(JSON.stringify({
+                          action: 'fetch_network_users',
+                          interval: '30',
+                          list: joint_list,
+                          socketID: desktop_socket_unique_id,
+                          netAddr: client_net_addr
+                        }));
+                        networkpanel_overlay('Searching for users');
+                      }
+                    break;
+
                   case 'desktop_client_disconnected':
                     console.log("Client logged out!");
                     let loader = document.querySelector('._pre_loader');
@@ -245,7 +293,7 @@
                       clearDOM(document.querySelector("div[data-element-id='netlist']"));
                       generate_net_prof(netList);
                     } else {
-                      networkpanel_overlay("No users found!");
+                      networkpanel_overlay("No users found yet!");
                     }
                     break;
 
@@ -288,7 +336,7 @@
                   case 'realtime_download_progress':
                     // Clear messages in download panel
                     let parent = document.querySelector('._bdyContent[data-node-id="local_dm"]');
-                    if (parent.children[0] && parent.children[0].className == '_aMsg') clearDOM(parent);
+                    if (parent.children[0] && parent.children[0].className == '_aMsg') parent.children[0].remove();
 
                     let chnkID = eData.id;
                     let chnkJID = eData.jid;
@@ -303,8 +351,10 @@
                     if (chnkElement) {
                       let chnkProgBar = chnkElement.children[1].children[1].children[0];
                       let chnkProgTxt = chnkElement.children[1].children[2].children[3];
+                      let chnkSizeTxt = chnkElement.children[1].children[2].children[1];
                           chnkProgBar.style.width = chnkPROG + '%';
                           chnkProgTxt.innerText = 'P: '+chnkPROG + '%';
+                          chnkSizeTxt.innerText = 'S: '+chnkSIZE;
                       return;
                     }
 
@@ -322,7 +372,7 @@
                             dmContent.classList.add('dm_content');
                             let dmcName = document.createElement('DIV');
                                 dmcName.classList.add('dmc_name');
-                                dmcName.innerText = '['+chnkID+'] Arch_'+chnkJID+'_'+chnkRID+'.zip';
+                                dmcName.innerText = '['+chnkID+'] Arch_'+chnkJID+'_'+chnkRID+'.J0INT';
                                 dmContent.append(dmcName);
 
                             let dmcProgress = document.createElement('DIV');

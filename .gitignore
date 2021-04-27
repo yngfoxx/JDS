@@ -5,5 +5,5 @@
 /application/venv
 /storage
 /application/engine/__pycache__
-/application/u_config.txt
+/application/u_config.json
 /application/storage

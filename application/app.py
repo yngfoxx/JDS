@@ -28,7 +28,7 @@ downloadMngrService = downloadManagerSS()
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
-jds_server_domain = "46a7eef900f4.ngrok.io"
+jds_server_domain = str(domainObject.getServerDomain())
 
 
 
@@ -91,14 +91,6 @@ class JDS_CLIENT(QMainWindow):
 
         horizontalBox.addWidget(splitter)
 
-        # horizontalBox.addWidget(self.webViewOnline) # JDS online webview
-        # horizontalBox.addWidget(self.webViewClient) # Local Client file sharing
-
-        # widget = QWidget()
-        # widget.setLayout(horizontalBox)
-
-        # self.setLayout(horizontalBox)
-
         parentWidget = QWidget()
         parentWidget.setLayout(horizontalBox)
         self.setCentralWidget(parentWidget)
@@ -151,11 +143,14 @@ class JDS_CLIENT(QMainWindow):
         # self.setQuitOnLastWindowClosed(False)
         self.trayIcon = QSystemTrayIcon(QtGui.QIcon("logo-512x512.png"), parent=app)
         self.trayIcon.setToolTip('JDS Client download manager is running in background.')
-        self.trayIcon.show()
+        self.trayIcon.hide()
 
         self.trayMenu = QMenu()
         self.exitAction = self.trayMenu.addAction('Exit')
         self.exitAction.triggered.connect(lambda: app.quit())
+
+        self.exitAction = self.trayMenu.addAction('Restore')
+        self.exitAction.triggered.connect(lambda: self.restore_window())
 
         self.trayIcon.setContextMenu(self.trayMenu)
         # --------------------------------------------------------------------->
@@ -167,8 +162,45 @@ class JDS_CLIENT(QMainWindow):
         self.show()
         # --------------------------------------------------------------------->
 
+    def event(self, event):
+        if (event.type() == QtCore.QEvent.WindowStateChange and
+                self.isMinimized()):
+            # The window is already minimized at this point.  AFAIK,
+            # there is no hook stop a minimize event. Instead,
+            # removing the Qt.Tool flag should remove the window
+            # from the taskbar.
+            self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.Tool)
+            self.trayIcon.show()
+            return True
+        else:
+            return super(JDS_CLIENT, self).event(event)
+
+
+    def closeEvent(self, event):
+        reply = QMessageBox.question(
+            self,
+            'Message',"Are you sure to quit?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            self.trayIcon.show()
+            self.hide()
+            event.ignore()
+
+
+    def restore_window(self):
+        self.trayIcon.hide()
+        # Restore the window
+        self.showNormal()
+
+
+
     def loadWebPage(self):
         self.webViewOnline.load(QUrl(self.webURL))
+
 
     def loadClientPage(self):
         self.webViewClient.load(QUrl("http://"+hostdomain+":8000/index.html"))
