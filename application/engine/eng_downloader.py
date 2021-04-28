@@ -99,6 +99,7 @@ class downloadManagerSS():
 
         # Arguments ---------------------------------------------------------------\/
         engine_config = None
+        chunkID = arg['cid'].replace("\'", "")
         jointID = arg['jid'].replace("\'", "")
         requestID = arg['rid'].replace("\'", "")
         chunkORDER = arg['order'].replace("\'", "")
@@ -114,7 +115,7 @@ class downloadManagerSS():
         else:
             headers_dlm_arg = {"headers":{}}
 
-        print('[+] Starting download', '-'*80, '\n Joint_ID:\t', jointID, '\n Request_ID:\t', requestID, '\n Chunk_ORDER:\t', chunkORDER, '\n')
+        print('[+] Starting download', '-'*80, '\n Joint_ID:\t', jointID, '\n Request_ID:\t', requestID, '\n CHUNK_ID: \t', chunkID, '\n Chunk_ORDER:\t', chunkORDER, '\n')
 
 
         # Paths
@@ -138,7 +139,7 @@ class downloadManagerSS():
 
 
         # Chunk file destination
-        chunkPATH = storage + "/" + "Chnk_"+jointID+"_"+requestID+"_"+chunkORDER+".J0INT"
+        chunkPATH = storage + "/" + "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+chunkORDER+".J0INT"
         chunkCONF = storage + "/config.json"
 
 
@@ -147,7 +148,8 @@ class downloadManagerSS():
         chunkJSON['id'] = int(chunkORDER);
         chunkJSON['jid'] = jointID;
         chunkJSON['rid'] = requestID;
-        chunkJSON['filename'] = "Chnk_"+jointID+"_"+requestID+"_"+chunkORDER+".J0INT";
+        chunkJSON['cid'] = chunkID;
+        chunkJSON['filename'] = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+chunkORDER+".J0INT";
         chunkJSON['byte_start'] = float(byte_start);
         chunkJSON['byte_end'] = float(byte_end);
         chunkJSON['status'] = None;
@@ -160,7 +162,7 @@ class downloadManagerSS():
                 for line in chConf:
                     chnkJSON = json.loads(line)
                     if jointID == str(chnkJSON['jid']) and requestID == str(chnkJSON['rid']) and chunkORDER == str(chnkJSON['id']):
-                        chnkNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkORDER+".J0INT";
+                        chnkNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+chunkORDER+".J0INT";
                         # check if chunk is valid
                         if os.path.exists(chunkPATH) == True:
                             # compare size and hash stored in config.json

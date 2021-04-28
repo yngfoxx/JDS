@@ -894,6 +894,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         foreach ($ch_children as $key => $child) if ($child['uid'] == $rcvd_userID) { // Per chunk children
           $child['jid'] = $fileJID;
           $child['rid'] = $fileRID;
+          $child['cid'] = $chnkID;
           if ($child['download_progress'] == null) $child['download_progress'] = 0;
           $chnksCHILDREN[$fileJID][] = $child;
         }
@@ -936,6 +937,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $result = array('response' => $res, 'jid' => $jID);
     echo json_encode($result);
     exit();
+  }
+
+  if (isset($_GET['rtDownloadProg'])) {
+    var_dump($_GET);
   }
 }
 ?>

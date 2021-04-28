@@ -366,6 +366,7 @@ class websocketserver():
                                         dArg = {
                                             'jid' : jid,
                                             'rid' : chunk['rid'],
+                                            'cid' : chunk['cid'],
                                             'order' : chunk['order'],
                                             'byte_start' : chunk['byte_start'],
                                             'byte_end' : chunk['byte_end'],

@@ -361,14 +361,15 @@
                     let parent = document.querySelector('._bdyContent[data-node-id="local_dm"]');
                     if (parent.children[0] && parent.children[0].className == '_aMsg') parent.children[0].remove();
 
-                    let chnkID = eData.id;
+                    let chnkOID = eData.id;
+                    let chnkCID = eData.cid;
                     let chnkJID = eData.jid;
                     let chnkRID = eData.rid;
                     let chnkFNAME = eData.filename;
                     let chnkSIZE = humanFileSize(eData.size, false);
                     let chnkPROG = eData.progress;
                     let chnkTELAPSED = eData.time_elapsed;
-                    let chnkElementID = chnkJID+'_'+chnkRID+'_'+chnkID;
+                    let chnkElementID = chnkJID+'_'+chnkRID+'_'+chnkOID;
 
                     let chnkElement = document.querySelector('.dm_download_row[data-download-id="'+chnkElementID+'"]');
                     if (chnkElement) {
@@ -395,7 +396,7 @@
                             dmContent.classList.add('dm_content');
                             let dmcName = document.createElement('DIV');
                                 dmcName.classList.add('dmc_name');
-                                dmcName.innerText = '['+chnkID+'] Arch_'+chnkJID+'_'+chnkRID+'.J0INT';
+                                dmcName.innerText = '['+chnkOID+'] Arch_'+chnkJID+'_'+chnkRID+'.zip';
                                 dmContent.append(dmcName);
 
                             let dmcProgress = document.createElement('DIV');
@@ -426,6 +427,7 @@
                     try {
                       let chnk = {
                         'ID' : eData.id,
+                        'CID' : eData.cid,
                         'JID' : eData.jid,
                         'RID' : eData.rid,
                         'UID' : client_data.userID,
@@ -434,9 +436,9 @@
                         'SIZE' : eData.size,
                         'PROG' : eData.progress,
                         'TELAPSED' : eData.time_elapsed,
-                        'ElementID' : chnkJID+'_'+chnkRID+'_'+chnkID,
+                        'ElementID' : chnkJID+'_'+chnkRID+'_'+chnkOID,
                       };
-                      user_socket.emit('client_app_msg', {type: 'realtime_download_progress', payload: chnk});
+                      user_socket.emit('client_app_msg', {'type': 'realtime_download_progress', 'payload': chnk});
                     } catch (e) {
                       console.log('[!] user_socket error: '+e);
                     }
