@@ -164,18 +164,15 @@ select {
     }
   }
   ._bdyMain {
-    height: calc(100% - 50px);
-    display: flex;
+    overflow-y: auto;
+    min-height: 250px;
     ._bdyContent {
     	text-align: center;
-      width: 100%;
-    	display: block;
     	padding: 5px;
     	background-color: var(--sec-dark-color);
     	margin: 7px 10px 7px 10px;
     	border-radius: 6px;
       position: relative;
-      overflow: auto;
       min-height: 250px;
       .net_usr_div {
         background-color: var(--light-gray);

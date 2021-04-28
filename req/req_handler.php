@@ -956,9 +956,17 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // Update chunk download info
     $arr['chunkCID'] = $std->db->escape_string($_GET['chunkCID']);
     $arr['chunkOID'] = $std->db->escape_string($_GET['chunkOID']);
+    $arr['chunkJID'] = $std->db->escape_string($_GET['chunkJID']);
     $arr['chunkPROGRESS'] = $std->db->escape_string($_GET['chunkPROGRESS']);
     $arr['chunkSIZE'] = $std->db->escape_string($_GET['chunkSIZE']);
-    echo $jds->updateChildChunk($arr);
+    if ($jds->updateChildChunk($arr)) {
+      $joint = $jds->getJointInfo($arr['chunkJID']);
+      $result = array('channel' => $joint['channel']); // forbidden
+      echo json_encode($result);
+    } else {
+      $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+      echo json_encode($result);
+    }
     exit();
   }
 }
