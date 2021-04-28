@@ -426,19 +426,19 @@
 
                     try {
                       let chnk = {
-                        'ID' : eData.id,
-                        'CID' : eData.cid,
-                        'JID' : eData.jid,
-                        'RID' : eData.rid,
+                        'OID' : chnkOID,
+                        'CID' : chnkCID,
+                        'JID' : chnkJID,
+                        'RID' : chnkRID,
                         'UID' : client_data.userID,
                         'UNAME' : client_data.username,
                         'FNAME' : eData.filename,
-                        'SIZE' : eData.size,
+                        'SIZE' : chnkSIZE,
                         'PROG' : eData.progress,
                         'TELAPSED' : eData.time_elapsed,
                         'ElementID' : chnkJID+'_'+chnkRID+'_'+chnkOID,
                       };
-                      user_socket.emit('client_app_msg', {'type': 'realtime_download_progress', 'payload': chnk});
+                      user_socket.emit('client_app_msg', {type: 'realtime_download_progress', payload: chnk});
                     } catch (e) {
                       console.log('[!] user_socket error: '+e);
                     }

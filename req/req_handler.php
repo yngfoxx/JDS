@@ -940,7 +940,26 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
   }
 
   if (isset($_GET['rtDownloadProg'])) {
-    var_dump($_GET);
+    // $_GET['jointID'];
+    // $_GET['requestID'];
+    // $_GET['userNAME'];
+
+    // $_GET['chunkTIME'];
+
+    $uID = $std->db->escape_string($_GET['userID']);
+
+    // $result = array('server_error' => "Access violation detected!", 'code' => '403'); // forbidden
+    // echo json_encode($result);
+    // exit();
+
+    $arr = array();
+    // Update chunk download info
+    $arr['chunkCID'] = $std->db->escape_string($_GET['chunkCID']);
+    $arr['chunkOID'] = $std->db->escape_string($_GET['chunkOID']);
+    $arr['chunkPROGRESS'] = $std->db->escape_string($_GET['chunkPROGRESS']);
+    $arr['chunkSIZE'] = $std->db->escape_string($_GET['chunkSIZE']);
+    echo $jds->updateChildChunk($arr);
+    exit();
   }
 }
 ?>

@@ -422,5 +422,24 @@ class jointlib extends stdlib {
     if ($qry && mysqli_num_rows($qry) > 0) return mysqli_fetch_assoc($qry);
     return false;
   }
+
+
+  /*
+    Update child chunk data
+  */
+  public function updateChildChunk($arr)
+  {
+    $chunkID = $arr['chunkCID'];
+    $chunkOrder = $arr['chunkOID'];
+    $chunkSize = $arr['chunkSIZE'];
+    $chunkProgress = $arr['chunkPROGRESS'];
+    $sql = "
+      UPDATE chunk_child
+      SET progress = '$chunkProgress', size = '$chunkSize'
+      WHERE chunk_id = '$chunkID' AND chunk_order = '$chunkOrder'
+    ";
+    $qry = mysqli_query($this->db, $sql);
+    return (($qry) ? true : $this->db->error);
+  }
 }
 ?>
