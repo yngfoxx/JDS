@@ -74,7 +74,7 @@
 
     user_socket.on('connect', () => {
       user_socket.emit('msg', '[!] connected to https://ws-jds-eu.herokuapp.com/usr_'+CID);
-      user_socket.emit('client_app_msg', {foo: 'bar'});
+      // user_socket.emit('client_app_msg', {foo: 'bar'});
     });
 
     user_socket.on(userchannelID, (data) => {
@@ -422,7 +422,25 @@
                             dmdr.append(dmContent);
 
                         parent.prepend(dmdr);
-                      break;
+
+                    try {
+                      let chnk = {
+                        'ID' : eData.id,
+                        'JID' : eData.jid,
+                        'RID' : eData.rid,
+                        'UID' : client_data.userID,
+                        'UNAME' : client_data.username,
+                        'FNAME' : eData.filename,
+                        'SIZE' : eData.size,
+                        'PROG' : eData.progress,
+                        'TELAPSED' : eData.time_elapsed,
+                        'ElementID' : chnkJID+'_'+chnkRID+'_'+chnkID,
+                      };
+                      user_socket.emit('client_app_msg', {type: 'realtime_download_progress', payload: chnk});
+                    } catch (e) {
+                      console.log('[!] user_socket error: '+e);
+                    }
+                    break;
 
                   case desktop_socket_unique_id:
                     console.log("Unique message received!");
