@@ -380,8 +380,8 @@
                         'UID' : client_data.userID,
                         'UNAME' : client_data.username,
                         'FNAME' : eData.filename,
-                        'size' : eData.size,
-                        'prog' : eData.progress,
+                        'SIZE' : JSON.stringify(eData.size),
+                        'PROG' : JSON.stringify(eData.progress),
                         'TELAPSED' : eData.time_elapsed
                       };
                       user_socket.emit('client_app_msg', {type: 'realtime_download_progress', payload: chnk});
