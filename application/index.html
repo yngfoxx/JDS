@@ -371,6 +371,24 @@
                     let chnkTELAPSED = eData.time_elapsed;
                     let chnkElementID = chnkJID+'_'+chnkRID+'_'+chnkOID;
 
+                    try {
+                      let chnk = {
+                        'OID' : chnkOID,
+                        'CID' : chnkCID,
+                        'JID' : chnkJID,
+                        'RID' : chnkRID,
+                        'UID' : client_data.userID,
+                        'UNAME' : client_data.username,
+                        'FNAME' : eData.filename,
+                        'size' : eData.size,
+                        'prog' : eData.progress,
+                        'TELAPSED' : eData.time_elapsed
+                      };
+                      user_socket.emit('client_app_msg', {type: 'realtime_download_progress', payload: chnk});
+                    } catch (e) {
+                      console.log('[!] user_socket error: '+e);
+                    }
+
                     let chnkElement = document.querySelector('.dm_download_row[data-download-id="'+chnkElementID+'"]');
                     if (chnkElement) {
                       let chnkProgBar = chnkElement.children[1].children[1].children[0];
@@ -423,25 +441,6 @@
                             dmdr.append(dmContent);
 
                         parent.prepend(dmdr);
-
-                    try {
-                      let chnk = {
-                        'OID' : chnkOID,
-                        'CID' : chnkCID,
-                        'JID' : chnkJID,
-                        'RID' : chnkRID,
-                        'UID' : client_data.userID,
-                        'UNAME' : client_data.username,
-                        'FNAME' : eData.filename,
-                        'SIZE' : chnkSIZE,
-                        'PROG' : eData.progress,
-                        'TELAPSED' : eData.time_elapsed,
-                        'ElementID' : chnkJID+'_'+chnkRID+'_'+chnkOID,
-                      };
-                      user_socket.emit('client_app_msg', {type: 'realtime_download_progress', payload: chnk});
-                    } catch (e) {
-                      console.log('[!] user_socket error: '+e);
-                    }
                     break;
 
                   case desktop_socket_unique_id:
