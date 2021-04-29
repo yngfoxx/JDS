@@ -104,8 +104,8 @@ class downloadManagerSS():
         requestID = arg['rid'].replace("\'", "")
         chunkORDER = arg['order'].replace("\'", "")
 
-        byte_start = int(arg['byte_start'])
-        byte_end = int(arg['byte_end'])
+        byte_start = int(float(arg['byte_start']))
+        byte_end = int(float(arg['byte_end']))
         headers_dlm_arg = {
             "headers" : {
                 "Range" : "bytes="+str(byte_start)+"-"+str(byte_end),
@@ -147,8 +147,8 @@ class downloadManagerSS():
         chunkJSON['rid'] = requestID;
         chunkJSON['cid'] = chunkID;
         chunkJSON['filename'] = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+chunkORDER+".J0INT";
-        chunkJSON['byte_start'] = int(byte_start);
-        chunkJSON['byte_end'] = int(byte_end);
+        chunkJSON['byte_start'] = byte_start;
+        chunkJSON['byte_end'] = byte_end;
         chunkJSON['status'] = None;
 
 
