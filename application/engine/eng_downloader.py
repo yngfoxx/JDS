@@ -18,6 +18,8 @@ from concurrent.futures import ThreadPoolExecutor
 from engine.eng_standard import stdlib
 from engine.eng_platform import domainName
 
+
+serverDomain = domainName()
 stdlib = stdlib()
 _executor = ThreadPoolExecutor(1)
 
@@ -117,7 +119,7 @@ class downloadManagerSS():
 
 
         # Paths
-        url = 'http://'+str(domainName.getServerDomain())+'/JDS/storage/'+jointID+'/'+requestID+'/Arch_'+jointID+'_'+requestID+'.zip'
+        url = 'http://'+str(serverDomain.getServerDomain())+'/JDS/storage/'+jointID+'/'+requestID+'/Arch_'+jointID+'_'+requestID+'.zip'
 
         # Create storage folder if missing
         if os.path.exists("storage") == False:
