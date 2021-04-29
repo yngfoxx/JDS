@@ -347,7 +347,9 @@
                       // netList[nlID]['joints'].push(  );
                       let newList = { jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role'] };
                       let inList = false;
-                      netList[nlID]['joints'].forEach((item, i) => {if (item == newList) inList = true;});
+                      for (var i = 0; i < netList[nlID]['joints'].length; i++) {
+                        if (netList[nlID]['joints'][i].jid == newList.jid) inList = true;
+                      }
                       if (inList == false) netList[nlID]['joints'].push(newList);
                     }
                     console.log("----------------------------------");
