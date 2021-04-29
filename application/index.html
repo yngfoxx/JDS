@@ -371,7 +371,7 @@
                     let chnkRID = eData.rid;
                     let chnkFNAME = eData.filename;
                     let chnkSIZE = humanFileSize(eData.size, false);
-                    let chnkPROG = eData.progress;
+                    let chnkPROG = parseInt(eData.progress);
                     let chnkTELAPSED = eData.time_elapsed;
                     let chnkElementID = chnkJID+'_'+chnkRID+'_'+chnkOID;
 
@@ -387,7 +387,7 @@
                         'B_START' : eData.byte_start,
                         'B_END' : eData.byte_end,
                         'SIZE' : JSON.stringify(eData.size),
-                        'PROG' : JSON.stringify(eData.progress),
+                        'PROG' : JSON.stringify(chnkPROG),
                         'TELAPSED' : eData.time_elapsed
                       };
                       user_socket.emit('client_app_msg', {type: 'realtime_download_progress', payload: chnk});

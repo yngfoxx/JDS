@@ -372,7 +372,21 @@ class jointlib extends stdlib {
     $qry = mysqli_query($this->db, $sql);
     if ($qry && mysqli_num_rows($qry) > 0) {
       $response = array();
-      while ($arr = mysqli_fetch_assoc($qry)) $response[] = $arr;
+
+      // Merge all downloaded chunk size
+      while ($arr = mysqli_fetch_assoc($qry)) {
+        $tempArray = $arr;
+        $chnkChildren = $this->getChunkChildrenByChunkId($arr['chunk_id']);
+        if ($chnkChildren != false) {
+          $chnkChildSize = 0;
+          for ($i=0; $i < count($chnkChildren); $i++) {
+            if ($chnkChildren[$i]['downloaded']) $chnkChildSize = $chnkChildSize + $chnkChildren[$i]['downloaded'];
+          }
+          $tempArray['downloaded'] = $chnkChildSize;
+        }
+        $response[] = $tempArray;
+      }
+
       return $response;
     }
     return false;
@@ -391,6 +405,7 @@ class jointlib extends stdlib {
         chunk_child.byte_start AS 'byte_start',
         chunk_child.byte_end AS 'byte_end',
         chunk_child.progress AS 'download_progress',
+        chunk_child.size AS 'downloaded',
         chunk_child.user_id AS 'uid'
       FROM chunk_child
       WHERE chunk_child.chunk_id = '$chnkID'

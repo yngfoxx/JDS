@@ -103,17 +103,14 @@ class downloadManagerSS():
         jointID = arg['jid'].replace("\'", "")
         requestID = arg['rid'].replace("\'", "")
         chunkORDER = arg['order'].replace("\'", "")
-        headers_dlm_arg = {}
-        if 'byte_start' in arg and 'byte_end' in arg:
-            byte_start = float(arg['byte_start'])
-            byte_end = float(arg['byte_end'])
-            headers_dlm_arg = {
-                "headers" : {
-                    "Range" : "bytes="+str(byte_start)+"-"+str(byte_end),
-                }
+
+        byte_start = int(arg['byte_start'])
+        byte_end = int(arg['byte_end'])
+        headers_dlm_arg = {
+            "headers" : {
+                "Range" : "bytes="+str(byte_start)+"-"+str(byte_end),
             }
-        else:
-            headers_dlm_arg = {"headers":{}}
+        }
 
         print('[+] Starting download', '-'*80, '\n Joint_ID:\t', jointID, '\n Request_ID:\t', requestID, '\n CHUNK_ID: \t', chunkID, '\n Chunk_ORDER:\t', chunkORDER, '\n')
 
@@ -150,8 +147,8 @@ class downloadManagerSS():
         chunkJSON['rid'] = requestID;
         chunkJSON['cid'] = chunkID;
         chunkJSON['filename'] = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+chunkORDER+".J0INT";
-        chunkJSON['byte_start'] = float(byte_start);
-        chunkJSON['byte_end'] = float(byte_end);
+        chunkJSON['byte_start'] = int(byte_start);
+        chunkJSON['byte_end'] = int(byte_end);
         chunkJSON['status'] = None;
 
 
@@ -224,6 +221,7 @@ class downloadManagerSS():
 
         # Smart downloader --------------------------------------------------------\/
         # fileDLM = SmartDL(url, request_args=headers_dlm_arg)
+        print(headers_dlm_arg)
         fileDLM = SmartDL(url, storage, request_args=headers_dlm_arg)
         fileDLM.start(blocking=False)
 
