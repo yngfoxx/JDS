@@ -344,7 +344,11 @@
                       };
                     } else {
                       // Add joint code to list
-                      netList[nlID]['joints'].push( { jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role'] } );
+                      // netList[nlID]['joints'].push(  );
+                      let newList = { jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role'] };
+                      let inList = false;
+                      netList[nlID]['joints'].forEach((item, i) => {if (item == newList) inList = true;});
+                      if (inList == false) netList[nlID]['joints'].push(newList);
                     }
                     console.log("----------------------------------");
                     break;
