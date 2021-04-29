@@ -279,6 +279,7 @@ class websocketserver():
                                                     }
                                                     WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
                                                     await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+                                                    print('[!] Net user discovered')
                                         # ------------------------------------------------------------------------------->
 
                                 print("="*114, '\n')

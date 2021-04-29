@@ -49,7 +49,7 @@
         let eData = JSON.parse(event.data);
         if (eData.hasOwnProperty('channel')) {
           switch (eData.channel) {
-            case ('desktop_client_refresh' || 'desktop_client_connected'):
+            case 'desktop_client_connected':
               ajx({
                 type: 'POST',
                 url: '/JDS/req/req_handler.php',
@@ -58,7 +58,7 @@
                   if (isJson(res)) {
                     let uData = JSON.parse(res);
                     ws_client_app.send(JSON.stringify({
-                        "action": "desktop_client_refresh",
+                        "action": "jds_client_refresh",
                         "interval": "none",
                         "socketID": socket_unique_id,
                         "socketType": "web",
@@ -228,7 +228,7 @@
                           let uData = JSON.parse(res);
                           try {
                             ws_client_app.send(JSON.stringify({
-                              "action": "desktop_client_refresh",
+                              "action": "jds_client_refresh",
                               "interval": "none",
                               "socketID": socket_unique_id,
                               "socketType": "web",

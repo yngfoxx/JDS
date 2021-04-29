@@ -325,7 +325,7 @@
                     break;
 
                   case 'net_user_discovered':
-                    netList = {}; // empty the network list
+                    // netList = {}; // empty the network list
                     console.log("----------------------------------");
                     console.log("[+] User of same group discovered!");
                     // console.log(eData.payload);
@@ -333,30 +333,15 @@
                     if (!pLoad.hasOwnProperty('host_joint')) return;
                     // nlID = pLoad['host_uid'] + '/' + pLoad['host_net_addr'][0];
                     nlID = 'UUID_'+pLoad['host_uid'];
-                    if (!netList.hasOwnProperty(nlID)) {
-                      console.log('[!] User is not in network list');
-                      netList[nlID] = {
-                        'userID': pLoad['host_uid'],
-                        'userName': pLoad['host_uname'],
-                        'joints': [{jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role']}],
-                        'netAddr': pLoad['host_net_addr']
-                      };
-                      // generate_net_prof(netList[nlID]);
-                      // console.log(netList); // Log the network list to console
-
-                    } else if (netList.hasOwnProperty(nlID)) {
-                      // Update only list of joints if new joint group found
-                      console.log('[!] User is already in network list');
-                      let arr = netList[nlID]['joints'];
-                      let arrIndex = arr.findIndex(function (joint) {
-                        return joint['jid'] == pLoad['host_joint']['jid'];
-                      });
-                      if (arrIndex < 0) {
-                        netList[nlID]['joints'].push({jid: pLoad['host_joint'].jid, role: pLoad['host_joint'].role });
-                        // generate_net_prof(netList[nlID]);
-                      }
-                      console.log(netList);
-                    }
+                    console.log('[!] User is not in network list');
+                    netList[nlID] = {
+                      'userID': pLoad['host_uid'],
+                      'userName': pLoad['host_uname'],
+                      'netAddr': pLoad['host_net_addr']
+                    };
+                    if (!netList[nlID].hasOwnProperty('joints')) netList[nlID]['joints'] = [];
+                    netList[nlID]['joints'].push( { jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role'] } );
+                    console.log(netList);
                     console.log("----------------------------------");
                     break;
 
