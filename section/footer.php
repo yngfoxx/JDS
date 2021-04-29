@@ -57,6 +57,7 @@
                 success: (res) => {
                   if (isJson(res)) {
                     let uData = JSON.parse(res);
+                    console.log('[!] Refresh client');
                     ws_client_app.send(JSON.stringify({
                         "action": "jds_client_refresh",
                         "interval": "none",
@@ -227,6 +228,7 @@
                         if (isJson(res)) {
                           let uData = JSON.parse(res);
                           try {
+                            console.log('[!] Refresh client');
                             ws_client_app.send(JSON.stringify({
                               "action": "jds_client_refresh",
                               "interval": "none",
