@@ -316,6 +316,7 @@
                   case 'net_scanner_completed':
                     console.log("[*] Local network scanner completed!");
                     // restart timer 20 seconds later
+                    console.log(netList);
                     if (netList && !isEmpty(netList)) {
                       clearDOM(document.querySelector("div[data-element-id='netlist']"));
                       generate_net_prof(netList);
@@ -328,21 +329,23 @@
                     // netList = {}; // empty the network list
                     console.log("----------------------------------");
                     console.log("[+] User of same group discovered!");
-                    // console.log(eData.payload);
+                    console.log(eData.payload);
                     let pLoad = eData.payload;
                     if (!pLoad.hasOwnProperty('host_joint')) return;
                     // nlID = pLoad['host_uid'] + '/' + pLoad['host_net_addr'][0];
                     nlID = 'UUID_'+pLoad['host_uid'];
                     console.log('[!] User is not in network list');
-                    netList[nlID] = {
-                      'userID': pLoad['host_uid'],
-                      'userName': pLoad['host_uname'],
-                      'netAddr': pLoad['host_net_addr']
-                    };
-                    if (!netList[nlID].hasOwnProperty('joints')) netList[nlID]['joints'] = [];
-                    netList[nlID]['joints'].push( { jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role'] } );
-                    console.log(netList);
-                    console.log(pLoad);
+                    if (!netList.hasOwnProperty(nlID)) {
+                      netList[nlID] = {
+                        'userID': pLoad['host_uid'],
+                        'userName': pLoad['host_uname'],
+                        'netAddr': pLoad['host_net_addr'],
+                        'joints': [{ jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role'] }]
+                      };
+                    } else {
+                      // Add joint code to list
+                      netList[nlID]['joints'].push( { jid: pLoad['host_joint']['jid'], role: pLoad['host_joint']['role'] } );
+                    }
                     console.log("----------------------------------");
                     break;
 

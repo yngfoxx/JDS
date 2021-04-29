@@ -1,3 +1,6 @@
+<script type="text/javascript">
+  let ws_client_app = '';
+</script>
 <script type="text/javascript" src="/JDS/lib/js/ajx.js<?php echo "?v=".rand(100000000, 999999999);  ?>"></script>
 <?php
 // USER HOME PAGE ------------------------------------------------------------->
@@ -6,7 +9,7 @@
   const socket_unique_id = genKey(6);
   function ws_client_connect() {
     // Connect to client application ------------------------------------------->
-    var ws_client_app = new WebSocket("ws://127.0.0.1:5678/");
+    ws_client_app = new WebSocket("ws://127.0.0.1:5678/");
       ws_client_app.onopen = function () {
         ajx({
           type: 'POST',
