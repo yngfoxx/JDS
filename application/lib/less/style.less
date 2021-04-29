@@ -135,6 +135,7 @@ select {
   ._ptranslate(0, 0, 0, 0);
   border-left: 2px solid var(--sec-col);
   .wb_content_container {
+    position: relative;
     .tnvbr {
     	margin: 10px 10px auto 10px;
     	text-align: left;
@@ -143,6 +144,9 @@ select {
     	color: white;
     	border-radius: 6px;
       display: flex;
+      position: sticky;
+      top: 5px;
+      z-index: 9;
       h3 {
         margin: auto;
         margin-left: 0;
