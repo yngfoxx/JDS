@@ -22,6 +22,7 @@ from engine.eng_platform import domainName
 serverDomain = domainName()
 stdlib = stdlib()
 _executor = ThreadPoolExecutor(1)
+threads = []
 
 # Sharing manager client web socket class handler
 class sharingManagerSS():
@@ -134,6 +135,7 @@ class sharingManagerSS():
                             inJoint = True
 
                     if inJoint == True:
+                        # Create threads to handle file downloading
                         print('[!] J0INT member found: ', self.networkList[usr]['netAddr'])
                         usrIPaddress = self.networkList[usr]['netAddr'][0]
                         # Get jconf.json

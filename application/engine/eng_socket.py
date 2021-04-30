@@ -354,10 +354,9 @@ class websocketserver():
                         for jid in wsRequest['payload']:
                             jointPayload = wsRequest['payload'][jid]
                             print('[+] Download manager on J0INT:', jid);
-                            
-                            jConfPath = "storage/"+jid+"/jconf.json"
-                            if os.path.exists(jConfPath):
-                                os.remove(jConfPath)
+
+                            # Variable to hold J0INT data
+                            jConfData = []
 
                             dArgSet = []
                             for chunk in wsRequest['payload'][jid]:
@@ -377,6 +376,15 @@ class websocketserver():
                                             'byte_end' : chunk['byte_end'],
                                         }
                                         dArgSet.append(dArg)
+                                        jConfData.append({'jid': jid, 'rid': chunk['rid'], 'cid': chunk['cid'], 'oid': chunk['order']})
+
+
+                            # Create Joint Config file ---
+                            jConfPath = "storage/"+jid+"/jconf.json"
+                            jConf = open(jConfPath, 'w')
+                            jConf.write(json.dumps(jConfData))
+                            jConf.close()
+                            # ----------------------------
 
                             for program in connections:
                                 wsType = connections[program]['type']
