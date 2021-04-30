@@ -134,5 +134,5 @@ class sharingManagerSS():
                             inJoint = True
 
                     if inJoint == True:
-                        print('[!] J0INT member found: ', usr['netAddr'])
+                        print('[!] J0INT member found: ', self.networkList[usr]['netAddr'])
         print('\n')
