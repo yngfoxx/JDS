@@ -137,6 +137,7 @@ class sharingManagerSS():
                         print('[!] J0INT member found: ', self.networkList[usr]['netAddr'])
                         usrIPaddress = self.networkList[usr]['netAddr']
                         # Get jconf.json
-                        # uri = "http://"+usrIPaddress+":8000/storage/"+J0INT+"/jconf.json"
-                        # reqJCONF = requests.get(uri)
+                        uri = "http://"+usrIPaddress+":8000/storage/"+J0INT+"/jconf.json"
+                        reqJCONF = requests.get(uri)
+                        print(reqJCONF.text)
         print('\n')
