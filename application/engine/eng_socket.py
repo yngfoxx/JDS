@@ -422,7 +422,7 @@ class websocketserver():
                             wsType = connections[wSKT]['type']
                             ws = connections[wSKT]['socket']
                             # point to [desktop] socket
-                            if wsType == 'desktop':
+                            if wsType == 'desktop' or wsType == 'web':
                                 WEB_PAYLOAD_JSON = json.dumps(wsPload)
                                 await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
