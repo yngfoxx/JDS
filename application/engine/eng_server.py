@@ -110,7 +110,6 @@ class LocalServer(SimpleHTTPRequestHandler):
         rData['received'] = 'ok'
         if 'event' in rData:
             print('[!] event is in rData')
-            print(rData)
             if rData['event'] == 'sonar':
                 # ---
                 # the only purpose of this handshake is to respond and
@@ -135,7 +134,7 @@ class LocalServer(SimpleHTTPRequestHandler):
 
                 # Filter the uconfig data for the important variables needed
                 if uconfigData != None and uconfigData != '':
-                    print('[!] uconfig_content: ', uconfigData)
+                    # print('[!] uconfig_content: ', uconfigData)
                     response['host_uid'] = uconfigData['userID'] # belongs to host
                     response['host_uname'] = uconfigData['username'] # belongs to host
                     response['host_net_addr'] = lanServer().get_ip_list()

@@ -92,7 +92,7 @@ class sharingManagerSS():
             print('[!] New network list: ', networkList[user])
             self.networkList[user] = networkList[user]
 
-        # get J0INTs owned by user
+        # get user config data to update joint list
         if os.path.exists("u_config.json"):
             uConfig = open('u_config.json', 'r')
             self.u_config_data = json.loads(uConfig.read());
@@ -111,8 +111,16 @@ class sharingManagerSS():
         print('[+] File sharing initialized')
         if self.u_config_data != None:
             tempJointList = self.u_config_data['joints']
-            for joints in tempJointList:
-                if tempJointList['joints']['role'] == 'owner':
-                    self.jointList.add(tempJointList['joints']['jid'])
+            print('\n[+++] J0INTs for file sharing:', tempJointList)
+            for jds in tempJointList:
+                print('[+++] JDS: ', jds['jid'])
+                print('[+++] role: ', jds['role'])
+                print('[+++] user: ', jds['uid'])
+                print('\n')
+                if jds['role'] == 'owner':
+                    # add J0INTs owned by user
+                    self.jointList.add(jds['jid'])
 
-            print('[+++] J0INTs for file sharing:', self.jointList)
+            print('\n')
+        else:
+            print('[---] No J0INTs available')

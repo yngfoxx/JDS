@@ -314,16 +314,16 @@
 
                   case 'net_scanner_completed':
                     console.log("[*] Local network scanner completed!");
-                    // run scanner 20 seconds later
+                    // run scanner 50 seconds later
                     setTimeout(()=>{
                       ws.send(JSON.stringify({
                         action: 'fetch_network_users',
-                        interval: '30',
+                        interval: '50',
                         list: joint_list,
                         socketID: desktop_socket_unique_id,
                         netAddr: client_net_addr
                       }));
-                    }, 20000);
+                    }, 50000);
 
                     console.log('[!] NETLIST: '+JSON.stringify(netList));
                     if (netList && !isEmpty(netList)) {
