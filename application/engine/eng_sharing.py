@@ -140,7 +140,9 @@ class sharingManagerSS():
                         usrIPaddress = self.networkList[usr]['netAddr'][0]
                         # Get jconf.json
                         uri = "http://"+usrIPaddress+":8000/storage/"+J0INT+"/jconf.json"
+                        print('[!] J0INT config uri:', uri)
                         # uri = "http://"+usrIPaddress+":8000/?req=jconf&jds="+J0INT
                         reqJCONF = requests.get(uri)
-                        print(reqJCONF.text)
+                        logger = open('log_'+J0INT+'.txt', 'w')
+                        logger.write(reqJCONF.text + '\n\n\n' + str(self.jointList))
         print('\n')
