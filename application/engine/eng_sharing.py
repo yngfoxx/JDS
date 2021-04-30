@@ -167,9 +167,12 @@ class sharingManagerSS():
 
     # Thread worker ----------------------------------------------------------->
     def worker(self):
+        jid = None
+        rid = None
         while True:
             sQueueItem = self.sharingQueue.get()
-
+            jid = sQueueItem['jid']
+            rid = sQueueItem['rid']
             try:
                 # https://www.aeracode.org/2018/02/19/python-async-simplified/
                 loop = asyncio.new_event_loop()
@@ -180,6 +183,9 @@ class sharingManagerSS():
 
             self.sharingQueue.task_done()
             print('[+] A task completed..')
+        print('[!] All file downloads ended, validating files...')
+
+        self.validateFile(jid, rid) # Validate downloaded file
     # ------------------------------------------------------------------------->
 
 
@@ -396,5 +402,16 @@ class sharingManagerSS():
         path = fileDLM.get_dest()
         print('[+] Done ~', path)
 
+        # Write data of new file to config.json
+        configFile = open(seekCONF, 'a')
+        configFile.write(json.dumps(seekJSON))
+        configFile.close()
+
         print('[+]', '-'*97, '\n')
+    # ------------------------------------------------------------------------->
+
+
+    # File validator ---------------------------------------------------------->
+    def validateFile(self, jid, rid):
+        print('[!] VALIDATING FILES: [JointID]>', jid, '[RequestID]>', rid)
     # ------------------------------------------------------------------------->
