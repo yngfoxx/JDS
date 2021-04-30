@@ -159,6 +159,7 @@ class websocketserver():
                         local_ip = lanServer().get_ip_list()
                         CLIENT_PAYLOAD = {
                             "channel": "desktop_client_refresh",
+                            "sMNGR": "init",
                             "net_addr": local_ip,
                             "payload": pLoad
                         }

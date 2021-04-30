@@ -157,6 +157,7 @@
                     if (isJson(res)) {
                       let chnkData = JSON.parse(res);
                       // alert(chnkData);
+                      console.log('[!] Getting data of chunks for download manager');
                       try {
                         ws_client_app.send(JSON.stringify({
                           "action": "download_manager_data",
