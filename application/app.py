@@ -8,6 +8,7 @@ from engine import eng_server
 from engine import eng_socket
 from engine.eng_platform import domainName
 from engine.eng_downloader import downloadManagerSS
+from engine.eng_sharing import sharingManagerSS
 
 from PyQt5.QtCore import *
 from PyQt5.QtWebChannel import *
@@ -25,6 +26,7 @@ server_lan = eng_server.lanServer()
 wSocket = eng_socket.websocketserver(5678);
 
 downloadMngrService = downloadManagerSS()
+sharingMngrService = sharingManagerSS()
 
 domainObject = domainName()
 hostdomain = str(domainObject.getDomain())
@@ -240,6 +242,11 @@ class Threader (threading.Thread):
             downloadMngrService.connect()
             # ----------------------------------------------------------------->
 
+        elif self.name == "SHARING_MNGR":
+            # DOWNLOAD MANAGER SECTION ---------------------------------------->
+            sharingMngrService.connect()
+            # ----------------------------------------------------------------->
+
         elif self.name == "DEBUGGER":
             # DEBUGGER SECTION ------------------------------------------------>
             clientDebugger = JDS_DEBUGGER() # CLIENT APP DEBUGGER [Inspect element]
@@ -254,6 +261,9 @@ class Threader (threading.Thread):
 
             elif self.name == "DOWNLOAD_MNGR":
                 downloadMngrService.connect()
+
+            elif self.name == "SHARING_MNGR":
+                sharingMngrService.connect()
 
 
 # Exit application ------------------------------------------------------------>
@@ -275,6 +285,7 @@ def exit_():
             except:
                 print("[-] Error while closing LAN server!")
 
+
         elif (t.name == "SOCKET_SERVER"):
             try:
                 wSocket.close()
@@ -282,12 +293,21 @@ def exit_():
             except Exception as e:
                 print("[-] Error while closing WebSocket server:", e)
 
+
         elif (t.name == "DOWNLOAD_MNGR"):
             try:
-                # downloadMngrService.connect()
+                # downloadMngrService.exit()
                 print("[!] Close download manager service")
             except:
                 print("[-] Error while closing download manager service!")
+
+
+        elif (t.name == "SHARING_MNGR"):
+            try:
+                # sharingMngrService.exit()
+                print("[!] Close sharing manager service")
+            except:
+                print("[-] Error while closing sharing manager service!")
 
         # print(t) # Show thread
         t.join()
@@ -317,17 +337,16 @@ def main():
     print("[+] Socket server initialized")
 
 
-    # downloadMngr.start()
-
-    # time.sleep(20)
-
-    # downloadMngrService = downloadManagerSS()
-    # threading.Thread(target=downloadMngrService.connect(), daemon=True)
-
     thread3 = Threader(3, "DOWNLOAD_MNGR", 3)
     thread3.start()
     threads.append(thread3)
     print("[+] Download manager initialized")
+
+
+    thread4 = Threader(4, "SHARING_MNGR", 4)
+    thread4.start()
+    threads.append(thread4)
+    print("[+] Sharing manager initialized")
 
 
     # thread4 = Threader(4, "DEBUGGER", 4)

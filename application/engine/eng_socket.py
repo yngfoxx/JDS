@@ -141,8 +141,8 @@ class websocketserver():
                         # --------------------------------------------------------->
 
 
-                    if action == "jds_client_refresh":
-                        # save payload in temporary file -------------------------->
+                    elif action == "jds_client_refresh":
+                        # save payload in temporary file
                         payload = str(wsRequest['payload'])
                         self.payload_file.truncate()
                         self.payload_file.write(str.encode(payload))
@@ -152,7 +152,7 @@ class websocketserver():
                         pLoad = self.payload_file.read().decode('utf-8')
                         pLoad = pLoad.replace("\'", "\"")
 
-                        # Store uconfig in lan server -----------------------------
+                        # Store uconfig in lan server
                         lanServer().set_uconfig(pLoad)
 
                         # local_ip = socket.gethostbyname(socket.gethostname())
@@ -166,11 +166,10 @@ class websocketserver():
                         try:
                             await asyncio.wait([ws.send(CLIENT_PAYLOAD_JSON) for ws in clients])
                         except:
+                            print('[!] Socket error Ln 169')
                             pass
-                        # --------------------------------------------------------->
 
 
-                    # App is now connected to websocket
                     elif action == 'desktop_client_online':
                         self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
 
@@ -315,13 +314,13 @@ class websocketserver():
 
                     # Fetch J0INT download info
                     elif action == 'update_download_manager':
-
-                        print('[!] Updating download manager...')
                         # Send request to web app
+                        print('[!] Updating download manager...')
                         for ws in connections:
+                            wsType = connections[ws]['type']
                             ws = connections[ws]['socket']
                             # point to [web] socket
-                            if ws != websocket:
+                            if wsType == 'web':
                                 WEB_PAYLOAD = {
                                     "channel": "fetch_download_info",
                                     "payload": wsRequest['payload'],
@@ -403,6 +402,39 @@ class websocketserver():
                             if wsType == 'desktop':
                                 WEB_PAYLOAD_JSON = json.dumps(wsPload)
                                 await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+
+
+                    elif action == 'update_sharing_manager':
+                        # Send request to web app
+                        print('[!] Updating sharing manager...')
+                        for ws in connections:
+                            wsType = connections[ws]['type']
+                            ws = connections[ws]['socket']
+                            # point to [web] socket
+                            if wsType == 'sharing_mngr':
+                                WEB_PAYLOAD = {
+                                    "sMNGR": "save_sharing_info",
+                                    "payload": wsRequest['payload']
+                                }
+                                WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
+
+
+                    # Add sharing manager to socket connections
+                    elif action == 'sharing_manager_connected':
+                            print('[+] Sharing manager connected')
+                            self.addSocket(websocket, wsRequest['socketID'], wsRequest['socketType'])
+                            for ws in connections:
+                                wsType = connections[ws]['type']
+                                ws = connections[ws]['socket']
+                                # point to [web] socket
+                                if wsType != 'sharing_mngr':
+                                    WEB_PAYLOAD = {
+                                    "channel": "sharing_manager_connected",
+                                    "socketID": wsRequest['socketID']
+                                    }
+                                    WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
+                                    await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
 
                     elif action == 'jds_client_disconnected':

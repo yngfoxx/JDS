@@ -93,6 +93,7 @@
     let client_net_addr = null;
     let recon_cool_down = false;
     let refresh_cool_down = false;
+    let joint_list = []; // Hold list of joint codes
 
     const desktop_socket_unique_id = 'izTUTM';
     let netList = {};
@@ -197,7 +198,7 @@
                             loader.classList.add('hide');
 
 
-                        let joint_list = []; // populate joint_list
+                        // populate joint_list
                         if (client_data.joints != 0) {
                           client_data.joints.forEach((item, i) => {
                             joint_list.push(item.jid);
@@ -234,18 +235,16 @@
                             console.log("[!] Scanning network for users...");
                             networkpanel_overlay("Searching local network for users");
 
-                            ws.send(
-                              JSON.stringify({
-                                action: 'fetch_network_users',
-                                interval: '30',
-                                list: joint_list,
-                                socketID: desktop_socket_unique_id,
-                                netAddr: client_net_addr
-                              })
-                            );
+                            ws.send(JSON.stringify({
+                              action: 'fetch_network_users',
+                              interval: '30',
+                              list: joint_list,
+                              socketID: desktop_socket_unique_id,
+                              netAddr: client_net_addr
+                            }));
 
                             // turn off cooldown after 10 seconds
-                            setTimeout(() => { recon_cool_down = false; }, 10000);
+                            setTimeout(() => { recon_cool_down = false; }, 20000);
                           });
                         });
                         // ------------------------------------------------------>
@@ -315,11 +314,27 @@
 
                   case 'net_scanner_completed':
                     console.log("[*] Local network scanner completed!");
-                    // restart timer 20 seconds later
-                    console.log(netList);
+                    // run scanner 20 seconds later
+                    setTimeout(()=>{
+                      ws.send(JSON.stringify({
+                        action: 'fetch_network_users',
+                        interval: '30',
+                        list: joint_list,
+                        socketID: desktop_socket_unique_id,
+                        netAddr: client_net_addr
+                      }));
+                    }, 20000);
+
+                    console.log('[!] NETLIST: '+JSON.stringify(netList));
                     if (netList && !isEmpty(netList)) {
                       clearDOM(document.querySelector("div[data-element-id='netlist']"));
                       generate_net_prof(netList);
+                      // initialize periodic scan on lan users
+                      ws.send(JSON.stringify({
+                        action: 'update_sharing_manager',
+                        interval: '0',
+                        payload: netList
+                      }));
                     } else {
                       networkpanel_overlay("No users found yet!");
                     }
