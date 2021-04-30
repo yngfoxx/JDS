@@ -149,6 +149,14 @@ class LocalServer(SimpleHTTPRequestHandler):
                 else:
                     print('[!] user_config_path is empty: ', user_config_path)
 
+
+            elif rData['event'] == 'getJ0INTs':
+                # ---
+                # the only purpose of this handshake is to respond and
+                # send J0INT details to requester
+                # ---
+                print(rData)
+
         # Return the response ---
         self._set_response()
         print('[+] POST response payload =>',json.dumps(response))

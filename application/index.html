@@ -257,6 +257,7 @@
                     break;
 
                   case 'desktop_client_refresh':
+                    netList = {};
                     if (isJson(eData.payload)) { // Check if payload is an object
                       client_data = JSON.parse(eData.payload);
                       // alert(JSON.stringify(client_data));

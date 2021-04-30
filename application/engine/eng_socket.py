@@ -354,6 +354,11 @@ class websocketserver():
                         for jid in wsRequest['payload']:
                             jointPayload = wsRequest['payload'][jid]
                             print('[+] Download manager on J0INT:', jid);
+                            
+                            jConfPath = "storage/"+jid+"/jconf.json"
+                            if os.path.exists(jConfPath):
+                                os.remove(jConfPath)
+
                             dArgSet = []
                             for chunk in wsRequest['payload'][jid]:
                                 if os.path.exists("u_config.json"):
