@@ -94,9 +94,12 @@ class sharingManagerSS():
 
     # Update network list
     def updateNetList(self, networkList):
+        # Compare network list
         for user in networkList:
-            print('[!] New network list: ', networkList[user])
-            self.networkList[user] = networkList[user]
+            if self.networkList[user] != networkList[user]:
+                print('[!] New network list: ', networkList[user])
+                self.networkList[user] = networkList[user]
+                self.init = False
 
         # get user config data to update joint list
         if os.path.exists("u_config.json"):
@@ -113,6 +116,7 @@ class sharingManagerSS():
             self.initFileSharing()
 
 
+    #
     def initFileSharing(self):
         print('[+] File sharing initialized')
         if self.u_config_data != None:
@@ -150,7 +154,48 @@ class sharingManagerSS():
                         print('[!] J0INT config uri:', uri)
                         reqJCONF = requests.get(uri)
                         thPayload = reqJCONF.text
-                        
+
+                        self.sharingManager(json.loads(thPayload))
+
                         logger = open('log_'+J0INT+'.txt', 'w')
                         logger.write(thPayload)
         print('\n')
+
+
+    # Thread object ----------------------------------------------------------->
+    def worker(self):
+        while True:
+            dQueueItem = self.sharingQueue.get()
+
+            try:
+                # https://www.aeracode.org/2018/02/19/python-async-simplified/
+                # loop = asyncio.new_event_loop()
+                # asyncio.set_event_loop(loop)
+                # result = loop.run_until_complete(self.downloader(dQueueItem))
+                asyncio.sleep(4)
+                log = open('share_log.txt', 'a')
+                log.write(json.dumps(dQueueItem)+'\n')
+                log.close()
+            except Exception as e:
+                print('[!] Error in worker:', e)
+
+            self.sharingQueue.task_done()
+            print('[+] A task completed..')
+    # ------------------------------------------------------------------------->
+
+
+    # Queue manager ----------------------------------------------------------->
+    def sharingManager(self, dArg):
+        workerIndex = 0
+        for dParm in dArg:
+            self.sharingQueue.put(dParm)
+            print("[!] Shared file added to que")
+
+            workerThread = threading.Thread(target=self.worker, name=f'worker_{workerIndex}', daemon=True)
+            workerThread.start()
+            self.threads.append(workerThread)
+
+            # block until all tasks are done
+            self.sharingQueue.join()
+        print('[!] share completed')
+    # ------------------------------------------------------------------------->
