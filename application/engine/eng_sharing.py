@@ -135,9 +135,10 @@ class sharingManagerSS():
 
                     if inJoint == True:
                         print('[!] J0INT member found: ', self.networkList[usr]['netAddr'])
-                        usrIPaddress = self.networkList[usr]['netAddr']
+                        usrIPaddress = self.networkList[usr]['netAddr'][0]
                         # Get jconf.json
                         uri = "http://"+usrIPaddress+":8000/storage/"+J0INT+"/jconf.json"
+                        # uri = "http://"+usrIPaddress+":8000/?req=jconf&jds="+J0INT
                         reqJCONF = requests.get(uri)
                         print(reqJCONF.text)
         print('\n')
