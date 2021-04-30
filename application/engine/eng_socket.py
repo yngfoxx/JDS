@@ -377,7 +377,7 @@ class websocketserver():
                                             'byte_end' : chunk['byte_end'],
                                         }
                                         dArgSet.append(dArg)
-                                        jConfData.append({'jid': jid, 'rid': chunk['rid'], 'cid': chunk['cid'], 'oid': chunk['order']})
+                                        jConfData.append({'jid': jid, 'rid': chunk['rid'], 'cid': chunk['cid'], 'oid': chunk['order'], 'byte_start' : chunk['byte_start'],'byte_end' : chunk['byte_end'],})
 
 
                             # Create storage folder if missing----------------->

@@ -250,6 +250,8 @@ class sharingManagerSS():
         seekJSON['rid'] = arg['rid']
         seekJSON['cid'] = arg['cid']
         seekJSON['id'] = arg['oid']
+        seekJSON['byte_start'] = arg['byte_start']
+        seekJSON['byte_end'] = arg['byte_end']
         seekJSON['uDomain'] = arg['source']
 
 
