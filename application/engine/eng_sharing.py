@@ -120,11 +120,11 @@ class sharingManagerSS():
                 if jds['role'] == 'owner':
                     # add J0INTs owned by user
                     self.jointList.add(jds['jid'])
-            print('\n')
         else:
             print('[---] No J0INTs available')
 
         if len(self.jointList) > 0:
             # get config data of joints from network users
-            for J0INT in jointList:
+            for J0INT in self.jointList:
                 print(J0INT)
+        print('\n')
