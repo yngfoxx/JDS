@@ -122,6 +122,7 @@ class LocalServer(SimpleHTTPRequestHandler):
                     'origin_joint': rData['origin_joint'] # belongs to request origin
                 }
 
+                uconfigData = None
                 try:
                     # Get user configuration payload/data in u_config.json file
                     uconfigFile = open("u_config.json", 'r')
@@ -133,7 +134,7 @@ class LocalServer(SimpleHTTPRequestHandler):
                     self.wfile.write(str.encode('[!] Ran into a problem while handling \"u_config.json\"'))
 
                 # Filter the uconfig data for the important variables needed
-                if uconfigData != '':
+                if uconfigData != None and uconfigData != '':
                     print('[!] uconfig_content: ', uconfigData)
                     response['host_uid'] = uconfigData['userID'] # belongs to host
                     response['host_uname'] = uconfigData['username'] # belongs to host
@@ -145,8 +146,7 @@ class LocalServer(SimpleHTTPRequestHandler):
                                 'jid': jnt['jid'],
                                 'role': jnt['role']
                             }
-
-                    print('[!] payload: ', json.dumps(response))
+                    # print('[!] payload: ', json.dumps(response))
                 else:
                     print('[!] user_config_path is empty: ', user_config_path)
 

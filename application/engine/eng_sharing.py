@@ -33,8 +33,11 @@ class sharingManagerSS():
         self.keepAlive = True
         self.socket_id = stdlib.makeRandomKey(12)
         self.sharingQueue = Queue()
-        self.networkList = set()
+        self.networkList = {}
+        self.jointList = set()
         self.threads = []
+        self.init = False
+        self.u_config_data = None
 
 
     async def connectSocketServer(self):
@@ -87,5 +90,29 @@ class sharingManagerSS():
     def updateNetList(self, networkList):
         for user in networkList:
             print('[!] New network list: ', networkList[user])
-            self.networkList.add(networkList[user])
-            print('[!] Full network list: ', self.networkList)
+            self.networkList[user] = networkList[user]
+
+        # get J0INTs owned by user
+        if os.path.exists("u_config.json"):
+            uConfig = open('u_config.json', 'r')
+            self.u_config_data = json.loads(uConfig.read());
+            uConfig.close()
+            print('[!] User configuration: ', self.u_config_data)
+        else:
+            print('[!] Could not find u_config.json')
+
+        if self.init == False:
+            print('[!] Initialize file sharing')
+            self.init = True
+            self.initFileSharing()
+
+
+    def initFileSharing(self):
+        print('[+] File sharing initialized')
+        if self.u_config_data != None:
+            tempJointList = self.u_config_data['joints']
+            for joints in tempJointList:
+                if tempJointList['joints']['role'] == 'owner':
+                    self.jointList.add(tempJointList['joints']['jid'])
+
+            print('[+++] J0INTs for file sharing:', self.jointList)
