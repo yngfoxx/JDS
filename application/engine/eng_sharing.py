@@ -59,6 +59,11 @@ class sharingManagerSS():
                                 print('\n[!] Update sharing manager')
                                 self.updateNetList(wsRequest['payload']);
 
+                            elif wsRequest['sMNGR'] == "init":
+                                # Initialize from socket
+                                self.init = False
+                                break
+
                             elif wsRequest['sMNGR'] == "exit":
                                 # exit loop to terminate script
                                 self.connected = False
@@ -138,11 +143,14 @@ class sharingManagerSS():
                         # Create threads to handle file downloading
                         print('[!] J0INT member found: ', self.networkList[usr]['netAddr'])
                         usrIPaddress = self.networkList[usr]['netAddr'][0]
+
                         # Get jconf.json
+                        # uri = "http://"+usrIPaddress+":8000/?req=jconf&jds="+J0INT
                         uri = "http://"+usrIPaddress+":8000/storage/"+J0INT+"/jconf.json"
                         print('[!] J0INT config uri:', uri)
-                        # uri = "http://"+usrIPaddress+":8000/?req=jconf&jds="+J0INT
                         reqJCONF = requests.get(uri)
+                        thPayload = reqJCONF.text
+                        
                         logger = open('log_'+J0INT+'.txt', 'w')
-                        logger.write(reqJCONF.text + '\n\n\n' + str(self.jointList))
+                        logger.write(thPayload)
         print('\n')

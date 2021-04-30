@@ -307,7 +307,7 @@ class websocketserver():
                             ws = connections[ws]['socket']
                             # point to [web] socket
                             if ws != websocket:
-                                WEB_PAYLOAD = { "channel": "refresh" }
+                                WEB_PAYLOAD = { "channel": "refresh", "sMNGR": "init"  }
                                 WEB_PAYLOAD_JSON = json.dumps(WEB_PAYLOAD)
                                 await asyncio.wait([ws.send(WEB_PAYLOAD_JSON)])
 
