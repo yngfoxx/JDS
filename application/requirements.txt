@@ -14,5 +14,5 @@ requests==2.25.1
 style==1.1.0
 tornado==6.1
 update==0.0.1
-urllib3==1.26.3
+urllib3>=1.26.4
 websockets==8.1
