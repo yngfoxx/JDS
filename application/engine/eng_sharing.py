@@ -96,7 +96,9 @@ class sharingManagerSS():
     def updateNetList(self, networkList):
         # Compare network list
         for user in networkList:
-            if self.networkList[user] != networkList[user]:
+            if not self.networkList:
+                self.networkList[user] = networkList[user]
+            elif self.networkList[user] != networkList[user]:
                 print('[!] New network list: ', networkList[user])
                 self.networkList[user] = networkList[user]
                 self.init = False
@@ -113,11 +115,11 @@ class sharingManagerSS():
         if self.init == False:
             print('[!] Initialize file sharing')
             self.init = True
-            self.initFileSharing()
+            self.initFileShareSeeker()
 
 
-    #
-    def initFileSharing(self):
+    # initiatialize file sharing seeker
+    def initFileShareSeeker(self):
         print('[+] File sharing initialized')
         if self.u_config_data != None:
             tempJointList = self.u_config_data['joints']
@@ -165,17 +167,13 @@ class sharingManagerSS():
     # Thread object ----------------------------------------------------------->
     def worker(self):
         while True:
-            dQueueItem = self.sharingQueue.get()
+            sQueueItem = self.sharingQueue.get()
 
             try:
                 # https://www.aeracode.org/2018/02/19/python-async-simplified/
-                # loop = asyncio.new_event_loop()
-                # asyncio.set_event_loop(loop)
-                # result = loop.run_until_complete(self.downloader(dQueueItem))
-                asyncio.sleep(4)
-                log = open('share_log.txt', 'a')
-                log.write(json.dumps(dQueueItem)+'\n')
-                log.close()
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                result = loop.run_until_complete(self.fileSeeker(sQueueItem))
             except Exception as e:
                 print('[!] Error in worker:', e)
 
@@ -198,4 +196,13 @@ class sharingManagerSS():
             # block until all tasks are done
             self.sharingQueue.join()
         print('[!] share completed')
+    # ------------------------------------------------------------------------->
+
+
+    # File seeker ------------------------------------------------------------->
+    async def fileSeeker(self, arg):
+        log = open('share_log.txt', 'a')
+        log.write(json.dumps(arg)+'\n')
+        log.close()
+        await asyncio.sleep(4)
     # ------------------------------------------------------------------------->
