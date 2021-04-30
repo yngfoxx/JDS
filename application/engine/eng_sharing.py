@@ -240,6 +240,7 @@ class sharingManagerSS():
 
         uri = "http://"+uDomain+":8000/storage/" + jointID + "/" + requestID + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+orderID+".J0INT"
         dest = "storage/" + jointID + "/" + requestID
+        seekPATH = dest + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+orderID+".J0INT"
         seekCONF = dest + "/config.json"
 
 
@@ -261,15 +262,15 @@ class sharingManagerSS():
                     if jointID == str(skJSON['jid']) and requestID == str(skJSON['rid']) and orderID == str(skJSON['id']):
                         skNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+orderID+".J0INT";
                         # check if chunk is valid
-                        if os.path.exists(chunkPATH) == True:
+                        if os.path.exists(seekPATH) == True:
                             # compare size and hash stored in config.json
-                            # to the available file in chunkPATH
+                            # to the available file in seekPATH
                             print('[+]', skNAME, '~ File match found\n')
 
                             storedHash = skJSON['hash']['md5']
                             print('[!] Stored md5 hash:', storedHash)
 
-                            calcHash = stdlib.md5(chunkPATH)
+                            calcHash = stdlib.md5(seekPATH)
                             print('[!] Calculated md5 hash:', calcHash)
 
                             if storedHash == calcHash:
@@ -278,7 +279,7 @@ class sharingManagerSS():
                                 # REF: https://www.kite.com/python/answers/how-to-edit-a-specific-line-in-a-text-file-in-python#:~:text=Use%20file.,at%20a%20certain%20line%20number.
                                 # revalidate file data based (due to hash authenticity)
 
-                                skJSON['size'] = os.path.getsize(chunkPATH)
+                                skJSON['size'] = os.path.getsize(seekPATH)
                                 skJSON['progress'] = 100.0
                                 skJSON['status'] = "finished"
                                 skJSON['action'] = 'realtime_share_progress'
