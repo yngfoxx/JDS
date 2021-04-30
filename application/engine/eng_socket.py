@@ -379,12 +379,21 @@ class websocketserver():
                                         jConfData.append({'jid': jid, 'rid': chunk['rid'], 'cid': chunk['cid'], 'oid': chunk['order']})
 
 
+                            # Create storage folder if missing----------------->
+                            if os.path.exists("storage") == False:
+                                os.mkdir("storage")
+
+                            # Create J0INT directory if missing
+                            storage = "storage/"+jid
+                            if os.path.exists(storage) == False:
+                                os.mkdir(storage)
+
                             # Create Joint Config file ---
                             jConfPath = "storage/"+jid+"/jconf.json"
                             jConf = open(jConfPath, 'w')
                             jConf.write(json.dumps(jConfData))
                             jConf.close()
-                            # ----------------------------
+                            # ------------------------------------------------->
 
                             for program in connections:
                                 wsType = connections[program]['type']
