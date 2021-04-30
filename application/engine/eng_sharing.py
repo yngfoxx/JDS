@@ -415,7 +415,7 @@ class sharingManagerSS():
     # File validator ---------------------------------------------------------->
     def validateFile(self, jid, rid):
         print('[!] VALIDATING FILES: [JointID]>', jid, '[RequestID]>', rid)
-        storage = "storage/"+jid+"/"+rid
+        storage = "storage/"+str(jid)+"/"+str(rid)
         config = storage + "/config.json"
 
         configFile = None
@@ -427,5 +427,7 @@ class sharingManagerSS():
                 configData.append(json.loads(line))
 
         sConfigData = sorted(configData, key=lambda k: k['id'])
-        open('log.txt', 'a').write(json.dumps(sConfigData)+"\n")
+        for chunk in sConfigData:
+            print('[!] Chunk from eng_sharing.py:', chunk)
+            # open('log.txt', 'w').write(json.dumps(sConfigData)+"\n")
     # ------------------------------------------------------------------------->
