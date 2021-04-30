@@ -52,6 +52,15 @@ class LocalServer(SimpleHTTPRequestHandler):
                 f.close()
                 return
 
+            elif self.path.endswith(".J0INT"):
+                f = open(curdir + sep + self.path, "rb")
+                self.send_response(200)
+                self.send_header("Content-type", "text/J0INT")
+                self.end_headers()
+                self.wfile.write(f.read())
+                f.close()
+                return
+
             elif self.path.endswith(".less"):
                 f = open(curdir + sep + self.path, "rb")
                 self.send_response(200)
