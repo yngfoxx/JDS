@@ -112,10 +112,12 @@ class sharingManagerSS():
         else:
             print('[!] Could not find u_config.json')
 
-        if self.init == False:
-            print('[!] Initialize file sharing')
-            self.init = True
-            self.initFileShareSeeker()
+        self.initFileShareSeeker()
+        
+        # if self.init == False:
+        #     print('[!] Initialize file sharing')
+        #     self.init = True
+        #     self.initFileShareSeeker()
 
 
     # initiatialize file sharing seeker
