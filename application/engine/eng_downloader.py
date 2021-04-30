@@ -132,31 +132,6 @@ class downloadManagerSS():
             os.mkdir(storage)
 
 
-        # Create/Recreate J0INT config file
-        jointConf = None
-        jConfPath = "storage/"+jointID+"/jconf.json"
-        if os.path.exists(jConfPath) == False:
-            jointConf = open(jConfPath, 'w')
-            jointConf.write(json.dumps({'jid': jointID, 'rid': requestID, 'cid': chunkID, 'oid': chunkORDER})+'\n')
-        else:
-            jointConf = open(jConfPath, 'r')
-            jConfLineIndex = 0
-            jConfData = json.dumps({'jid': jointID, 'rid': requestID, 'cid': chunkID, 'oid': chunkORDER})
-            for jConfLine in jointConf:
-                # Get file line
-                jCFile = open(jConfPath, 'r')
-                jCLines = jCFile.readlines()
-                jCLines[jConfLineIndex] = jConfData+'\n'
-
-                jCFile = open(jConfPath, 'w')
-                jCFile.writelines(jCLines)
-                jCFile.close()
-
-                jConfLineIndex += 1
-
-        jointConf.close()
-
-
         # Create request directory if missing
         storage = "storage/" + jointID + "/" + requestID
         if os.path.exists(storage) == False:
