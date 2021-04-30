@@ -127,4 +127,12 @@ class sharingManagerSS():
             # get config data of joints from network users
             for J0INT in self.jointList:
                 print(J0INT)
+                for usr in self.networkList:
+                    inJoint = False
+                    for usrJoint in self.networkList[usr]['joints']:
+                        if usrJoint['jid'] == J0INT:
+                            inJoint = True
+
+                    if inJoint == True:
+                        print('[!] J0INT member found: ', usr['netAddr'])
         print('\n')
