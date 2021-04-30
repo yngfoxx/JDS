@@ -245,10 +245,10 @@ class sharingManagerSS():
 
         # Chunk/Seek config data
         seekJSON = {}
-        seekJSON['jointID'] = arg['jid']
-        seekJSON['requestID'] = arg['rid']
-        seekJSON['chunkID'] = arg['cid']
-        seekJSON['orderID'] = arg['oid']
+        seekJSON['jid'] = arg['jid']
+        seekJSON['rid'] = arg['rid']
+        seekJSON['cid'] = arg['cid']
+        seekJSON['id'] = arg['oid']
         seekJSON['uDomain'] = arg['source']
 
 
@@ -398,7 +398,7 @@ class sharingManagerSS():
 
         # Write data of new file to config.json
         configFile = open(seekCONF, 'a')
-        configFile.write(json.dumps(seekJSON))
+        configFile.write(json.dumps(seekJSON)+'\n')
         configFile.close()
 
         print('[+]', '-'*97, '\n')
