@@ -113,7 +113,7 @@ class sharingManagerSS():
             print('[!] Could not find u_config.json')
 
         self.initFileShareSeeker()
-        
+
         # if self.init == False:
         #     print('[!] Initialize file sharing')
         #     self.init = True
@@ -181,7 +181,6 @@ class sharingManagerSS():
 
             self.sharingQueue.task_done()
             print('[+] A task completed..')
-        print('[!] All file downloads ended, validating files...')
     # ------------------------------------------------------------------------->
 
 
@@ -208,7 +207,10 @@ class sharingManagerSS():
 
             # block until all tasks are done
             self.sharingQueue.join()
-        print('[!] share completed')
+
+        print('[!] File sharing completed')
+        print('[!] All file downloads ended, validating files...')
+        self.validateFile(jointArr[0]['jid'], jointArr[0]['rid'])
     # ------------------------------------------------------------------------->
 
 
@@ -221,7 +223,7 @@ class sharingManagerSS():
         jointID = arg['jid']
         requestID = arg['rid']
         chunkID = arg['cid']
-        orderID = arg['oid']
+        orderID = int(arg['oid'])
         uDomain = arg['source']
 
 
@@ -240,9 +242,9 @@ class sharingManagerSS():
             os.mkdir(storage)
 
 
-        uri = "http://"+uDomain+":8000/storage/" + jointID + "/" + requestID + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+orderID+".J0INT"
+        uri = "http://"+uDomain+":8000/storage/" + jointID + "/" + requestID + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".J0INT"
         dest = "storage/" + jointID + "/" + requestID
-        seekPATH = dest + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+orderID+".J0INT"
+        seekPATH = dest + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".J0INT"
         seekCONF = dest + "/config.json"
 
 
@@ -251,7 +253,7 @@ class sharingManagerSS():
         seekJSON['jid'] = arg['jid']
         seekJSON['rid'] = arg['rid']
         seekJSON['cid'] = arg['cid']
-        seekJSON['id'] = arg['oid']
+        seekJSON['id'] = int(arg['oid'])
         seekJSON['byte_start'] = arg['byte_start']
         seekJSON['byte_end'] = arg['byte_end']
         seekJSON['uDomain'] = arg['source']
@@ -263,8 +265,8 @@ class sharingManagerSS():
                 lineIndex = 0
                 for line in chConf:
                     skJSON = json.loads(line)
-                    if jointID == str(skJSON['jid']) and requestID == str(skJSON['rid']) and orderID == str(skJSON['id']):
-                        skNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+orderID+".J0INT";
+                    if jointID == str(skJSON['jid']) and requestID == str(skJSON['rid']) and str(orderID) == str(skJSON['id']):
+                        skNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".J0INT";
                         # check if chunk is valid
                         if os.path.exists(seekPATH) == True:
                             # compare size and hash stored in config.json
@@ -413,4 +415,17 @@ class sharingManagerSS():
     # File validator ---------------------------------------------------------->
     def validateFile(self, jid, rid):
         print('[!] VALIDATING FILES: [JointID]>', jid, '[RequestID]>', rid)
+        storage = "storage/"+jid+"/"+rid
+        config = storage + "/config.json"
+
+        configFile = None
+        configData = []
+        if os.path.exists(config):
+            print('[!] Config exists!')
+            configFile = open(config, 'r')
+            for line in configFile:
+                configData.append(json.loads(line))
+
+        sConfigData = sorted(configData, key=lambda k: k['id'])
+        open('log.txt', 'a').write(json.dumps(sConfigData)+"\n")
     # ------------------------------------------------------------------------->
