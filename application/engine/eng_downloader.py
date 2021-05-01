@@ -303,7 +303,7 @@ class downloadManagerSS():
             chunkDATA.write(json.dumps(chunkJSON)+'\n')
 
         # Create chunk, store bytes in J0INT file
-        chunk = open(chunkPATH, 'wb')
+        chunk = open(chunkPATH, 'w')
         chunk.write(fileBIN)
         chunk.close()
 

@@ -210,7 +210,7 @@ class sharingManagerSS():
 
         print('[!] File sharing completed')
         print('[!] All file downloads ended, validating files...')
-        self.validateFile(jointArr[0]['jid'], jointArr[0]['rid'])
+        self.makeFile(jointArr[0]['jid'], jointArr[0]['rid'])
     # ------------------------------------------------------------------------->
 
 
@@ -412,22 +412,88 @@ class sharingManagerSS():
     # ------------------------------------------------------------------------->
 
 
-    # File validator ---------------------------------------------------------->
-    def validateFile(self, jid, rid):
+    # File validator/merger --------------------------------------------------->
+    def makeFile(self, jid, rid):
         print('[!] VALIDATING FILES: [JointID]>', jid, '[RequestID]>', rid)
         storage = "storage/"+str(jid)+"/"+str(rid)
         config = storage + "/config.json"
+        destFile = storage+'/Arch_'+jid+'_'+rid+'.zip'
+
 
         configFile = None
         configData = []
+        fileCount = 0
         if os.path.exists(config):
             print('[!] Config exists!')
             configFile = open(config, 'r')
             for line in configFile:
                 configData.append(json.loads(line))
+                fileCount += 1
 
-        sConfigData = sorted(configData, key=lambda k: k['id'])
+        # Sort config data by id
+        sConfigData = sorted(configData, key = lambda k: k['id'])
+        open('log_'+jid+'_'+rid+'.txt', 'a').write(json.dumps(sConfigData)+"\n\n")
+
+        mainFile = open(destFile, 'ab')
+        mJdata = None
+        if os.path.exists(storage+'/make.json'):
+            print('[!] File already exists, skipping ...')
+            makeJsonChk = open(storage+'/make.json', 'r')
+            mJdata = json.loads(makeJsonChk.read())
+            makeJsonChk.close()
+
+        # Validate file before merging
         for chunk in sConfigData:
+            fOrderID = chunk['id']
+            fJointID = chunk['jid']
+            fRequestID = chunk['rid']
+            fChunkID = chunk['cid']
+            fname = 'Chnk_'+fJointID+'_'+str(fRequestID)+'_'+str(fChunkID)+'_'+str(fOrderID)+'.J0INT'
+            fMD5 = chunk['hash']['md5']
+
+            if mJdata != None:
+                print('[!] CHECKING LAST FILE ORDER FOR MERGING')
+                if fOrderID <= mJdata['lastOrder']:
+                    # skip loop to next loop
+                    continue
+                print('[!] FILE MERGING CONTINUED')
+
+
+            fPath = "storage/"+fJointID+"/"+fRequestID+"/"+fname
+            if os.path.exists(fPath) == False:
+                print('[-] FILE NOT FOUND EXITING MERGER:', fPath)
+                return
+
+            elif os.path.exists(fPath) == True:
+                print('[+] FILE FOUND, PROCEEDING')
+                # Compare MD5 hash
+                calcHash = stdlib.md5(fPath)
+
+                if fMD5 == calcHash:
+                    print('[+] FILE IS VALID')
+
+                    # read file in bytes
+                    chunkFile = open(fPath, 'r')
+                    chunkBytes = chunkFile.read()
+
+                    # add bytes to main file
+                    mainFile.write(chunkBytes)
+                    chunkFile.close()
+
             print('[!] Chunk from eng_sharing.py:', chunk)
-            # open('log.txt', 'w').write(json.dumps(sConfigData)+"\n")
+            makeJson = open(storage+'/make.json', 'w')
+            makeJson.write(json.dumps({
+                'filename': 'Arch_'+jid+'_'+rid+'.zip',
+                'size': os.path.getsize(destFile),
+                'hash': {'md5': stdlib.md5(destFile)},
+                'jid': jid,
+                'rid': rid,
+                'lastOrder': fOrderID,
+                'lastChunk': fChunkID
+            }))
+            makeJson.close()
+
+        mainFile.close()
+        print('[+] FILE MERGING COMPLETED')
+
     # ------------------------------------------------------------------------->
