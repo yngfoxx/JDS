@@ -299,25 +299,27 @@ class downloadManagerSS():
 
 
         # Store binary data into file
-        fileBIN = fileDLM.get_data(binary=True)
+        # fileBIN = fileDLM.get_data(binary=True)
         # print('\n[BINARY]\n', fileBIN)
 
         with open(chunkCONF, 'a') as chunkDATA:
             chunkDATA.write(json.dumps(chunkJSON)+'\n')
 
         # Create chunk, store bytes in J0INT file
-        chunk = open(chunkPATH, 'wb')
-        chunk.write(fileBIN)
-        chunk.close()
+        # chunk = open(chunkPATH, 'wb')
+        # chunk.write(fileBIN)
+        # chunk.close()
 
         # Delete downloaded file
         path = fileDLM.get_dest()
         print('\n[TEMP]', path)
         if os.path.exists(path):
-            os.remove(path)
-            print('[+] Cleaned up temporary file: ', path);
+            # os.remove(path)
+            os.rename(path, chunkPATH)
+            # print('[+] Cleaned up temporary file: ', path);
+            print('[+] Renamed file:', path, 'to', chunkPATH);
         else:
-            print('[-] Could not find file: ',path);
+            print('[-] Could not find file:', path);
 
         print('-'*101)
         # ---------------------------------------------------------------------/\
