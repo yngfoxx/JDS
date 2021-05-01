@@ -619,7 +619,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
       for ($i=0; $i < count($chunkArrEnds); $i++) {
         // CHUNK PARENT -------------------------------------------------------\/
-        $chunkEnd = $chunkArrEnds[$i];
+        $chunkEnd = ceil($chunkArrEnds[$i]);
         $chunkArr = array(
           'chunk_order' => $iterator,
           'joint_id' => $arr['jid'],
