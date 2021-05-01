@@ -453,7 +453,7 @@ class sharingManagerSS():
 
             if mJdata != None:
                 print('[!] CHECKING LAST FILE ORDER FOR MERGING')
-                if fOrderID <= mJdata['lastOrder']:
+                if fOrderID <= mJdata['lastOrder'] or (fOrderID - 1) != mJdata['lastOrder']:
                     # skip loop to next loop
                     continue
                 print('[!] FILE MERGING CONTINUED')
