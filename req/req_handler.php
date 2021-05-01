@@ -639,14 +639,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             'ch_chunk_end' => ceil($childChunkEnd)
           );
           $childChunkOrder += 1;
-          $childChunkStart = ceil($childChunkEnd);
+          $childChunkStart = ceil($childChunkEnd) + 1;
           $childChunkEnd += ceil($childChunkSize);
         }
         # --------------------------------------------------
 
         echo json_encode($chunkArr);
         $crt_chunks = $jds->crt_chunks($chunkArr);
-        $chunkStart = ceil($chunkEnd);
+        $chunkStart = ceil($chunkEnd) + 1;
         $iterator += 1;
         // --------------------------------------------------------------------/\
       }
