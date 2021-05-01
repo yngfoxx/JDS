@@ -242,11 +242,11 @@ class sharingManagerSS():
             os.mkdir(storage)
 
 
-        # uri = "http://"+uDomain+":8000/storage/" + jointID + "/" + requestID + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".J0INT"
-        uri = "http://"+uDomain+":8000/storage/" + jointID + "/" + requestID + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".zip"
+        uri = "http://"+uDomain+":8000/storage/" + jointID + "/" + requestID + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".J0INT"
+        # uri = "http://"+uDomain+":8000/storage/" + jointID + "/" + requestID + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".zip"
         dest = "storage/" + jointID + "/" + requestID
-        # seekPATH = dest + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".J0INT"
-        seekPATH = dest + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".zip"
+        seekPATH = dest + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".J0INT"
+        # seekPATH = dest + "/Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".zip"
         seekCONF = dest + "/config.json"
 
 
@@ -268,8 +268,8 @@ class sharingManagerSS():
                 for line in chConf:
                     skJSON = json.loads(line)
                     if jointID == str(skJSON['jid']) and requestID == str(skJSON['rid']) and str(orderID) == str(skJSON['id']):
-                        # skNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".J0INT"
-                        skNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".zip"
+                        skNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".J0INT"
+                        # skNAME = "Chnk_"+jointID+"_"+requestID+"_"+chunkID+"_"+str(orderID)+".zip"
                         # check if chunk is valid
                         if os.path.exists(seekPATH) == True:
                             # compare size and hash stored in config.json
@@ -435,7 +435,7 @@ class sharingManagerSS():
 
         # Sort config data by id
         sConfigData = sorted(configData, key = lambda k: k['id'])
-        open('log_'+jid+'_'+rid+'.txt', 'a').write(json.dumps(sConfigData)+"\n\n")
+        # open('log_'+jid+'_'+rid+'.txt', 'a').write(json.dumps(sConfigData)+"\n\n")
 
         with open(destFile, 'ab') as mainFile:
             # Main file
@@ -452,8 +452,8 @@ class sharingManagerSS():
                 fJointID = chunk['jid']
                 fRequestID = chunk['rid']
                 fChunkID = chunk['cid']
-                # fname = 'Chnk_'+fJointID+'_'+str(fRequestID)+'_'+str(fChunkID)+'_'+str(fOrderID)+'.J0INT'
-                fname = 'Chnk_'+fJointID+'_'+str(fRequestID)+'_'+str(fChunkID)+'_'+str(fOrderID)+'.zip'
+                fname = 'Chnk_'+fJointID+'_'+str(fRequestID)+'_'+str(fChunkID)+'_'+str(fOrderID)+'.J0INT'
+                # fname = 'Chnk_'+fJointID+'_'+str(fRequestID)+'_'+str(fChunkID)+'_'+str(fOrderID)+'.zip'
                 fMD5 = chunk['hash']['md5']
 
                 if mJdata != None:
