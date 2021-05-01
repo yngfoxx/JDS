@@ -179,7 +179,7 @@ class jdsDownloader():
         file_zip_path = dest + file_name
 
         # fileZIP = zipfile.ZipFile('test.zip', mode='w')
-        fileZIP = zipfile.ZipFile(file_zip_path, mode='w')
+        fileZIP = zipfile.ZipFile(file_name, mode='w')
 
         # INITIALIZE COMPRESSION STAGE ----------------------------------------\/
         try:
@@ -211,6 +211,9 @@ class jdsDownloader():
                 print('[-] Could not find file: ',path);
 
             fileZIP.close()
+            os.rename(file_name, file_zip_path)
+            if os.path.exists(file_zip_path):
+                print('[!] File moved to destination folder')
 
             self.socket.emit('event', {
                 'namespace': self.namespace,
