@@ -624,8 +624,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           'chunk_order' => $iterator,
           'joint_id' => $arr['jid'],
           'request_id' => $arr['rid'],
-          'byte_start' => $chunkStart,
-          'byte_end' => $chunkEnd,
+          'byte_start' => ceil($chunkStart),
+          'byte_end' => ceil($chunkEnd),
           'children' => array()
         );
 
@@ -635,18 +635,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
           $chunkArr['children'][] = array(
             'uID' => $user['uid'],
             'ch_chunk_order' => $childChunkOrder,
-            'ch_chunk_start' => $childChunkStart,
-            'ch_chunk_end' => $childChunkEnd
+            'ch_chunk_start' => ceil($childChunkStart),
+            'ch_chunk_end' => ceil($childChunkEnd)
           );
           $childChunkOrder += 1;
-          $childChunkStart = $childChunkEnd;
-          $childChunkEnd += $childChunkSize;
+          $childChunkStart = ceil($childChunkEnd);
+          $childChunkEnd += ceil($childChunkSize);
         }
         # --------------------------------------------------
 
         echo json_encode($chunkArr);
         $crt_chunks = $jds->crt_chunks($chunkArr);
-        $chunkStart = $chunkEnd;
+        $chunkStart = ceil($chunkEnd);
         $iterator += 1;
         // --------------------------------------------------------------------/\
       }
