@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 19, 2021 at 04:14 AM
+-- Generation Time: May 04, 2021 at 09:58 AM
 -- Server version: 10.4.18-MariaDB
 -- PHP Version: 8.0.3
 
@@ -29,7 +29,6 @@ USE `jds_main_db`;
 -- Table structure for table `applications`
 --
 
-DROP TABLE IF EXISTS `applications`;
 CREATE TABLE `applications` (
   `id` int(12) NOT NULL,
   `app_ID` text NOT NULL,
@@ -37,6 +36,10 @@ CREATE TABLE `applications` (
   `app_desc` text NOT NULL,
   `dateCreated` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- RELATIONSHIPS FOR TABLE `applications`:
+--
 
 --
 -- Dumping data for table `applications`
@@ -51,7 +54,6 @@ INSERT INTO `applications` (`id`, `app_ID`, `app_name`, `app_desc`, `dateCreated
 -- Table structure for table `authlogin`
 --
 
-DROP TABLE IF EXISTS `authlogin`;
 CREATE TABLE `authlogin` (
   `id` int(12) NOT NULL,
   `user_id` int(12) NOT NULL,
@@ -62,13 +64,20 @@ CREATE TABLE `authlogin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
+-- RELATIONSHIPS FOR TABLE `authlogin`:
+--   `user_id`
+--       `user` -> `user_id`
+--
+
+--
 -- Dumping data for table `authlogin`
 --
 
 INSERT INTO `authlogin` (`id`, `user_id`, `deviceKey`, `usr_channel`, `local_net_addr`, `dateCreated`) VALUES
 (147, 3, '861fa0b40531486db307453b00d36442ccbc1b2b282559c7072f493092ca8881c3e12e65e1725aeb90a1515d2a506b1db676a6cd82af1a77f75554aa2e212e64', NULL, NULL, '2021-02-19 22:26:44'),
-(283, 1, '4fb144264f91479a822e82a98248f40e3eb114dd8a2fc438aa6e985b883d0b6fcfd31c6b41d2694f84100ddb3711b2089b361197c0983455aead01650d6ff3cf', NULL, NULL, '2021-04-18 09:55:37'),
-(285, 2, 'f260bfdb37c24614f2b9ab902d2b244b6e4e21a5df969dd38317c219dc0609913e62765e939aa8122b230fefc5c22e22778677d0d307144d09c676518f7e2ded', NULL, '[\\\"172.23.144.1\\\",\\\"10.6.8.190\\\",\\\"192.168.52.1\\\",\\\"192.168.232.1\\\"]', '2021-04-18 22:42:28');
+(300, 4, '8234acc8525124fd939b7ebd3e3d2f99e0b98fe32913bd1777039d390044a61112d4e09f077163bece07c919f0877f26ef07a8bd812e3c7db63c0e87c7a32a9e', NULL, '[\\\"10.6.8.190\\\",\\\"192.168.52.1\\\",\\\"192.168.232.1\\\",\\\"172.29.160.1\\\"]', '2021-04-30 05:43:40'),
+(306, 2, '6303f470fda40588d5341432925694c7f4d7e2ea18438418999457b4e985958479800bd9161734596de28fad6e9df8d90eabfe57ddd9a8eba4354c59ff5ad873', NULL, '[\\\"192.168.232.128\\\"]', '2021-04-30 22:28:49'),
+(311, 1, '9cd1ec7b344b3f2fa74d6f0c4c04aa9471d49919ae4d8f35742e670cbc561870ba4be9edac244841085a87c94dd357277896af0c57d3136149456fae9e872120', NULL, '[\\\"10.6.8.190\\\",\\\"192.168.52.1\\\",\\\"192.168.232.1\\\",\\\"172.17.160.1\\\"]', '2021-05-03 10:46:55');
 
 -- --------------------------------------------------------
 
@@ -76,7 +85,6 @@ INSERT INTO `authlogin` (`id`, `user_id`, `deviceKey`, `usr_channel`, `local_net
 -- Table structure for table `chunk`
 --
 
-DROP TABLE IF EXISTS `chunk`;
 CREATE TABLE `chunk` (
   `id` int(12) NOT NULL,
   `chunk_order` int(12) NOT NULL,
@@ -88,20 +96,46 @@ CREATE TABLE `chunk` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
+-- RELATIONSHIPS FOR TABLE `chunk`:
+--   `request_id`
+--       `svr_download_request` -> `request_id`
+--   `joint_id`
+--       `joint_group` -> `joint_id`
+--
+
+--
 -- Dumping data for table `chunk`
 --
 
 INSERT INTO `chunk` (`id`, `chunk_order`, `joint_id`, `request_id`, `byte_start`, `byte_end`, `date_created`) VALUES
-(87, 0, 'MNX0K1', 520, '0', '73126960', '2021-04-18 22:44:28'),
-(88, 1, 'MNX0K1', 520, '73126960', '146253920', '2021-04-18 22:44:28'),
-(89, 2, 'MNX0K1', 520, '146253920', '219380880', '2021-04-18 22:44:28'),
-(90, 3, 'MNX0K1', 520, '219380880', '292507840', '2021-04-18 22:44:28'),
-(91, 4, 'MNX0K1', 520, '292507840', '365634800', '2021-04-18 22:44:28'),
-(92, 0, '9BSW1Y', 521, '0', '73126960', '2021-04-19 00:36:31'),
-(93, 1, '9BSW1Y', 521, '73126960', '146253920', '2021-04-19 00:36:31'),
-(94, 2, '9BSW1Y', 521, '146253920', '219380880', '2021-04-19 00:36:31'),
-(95, 3, '9BSW1Y', 521, '219380880', '292507840', '2021-04-19 00:36:31'),
-(96, 4, '9BSW1Y', 521, '292507840', '365634800', '2021-04-19 00:36:31');
+(212, 0, 'YI7C3D', 553, '0', '4920249', '2021-05-01 10:59:22'),
+(213, 1, 'YI7C3D', 553, '4920250', '9840497', '2021-05-01 10:59:22'),
+(214, 0, 'YI7C3D', 555, '0', '188674', '2021-05-01 11:16:13'),
+(215, 1, 'YI7C3D', 555, '188675', '377348', '2021-05-01 11:16:13'),
+(216, 2, 'YI7C3D', 555, '377349', '566021', '2021-05-01 11:16:13'),
+(217, 3, 'YI7C3D', 555, '566022', '754695', '2021-05-01 11:16:13'),
+(218, 4, 'YI7C3D', 555, '754696', '943368', '2021-05-01 11:16:13'),
+(219, 0, 'BSKMJF', 556, '0', '6488', '2021-05-03 11:51:25'),
+(220, 1, 'BSKMJF', 556, '6489', '12976', '2021-05-03 11:51:25'),
+(221, 2, 'BSKMJF', 556, '12977', '19464', '2021-05-03 11:51:25'),
+(222, 3, 'BSKMJF', 556, '19465', '25951', '2021-05-03 11:51:25'),
+(223, 4, 'BSKMJF', 556, '25952', '32439', '2021-05-03 11:51:25'),
+(224, 5, 'BSKMJF', 556, '32440', '38927', '2021-05-03 11:51:25'),
+(225, 6, 'BSKMJF', 556, '38928', '45414', '2021-05-03 11:51:25'),
+(226, 7, 'BSKMJF', 556, '45415', '51902', '2021-05-03 11:51:25'),
+(227, 8, 'BSKMJF', 556, '51903', '58390', '2021-05-03 11:51:25'),
+(228, 9, 'BSKMJF', 556, '58391', '64877', '2021-05-03 11:51:25'),
+(229, 10, 'BSKMJF', 556, '64878', '71365', '2021-05-03 11:51:25'),
+(230, 11, 'BSKMJF', 556, '71366', '77853', '2021-05-03 11:51:25'),
+(231, 12, 'BSKMJF', 556, '77854', '84341', '2021-05-03 11:51:25'),
+(232, 13, 'BSKMJF', 556, '84342', '90828', '2021-05-03 11:51:25'),
+(233, 14, 'BSKMJF', 556, '90829', '97316', '2021-05-03 11:51:25'),
+(234, 15, 'BSKMJF', 556, '97317', '103804', '2021-05-03 11:51:25'),
+(235, 16, 'BSKMJF', 556, '103805', '110291', '2021-05-03 11:51:25'),
+(236, 17, 'BSKMJF', 556, '110292', '116779', '2021-05-03 11:51:25'),
+(237, 18, 'BSKMJF', 556, '116780', '123267', '2021-05-03 11:51:25'),
+(238, 19, 'BSKMJF', 556, '123268', '129754', '2021-05-03 11:51:25'),
+(239, 20, 'BSKMJF', 556, '129755', '136242', '2021-05-03 11:51:25');
 
 -- --------------------------------------------------------
 
@@ -109,32 +143,65 @@ INSERT INTO `chunk` (`id`, `chunk_order`, `joint_id`, `request_id`, `byte_start`
 -- Table structure for table `chunk_child`
 --
 
-DROP TABLE IF EXISTS `chunk_child`;
 CREATE TABLE `chunk_child` (
   `id` int(12) NOT NULL,
   `chunk_id` int(12) NOT NULL,
   `chunk_order` int(12) NOT NULL,
   `byte_start` text NOT NULL,
   `byte_end` text NOT NULL,
-  `progress` varchar(12) DEFAULT NULL,
-  `user_id` int(12) NOT NULL
+  `size` varchar(20) DEFAULT '0',
+  `progress` varchar(12) DEFAULT '0',
+  `user_id` int(12) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- RELATIONSHIPS FOR TABLE `chunk_child`:
+--   `chunk_id`
+--       `chunk` -> `id`
+--   `user_id`
+--       `user` -> `user_id`
+--
 
 --
 -- Dumping data for table `chunk_child`
 --
 
-INSERT INTO `chunk_child` (`id`, `chunk_id`, `chunk_order`, `byte_start`, `byte_end`, `progress`, `user_id`) VALUES
-(11, 87, 0, '0', '73126960', NULL, 2),
-(12, 88, 1, '73126960', '146253920', NULL, 2),
-(13, 89, 2, '146253920', '219380880', NULL, 2),
-(14, 90, 3, '219380880', '292507840', NULL, 2),
-(15, 91, 4, '292507840', '365634800', NULL, 2),
-(16, 92, 0, '0', '73126960', NULL, 2),
-(17, 93, 1, '73126960', '146253920', NULL, 2),
-(18, 94, 2, '146253920', '219380880', NULL, 2),
-(19, 95, 3, '219380880', '292507840', NULL, 2),
-(20, 96, 4, '292507840', '365634800', NULL, 2);
+INSERT INTO `chunk_child` (`id`, `chunk_id`, `chunk_order`, `byte_start`, `byte_end`, `size`, `progress`, `user_id`) VALUES
+(221, 212, 0, '0', '2460125', '2460126', '100', 1),
+(222, 212, 1, '2460126', '4920250', '2460125', '100', 2),
+(223, 213, 2, '4920251', '7380375', '2460125', '100', 1),
+(224, 213, 3, '7380376', '9840500', '2460125', '100', 2),
+(225, 214, 0, '0', '94337', '94338', '100', 1),
+(226, 214, 1, '94338', '188674', '94337', '100', 2),
+(227, 215, 2, '188675', '283011', '94337', '100', 1),
+(228, 215, 3, '283012', '377348', '94337', '100', 2),
+(229, 216, 4, '377349', '471685', '94337', '100', 1),
+(230, 216, 5, '471686', '566022', '94337', '100', 2),
+(231, 217, 6, '566023', '660359', '94337', '100', 1),
+(232, 217, 7, '660360', '754696', '94337', '100', 2),
+(233, 218, 8, '754697', '849033', '94337', '100', 1),
+(234, 218, 9, '849034', '943370', '94337', '100', 2),
+(235, 219, 0, '0', '6488', '6489', '100', 1),
+(236, 220, 1, '6489', '12976', '6488', '100', 1),
+(237, 221, 2, '12977', '19464', '6488', '100', 1),
+(238, 222, 3, '19465', '25952', '6488', '100', 1),
+(239, 223, 4, '25953', '32440', '6488', '100', 1),
+(240, 224, 5, '32441', '38928', '6488', '100', 1),
+(241, 225, 6, '38929', '45416', '6488', '100', 1),
+(242, 226, 7, '45417', '51904', '6488', '100', 1),
+(243, 227, 8, '51905', '58392', '6488', '100', 1),
+(244, 228, 9, '58393', '64880', '6488', '100', 1),
+(245, 229, 10, '64881', '71368', '6488', '100', 1),
+(246, 230, 11, '71369', '77856', '6488', '100', 1),
+(247, 231, 12, '77857', '84344', '6488', '100', 1),
+(248, 232, 13, '84345', '90832', '6488', '100', 1),
+(249, 233, 14, '90833', '97320', '6488', '100', 1),
+(250, 234, 15, '97321', '103808', '6488', '100', 1),
+(251, 235, 16, '103809', '110296', '6488', '100', 1),
+(252, 236, 17, '110297', '116784', '6488', '100', 1),
+(253, 237, 18, '116785', '123272', '6488', '100', 1),
+(254, 238, 19, '123273', '129760', '6488', '100', 1),
+(255, 239, 20, '129761', '136248', '271', '100', 1);
 
 -- --------------------------------------------------------
 
@@ -142,7 +209,6 @@ INSERT INTO `chunk_child` (`id`, `chunk_id`, `chunk_order`, `byte_start`, `byte_
 -- Table structure for table `file`
 --
 
-DROP TABLE IF EXISTS `file`;
 CREATE TABLE `file` (
   `file_id` int(12) NOT NULL,
   `request_id` int(12) NOT NULL,
@@ -158,12 +224,22 @@ CREATE TABLE `file` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
+-- RELATIONSHIPS FOR TABLE `file`:
+--   `joint_id`
+--       `joint_group` -> `joint_id`
+--   `request_id`
+--       `svr_download_request` -> `request_id`
+--
+
+--
 -- Dumping data for table `file`
 --
 
 INSERT INTO `file` (`file_id`, `request_id`, `joint_id`, `py_channel`, `server_path`, `size`, `md5_hash`, `sha1_hash`, `sha256_hash`, `progress`, `init_date`) VALUES
-(351, 520, 'MNX0K1', '283697', 'C:/xampp/htdocs/JDS/storage/MNX0K1/520/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-04-18 22:44:14'),
-(352, 521, '9BSW1Y', '543026', 'C:/xampp/htdocs/JDS/storage/9BSW1Y/521/', '348.70 MB', 'fc5f402f65fe8491403d7c9939953e6a', '2ff79bbeb6cd35c8c2d3a3305db9993f6fef8c42', 'd5d18c36ef709a28cb92bcf13def99254a3e4cb10b0c90bcc024dfc920be8285', 100, '2021-04-19 00:36:19');
+(372, 553, 'YI7C3D', '738250', 'C:/xampp/htdocs/JDS/storage/YI7C3D/553/', '9.38 MB', '10c918b1d01aea85864ee65d9e0c2305', 'afed64ed7a90fed976cf76476432105e722049c8', '8ab080c1406dff77f8897955cf977e9ad779e40ab3a07bc2f8694fbd2fc2be21', 0, '2021-05-01 10:59:19'),
+(373, 555, 'YI7C3D', '738250', 'C:/xampp/htdocs/JDS/storage/YI7C3D/555/', '921.26 KB', '6ddce22fc53fb38967d61d1db75255f2', 'f9dff8c8ec3ce45b08b7c926a25feb1bda734c0b', 'e68a5034444cd5dd15733b2f2ab1b5c6ac413374afd0455bb40601aaf4359cb8', 67.07689190651499, '2021-05-01 11:16:07'),
+(374, 556, 'BSKMJF', '134905', 'C:/xampp/htdocs/JDS/storage/BSKMJF/556/', '126.71 KB', '379d24f476637c38b995b6ddc98702df', 'ac97af19561272acfa90400312edc2ce9c3834d2', '4e7b11096d23c56b53a7e622aad263897d6a7ddb8dfbe9c4459bda6e1e86c8ea', 0, '2021-05-03 10:51:37'),
+(375, 556, 'BSKMJF', '134905', 'C:/xampp/htdocs/JDS/storage/BSKMJF/556/', '126.71 KB', '379d24f476637c38b995b6ddc98702df', 'ac97af19561272acfa90400312edc2ce9c3834d2', '4e7b11096d23c56b53a7e622aad263897d6a7ddb8dfbe9c4459bda6e1e86c8ea', 0, '2021-05-03 11:51:24');
 
 -- --------------------------------------------------------
 
@@ -171,7 +247,6 @@ INSERT INTO `file` (`file_id`, `request_id`, `joint_id`, `py_channel`, `server_p
 -- Table structure for table `joint_group`
 --
 
-DROP TABLE IF EXISTS `joint_group`;
 CREATE TABLE `joint_group` (
   `joint_id` varchar(12) NOT NULL,
   `user_id` int(12) NOT NULL,
@@ -182,12 +257,18 @@ CREATE TABLE `joint_group` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
+-- RELATIONSHIPS FOR TABLE `joint_group`:
+--   `user_id`
+--       `user` -> `user_id`
+--
+
+--
 -- Dumping data for table `joint_group`
 --
 
 INSERT INTO `joint_group` (`joint_id`, `user_id`, `py_channel`, `access_limit`, `expiry_date`, `date_created`) VALUES
-('9BSW1Y', 2, '543026', 10, '2021-05-19 00:36:12', '2021-04-19 00:36:12'),
-('MNX0K1', 2, '283697', 10, '2021-05-18 22:43:51', '2021-04-18 22:43:51');
+('BSKMJF', 1, '134905', 10, '2021-06-02 10:48:16', '2021-05-03 10:48:16'),
+('YI7C3D', 1, '738250', 10, '2021-05-31 08:10:04', '2021-05-01 08:10:04');
 
 -- --------------------------------------------------------
 
@@ -195,7 +276,6 @@ INSERT INTO `joint_group` (`joint_id`, `user_id`, `py_channel`, `access_limit`, 
 -- Table structure for table `joint_group_member`
 --
 
-DROP TABLE IF EXISTS `joint_group_member`;
 CREATE TABLE `joint_group_member` (
   `id` int(12) NOT NULL,
   `joint_id` varchar(12) NOT NULL,
@@ -205,12 +285,21 @@ CREATE TABLE `joint_group_member` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
+-- RELATIONSHIPS FOR TABLE `joint_group_member`:
+--   `joint_id`
+--       `joint_group` -> `joint_id`
+--   `user_id`
+--       `user` -> `user_id`
+--
+
+--
 -- Dumping data for table `joint_group_member`
 --
 
 INSERT INTO `joint_group_member` (`id`, `joint_id`, `user_id`, `joint_role`, `date_added`) VALUES
-(417, 'MNX0K1', 2, 'owner', '2021-04-18 22:43:51'),
-(418, '9BSW1Y', 2, 'owner', '2021-04-19 00:36:12');
+(447, 'YI7C3D', 1, 'owner', '2021-05-01 08:10:04'),
+(448, 'YI7C3D', 2, 'member', '2021-05-01 08:10:31'),
+(455, 'BSKMJF', 1, 'owner', '2021-05-03 10:48:16');
 
 -- --------------------------------------------------------
 
@@ -218,7 +307,6 @@ INSERT INTO `joint_group_member` (`id`, `joint_id`, `user_id`, `joint_role`, `da
 -- Table structure for table `svr_download_request`
 --
 
-DROP TABLE IF EXISTS `svr_download_request`;
 CREATE TABLE `svr_download_request` (
   `request_id` int(12) NOT NULL,
   `joint_id` varchar(12) NOT NULL,
@@ -233,12 +321,21 @@ CREATE TABLE `svr_download_request` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
+-- RELATIONSHIPS FOR TABLE `svr_download_request`:
+--   `joint_id`
+--       `joint_group` -> `joint_id`
+--   `user_id`
+--       `user` -> `user_id`
+--
+
+--
 -- Dumping data for table `svr_download_request`
 --
 
 INSERT INTO `svr_download_request` (`request_id`, `joint_id`, `user_id`, `url`, `ext`, `size`, `bytes`, `max_chunk_size`, `init`, `request_datetime`) VALUES
-(520, 'MNX0K1', 2, 'https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe', 'exe', '348.70 MB', '365634800', 'auto', 4, '2021-04-18 22:43:51'),
-(521, '9BSW1Y', 2, 'https://download-cf.jetbrains.com/python/pycharm-community-2020.3.exe', 'exe', '348.70 MB', '365634800', 'auto', 4, '2021-04-19 00:36:12');
+(553, 'YI7C3D', 1, 'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1280_10MG.mp4', 'mp4', '9.38 MB', '9840497', '50', 4, '2021-05-01 10:58:16'),
+(555, 'YI7C3D', 1, 'https://images.unsplash.com/photo-1549740425-5e9ed4d8cd34?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&dl=farshad-rezvanian-Eelegt4hFNc-unsplash.jpg&w=2400', 'jpg&w', '921.26 KB', '943368', 'auto', 4, '2021-05-01 11:15:55'),
+(556, 'BSKMJF', 1, 'https://www.google.co.uk/logos/doodles/2020/december-holidays-days-2-30-6753651837108830.3-law.gif', 'gif', '126.71 KB', '129754', '5', 4, '2021-05-03 10:48:16');
 
 -- --------------------------------------------------------
 
@@ -246,7 +343,6 @@ INSERT INTO `svr_download_request` (`request_id`, `joint_id`, `user_id`, `url`, 
 -- Table structure for table `user`
 --
 
-DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `user_id` int(12) NOT NULL,
   `username` varchar(20) NOT NULL,
@@ -257,13 +353,18 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
+-- RELATIONSHIPS FOR TABLE `user`:
+--
+
+--
 -- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`user_id`, `username`, `email`, `password`, `hash`, `joinedOn`) VALUES
 (1, 'admin', 'admin%40mail.com', '$2y$10$KKqc7DZ9KxFQtiJcCQTSl.YAikxE7sHWQ8vAmc3G5maHnxxL751cG', 'TOmyrQ8aWcpb', '2020-12-20 05:37:21'),
 (2, 'stephen', 'stevenoosunrinde%40mail.com', '$2y$10$KKqc7DZ9KxFQtiJcCQTSl.YAikxE7sHWQ8vAmc3G5maHnxxL751cG', 'TOmyrQ8aWcpb', '2020-12-20 05:37:23'),
-(3, 'myMacBook', 'mac%40mail.com', '$2y$10$8fh0wyl4mQ2yzG6qJPqFGePgr6xE26LDUIYwY9lVMyzFlvTzcFg5.', 'uk2ZxXt5ovOR', '2021-02-19 10:17:58');
+(3, 'myMacBook', 'mac%40mail.com', '$2y$10$8fh0wyl4mQ2yzG6qJPqFGePgr6xE26LDUIYwY9lVMyzFlvTzcFg5.', 'uk2ZxXt5ovOR', '2021-02-19 10:17:58'),
+(4, 'test', 'test%40mail.com', '$2y$10$tahzeBUdglQEM3coT8HnBOTXgDyXkx/LFh/hp9o8Sqmy55e4qmMiC', 'x6tiwjVvpsJM', '2021-04-30 05:43:26');
 
 --
 -- Indexes for dumped tables
@@ -295,7 +396,8 @@ ALTER TABLE `chunk`
 --
 ALTER TABLE `chunk_child`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `chunk_id` (`chunk_id`);
+  ADD KEY `chunk_id` (`chunk_id`),
+  ADD KEY `chunk_child_ibfk_2` (`user_id`);
 
 --
 -- Indexes for table `file`
@@ -348,43 +450,43 @@ ALTER TABLE `applications`
 -- AUTO_INCREMENT for table `authlogin`
 --
 ALTER TABLE `authlogin`
-  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=286;
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=312;
 
 --
 -- AUTO_INCREMENT for table `chunk`
 --
 ALTER TABLE `chunk`
-  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=240;
 
 --
 -- AUTO_INCREMENT for table `chunk_child`
 --
 ALTER TABLE `chunk_child`
-  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
 
 --
 -- AUTO_INCREMENT for table `file`
 --
 ALTER TABLE `file`
-  MODIFY `file_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=353;
+  MODIFY `file_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=376;
 
 --
 -- AUTO_INCREMENT for table `joint_group_member`
 --
 ALTER TABLE `joint_group_member`
-  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=419;
+  MODIFY `id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=456;
 
 --
 -- AUTO_INCREMENT for table `svr_download_request`
 --
 ALTER TABLE `svr_download_request`
-  MODIFY `request_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=522;
+  MODIFY `request_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=557;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `user_id` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
@@ -407,7 +509,8 @@ ALTER TABLE `chunk`
 -- Constraints for table `chunk_child`
 --
 ALTER TABLE `chunk_child`
-  ADD CONSTRAINT `chunk_child_ibfk_1` FOREIGN KEY (`chunk_id`) REFERENCES `chunk` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `chunk_child_ibfk_1` FOREIGN KEY (`chunk_id`) REFERENCES `chunk` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `chunk_child_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `file`

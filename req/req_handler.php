@@ -6,7 +6,7 @@ include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/standard.php';
 include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/auth.php';
 include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/user.php';
 include_once $_SERVER['DOCUMENT_ROOT']. '/JDS/class/joint.php';
-include $_SERVER['DOCUMENT_ROOT']. "/JDS/class/class.easyzip.php";
+// include $_SERVER['DOCUMENT_ROOT']. "/JDS/class/class.easyzip.php";
 // ------------------------------------
 
 
