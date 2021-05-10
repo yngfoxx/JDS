@@ -1,7 +1,7 @@
 import os
 import socket
+import json
 from sys import platform
-from engine.eng_server import lanServer
 
 class domainName(object):
     def __init__(self):
