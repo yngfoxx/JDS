@@ -7,3 +7,4 @@
 /application/engine/__pycache__
 /application/u_config.json
 /application/storage
+/application/netconf.json
