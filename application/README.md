@@ -1,12 +1,18 @@
 ## Execution
+
+```
 $ cd venv/Scripts
 $ activate
 $ cd ../../
 $ python app.py --remote-debugging-port=1231
-// the debugger will be live on http://127.0.0.1:1231
-
+```
+the debugger will be live on http://127.0.0.1:1231
+```
 $ cd /xampp/htdocs/JDS/application/venv/scripts && activate && cd ../../ && python app.py --remote-debugging-port=1231
-
+```
 ## tools
-// downloader
+
+downloader
+```
 $ python downloader.py -u "FILE_SOURCE_GOES_HERE" -d "."
+```
