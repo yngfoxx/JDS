@@ -14,5 +14,5 @@ $ cd /xampp/htdocs/JDS/application/venv/scripts && activate && cd ../../ && pyth
 
 downloader
 ```
-$ python downloader.py -u "FILE_SOURCE_GOES_HERE" -d "."
+$ python downloader.py -u "URL_SOURCE" -d "LOCAL_DESTINATION"
 ```
