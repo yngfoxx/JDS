@@ -10,11 +10,16 @@ $ python app.py --remote-debugging-port=1231
 ```
 the debugger will be live on http://127.0.0.1:1231
 ```
-$ cd application/venv/scripts && activate && cd ../../ && python app.py --remote-debugging-port=1231
+$ cd application/venv/scripts
+$ activate
+
+run the `app.py` stored in the root location
+$ cd ../../
+$ python app.py --remote-debugging-port=1231
 ```
 ## tools
 
-downloader
+downloader tool cli command
 ```
 $ python downloader.py -u "URL_SOURCE" -d "LOCAL_DESTINATION"
 ```
