@@ -1,4 +1,4 @@
-## Execution
+## Desktop Application
 
 Firstly move the application folder to wherever you wish to put it on your local machine. 
 It is not needed on the server!
