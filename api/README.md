@@ -9,17 +9,17 @@ $ python -m venv fetch
 ```
 ### Activate virtual environment new or old
 
-#### Activate the virtualenv (OS X & Linux)
+Activate the virtualenv (OS X & Linux)
 
 ```
 $ source fetch/bin/activate
 ```
-#### Activate the virtualenv (Windows)
+Activate the virtualenv (Windows)
 
 ```
 $ fetch\Scripts\activate
 ```
-### Install requirements for new virtual environment
+Install requirements for new virtual environment
 
 ```
 $ pip install -r requirements.txt
