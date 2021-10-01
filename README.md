@@ -7,6 +7,7 @@ Joint Downloading System (JDS) is an online content downloader that eases file d
 * Python 3.7^
 * npm
 * pip
+* php 7
 
 ### Setup and usage
 #### 1. Copy all files to *C:/xampp/htdocs/JDS*
