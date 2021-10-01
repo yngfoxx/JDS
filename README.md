@@ -3,7 +3,7 @@ Joint Downloading System (JDS) is an online content downloader that eases file d
 
 ## Installation
 ### Requirements
-* XAMPP Apache server
+* Apache
 * Python 3.7^
 * npm
 * pip
